@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Novacapital Home</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Slider custom */
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        background-color: #2563eb;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+      }
+      input[type='range']::-moz-range-thumb {
+        background-color: #2563eb;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        cursor: pointer;
+        border: none;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <h1
+                class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"
+              >
+                Novacapital
+              </h1>
+              <p class="text-xs text-gray-500">Préstamos por Libranza</p>
+            </div>
+          </div>
+
+          <!-- Desktop Menu -->
+          <div class="hidden md:block">
+            <div class="ml-10 flex items-center space-x-8">
+              <a href="#inicio" class="text-gray-700 hover:text-blue-600 transition">Inicio</a>
+              <a href="#simulador" class="text-gray-700 hover:text-blue-600 transition"
+                >Simulador</a
+              >
+              <a href="#beneficios" class="text-gray-700 hover:text-blue-600 transition"
+                >Beneficios</a
+              >
+              <a href="#proceso" class="text-gray-700 hover:text-blue-600 transition">Proceso</a>
+              <a href="#contacto" class="text-gray-700 hover:text-blue-600 transition">Contacto</a>
+              <button
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-md"
+              >
+                Solicitar Ahora
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Menu Button -->
+          <div class="md:hidden">
+            <button id="menu-toggle" class="text-gray-700 text-2xl">☰</button>
+          </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden hidden pb-4">
+          <div class="flex flex-col space-y-3">
+            <a href="#inicio" class="text-gray-700 hover:text-blue-600">Inicio</a>
+            <a href="#simulador" class="text-gray-700 hover:text-blue-600">Simulador</a>
+            <a href="#beneficios" class="text-gray-700 hover:text-blue-600">Beneficios</a>
+            <a href="#proceso" class="text-gray-700 hover:text-blue-600">Proceso</a>
+            <a href="#contacto" class="text-gray-700 hover:text-blue-600">Contacto</a>
+            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full">
+              Solicitar Ahora
+            </button>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="relative overflow-hidden">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <div
+              class="inline-block bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6"
+            >
+              ✨ Aprobación en 24 horas
+            </div>
+            <h1 class="text-4xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              Tu crédito por libranza
+              <span class="block text-blue-600">rápido y seguro</span>
+            </h1>
+            <p class="text-xl text-gray-600 mb-8">
+              Préstamos con descuento directo de nómina o pensión. Sin trámites complicados, con las
+              mejores tasas del mercado.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4">
+              <button
+                class="bg-blue-600 text-white px-8 py-4 rounded-lg hover:bg-blue-700 transition shadow-lg flex items-center justify-center text-lg font-semibold"
+              >
+                Solicitar Préstamo →
+              </button>
+              <button
+                class="border-2 border-gray-300 text-gray-700 px-8 py-4 rounded-lg hover:border-blue-600 hover:text-blue-600 transition text-lg font-semibold"
+              >
+                Ver Requisitos
+              </button>
+            </div>
+          </div>
+
+          <div class="relative">
+            <div
+              class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl p-8 shadow-2xl transform hover:scale-105 transition"
+            >
+              <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
+                <h3 class="text-white text-2xl font-bold mb-4">Características destacadas</h3>
+                <div class="space-y-4">
+                  <div class="flex items-start gap-3">
+                    <div class="bg-white/20 rounded-full p-2 text-white font-bold">✔</div>
+                    <div>
+                      <p class="text-white font-semibold">Hasta $50.000.000</p>
+                      <p class="text-blue-100 text-sm">Según tu capacidad de pago</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="bg-white/20 rounded-full p-2 text-white font-bold">✔</div>
+                    <div>
+                      <p class="text-white font-semibold">Plazo hasta 72 meses</p>
+                      <p class="text-blue-100 text-sm">Cuotas ajustadas a tu presupuesto</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start gap-3">
+                    <div class="bg-white/20 rounded-full p-2 text-white font-bold">✔</div>
+                    <div>
+                      <p class="text-white font-semibold">Tasa desde 1.5% mensual</p>
+                      <p class="text-blue-100 text-sm">Las mejores condiciones del mercado</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Simulador Section -->
+    <section id="simulador" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">Simula tu crédito</h2>
+          <p class="text-xl text-gray-600">
+            Calcula tu cuota mensual y conoce cuánto puedes solicitar
+          </p>
+        </div>
+
+        <div
+          class="max-w-4xl mx-auto bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl shadow-xl p-8"
+        >
+          <div class="grid md:grid-cols-2 gap-8">
+            <div>
+              <label class="block text-gray-700 font-semibold mb-3">Monto a solicitar</label>
+              <input
+                type="range"
+                min="1000000"
+                max="50000000"
+                step="500000"
+                value="5000000"
+                id="loanAmount"
+                class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="text-3xl font-bold text-blue-600 mt-3" id="loanAmountDisplay">
+                $5,000,000
+              </div>
+            </div>
+            <div>
+              <label class="block text-gray-700 font-semibold mb-3">Plazo en meses</label>
+              <input
+                type="range"
+                min="6"
+                max="72"
+                step="6"
+                value="24"
+                id="loanTerm"
+                class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
+              />
+              <div class="text-3xl font-bold text-blue-600 mt-3" id="loanTermDisplay">24 meses</div>
+            </div>
+          </div>
+
+          <div class="mt-8 bg-white rounded-xl p-6 shadow-md flex justify-between items-center">
+            <div>
+              <p class="text-gray-600 mb-1">Tu cuota mensual aproximada</p>
+              <p class="text-4xl font-bold text-gray-900" id="monthlyPayment">$0</p>
+            </div>
+            <div class="text-blue-600 text-4xl font-bold">🧮</div>
+          </div>
+
+          <p class="text-sm text-gray-500 mt-4">
+            *Valores aproximados. La tasa final puede variar según análisis crediticio.
+          </p>
+
+          <button
+            class="w-full mt-6 bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 transition font-semibold text-lg shadow-lg"
+          >
+            Continuar con la Solicitud
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Beneficios Section -->
+    <section id="beneficios" class="py-20">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            ¿Por qué elegir Novacapital?
+          </h2>
+          <p class="text-xl text-gray-600">Somos expertos en crédito por libranza</p>
+        </div>
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition">
+            <div class="bg-blue-100 w-14 h-14 rounded-lg flex items-center justify-center mb-4">
+              🕒
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Aprobación Rápida</h3>
+            <p class="text-gray-600">
+              Respuesta en menos de 24 horas y desembolso inmediato una vez aprobado.
+            </p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition">
+            <div class="bg-green-100 w-14 h-14 rounded-lg flex items-center justify-center mb-4">
+              🛡️
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">100% Seguro</h3>
+            <p class="text-gray-600">
+              Protegemos tus datos con los más altos estándares de seguridad.
+            </p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition">
+            <div class="bg-purple-100 w-14 h-14 rounded-lg flex items-center justify-center mb-4">
+              📈
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Mejores Tasas</h3>
+            <p class="text-gray-600">
+              Tasas competitivas desde 1.5% mensual para nuestros clientes.
+            </p>
+          </div>
+          <div class="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition">
+            <div class="bg-orange-100 w-14 h-14 rounded-lg flex items-center justify-center mb-4">
+              🧮
+            </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Sin Costos Ocultos</h3>
+            <p class="text-gray-600">
+              Transparencia total. Conoce todos los costos desde el inicio.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Proceso Section -->
+    <section id="proceso" class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            Proceso simple en 4 pasos
+          </h2>
+          <p class="text-xl text-gray-600">Obtén tu crédito de forma fácil y rápida</p>
+        </div>
+        <div class="grid md:grid-cols-4 gap-8">
+          <div
+            class="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-xl p-6 shadow-lg"
+          >
+            <div class="text-5xl font-bold opacity-20 mb-2">1</div>
+            <h3 class="text-xl font-bold mb-2">Solicita</h3>
+            <p class="text-blue-100">Completa el formulario en línea con tus datos básicos</p>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-xl p-6 shadow-lg"
+          >
+            <div class="text-5xl font-bold opacity-20 mb-2">2</div>
+            <h3 class="text-xl font-bold mb-2">Envía Documentos</h3>
+            <p class="text-blue-100">Adjunta cédula, certificado laboral y últimas nóminas</p>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-xl p-6 shadow-lg"
+          >
+            <div class="text-5xl font-bold opacity-20 mb-2">3</div>
+            <h3 class="text-xl font-bold mb-2">Aprobación</h3>
+            <p class="text-blue-100">Analizamos tu solicitud y te respondemos en 24 horas</p>
+          </div>
+          <div
+            class="bg-gradient-to-br from-blue-500 to-blue-700 text-white rounded-xl p-6 shadow-lg"
+          >
+            <div class="text-5xl font-bold opacity-20 mb-2">4</div>
+            <h3 class="text-xl font-bold mb-2">Recibe el Dinero</h3>
+            <p class="text-blue-100">Desembolso directo a tu cuenta bancaria</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-20 bg-gradient-to-r from-blue-600 to-blue-800">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="text-3xl lg:text-5xl font-bold text-white mb-6">
+          ¿Listo para solicitar tu crédito?
+        </h2>
+        <p class="text-xl text-blue-100 mb-8">
+          Obtén el dinero que necesitas con las mejores condiciones del mercado
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            class="bg-white text-blue-600 px-8 py-4 rounded-lg hover:bg-gray-100 transition font-semibold text-lg shadow-lg"
+          >
+            Solicitar Préstamo
+          </button>
+          <button
+            class="border-2 border-white text-white px-8 py-4 rounded-lg hover:bg-white hover:text-blue-600 transition font-semibold text-lg"
+          >
+            Hablar con un Asesor
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="contacto" class="bg-gray-900 text-white py-12">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <h3 class="text-2xl font-bold mb-4">Novacapital</h3>
+            <p class="text-gray-400">
+              Tu aliado en crédito por libranza. Soluciones financieras confiables.
+            </p>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Productos</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#" class="hover:text-white">Crédito Libranza</a></li>
+              <li><a href="#" class="hover:text-white">Simulador</a></li>
+              <li><a href="#" class="hover:text-white">Requisitos</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Empresa</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li><a href="#" class="hover:text-white">Nosotros</a></li>
+              <li><a href="#" class="hover:text-white">Términos y Condiciones</a></li>
+              <li><a href="#" class="hover:text-white">Política de Privacidad</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="font-semibold mb-4">Contacto</h4>
+            <ul class="space-y-2 text-gray-400">
+              <li>Línea Nacional: 01 8000 123 456</li>
+              <li>Email: info@novacapital.com</li>
+              <li>WhatsApp: +57 300 123 4567</li>
+            </ul>
+          </div>
+        </div>
+        <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+          <p>&copy; 2026 Novacapital SAS. Todos los derechos reservados.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+      // Mobile Menu Toggle
+      const menuToggle = document.getElementById('menu-toggle');
+      const mobileMenu = document.getElementById('mobile-menu');
+      menuToggle.addEventListener('click', () => {
+        mobileMenu.classList.toggle('hidden');
+      });
+
+      // Simulador
+      const loanAmountInput = document.getElementById('loanAmount');
+      const loanTermInput = document.getElementById('loanTerm');
+      const loanAmountDisplay = document.getElementById('loanAmountDisplay');
+      const loanTermDisplay = document.getElementById('loanTermDisplay');
+      const monthlyPaymentDisplay = document.getElementById('monthlyPayment');
+
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('es-CO', {
+          style: 'currency',
+          currency: 'COP',
+          minimumFractionDigits: 0,
+        }).format(value);
+      }
+
+      function calculateMonthlyPayment() {
+        const loanAmount = Number(loanAmountInput.value);
+        const loanTerm = Number(loanTermInput.value);
+        const monthlyRate = 0.019;
+        const payment =
+          (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanTerm)) /
+          (Math.pow(1 + monthlyRate, loanTerm) - 1);
+        return Math.round(payment);
+      }
+
+      function updateSimulator() {
+        loanAmountDisplay.textContent = formatCurrency(loanAmountInput.value);
+        loanTermDisplay.textContent = loanTermInput.value + ' meses';
+        monthlyPaymentDisplay.textContent = formatCurrency(calculateMonthlyPayment());
+      }
+
+      loanAmountInput.addEventListener('input', updateSimulator);
+      loanTermInput.addEventListener('input', updateSimulator);
+      updateSimulator();
+    </script>
+  </body>
+</html>
