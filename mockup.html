@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PensionaFacilSA</title>
+    <style>
+      /* Reset básico */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        background-color: #f5f6fa;
+        color: #333;
+      }
+
+      /* Encabezado */
+      header {
+        background-color: #003366; /* Azul oscuro del logo */
+        color: white;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      header img {
+        height: 50px;
+      }
+
+      nav a {
+        color: white;
+        text-decoration: none;
+        margin-left: 20px;
+        font-weight: bold;
+      }
+
+      /* Hero */
+      .hero {
+        background-color: #e6f2ff;
+        padding: 80px 20px;
+        text-align: center;
+      }
+
+      .hero h1 {
+        color: #003366;
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+      }
+
+      .hero p {
+        color: #004d00; /* Verde del logo */
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+      }
+
+      .hero button {
+        background-color: #004d00;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1rem;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .hero button:hover {
+        background-color: #006600;
+      }
+
+      /* Sección de servicios */
+      .services {
+        display: flex;
+        justify-content: space-around;
+        padding: 60px 20px;
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .service {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        width: 250px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+
+      .service h3 {
+        color: #003366;
+        margin-bottom: 15px;
+      }
+
+      .service p {
+        font-size: 0.95rem;
+        color: #555;
+      }
+
+      /* Pie de página */
+      footer {
+        background-color: #003366;
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
+
+      footer p {
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Encabezado -->
+    <header>
+      <img src="pensionafacil.png" alt="PensionaFacilSA Logo" />
+      <nav>
+        <a href="#">Inicio</a>
+        <a href="#">Servicios</a>
+        <a href="#">Créditos</a>
+        <a href="#">Contacto</a>
+      </nav>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+      <h1>PensionaFacilSA</h1>
+      <p>Créditos y beneficios financieros fáciles para pensionados y empleados públicos</p>
+      <button>Solicitar Crédito</button>
+    </section>
+
+    <!-- Servicios -->
+    <section class="services">
+      <div class="service">
+        <h3>Créditos por Nómina</h3>
+        <p>Accede a créditos de forma rápida y segura descontando directamente de tu nómina.</p>
+      </div>
+      <div class="service">
+        <h3>Gestión de Beneficios</h3>
+        <p>Optimizamos tus beneficios financieros y programas especiales para pensionados.</p>
+      </div>
+      <div class="service">
+        <h3>Asesoría Personalizada</h3>
+        <p>Te ayudamos a tomar las mejores decisiones financieras según tu situación.</p>
+      </div>
+    </section>
+
+    <!-- Pie de página -->
+    <footer>
+      <p>&copy; 2026 PensionaFacilSA. Todos los derechos reservados.</p>
+    </footer>
+  </body>
+</html>
