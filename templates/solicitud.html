@@ -27,16 +27,34 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .header h1 {
+        .header-left h1 {
             font-size: 36px;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
-        .header p {
+        .header-left p {
             font-size: 18px;
             opacity: 0.9;
+        }
+
+        .user-info {
+            text-align: right;
+            color: white;
+        }
+
+        .user-info p {
+            margin-bottom: 5px;
+        }
+
+        .user-info a {
+            color: white;
+            text-decoration: underline;
+            font-size: 14px;
         }
 
         .form-card {
@@ -44,6 +62,24 @@
             border-radius: 20px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
         }
 
         .progress-bar {
@@ -195,6 +231,17 @@
             background: #1d4ed8;
         }
 
+        .btn-cancel {
+            background: transparent;
+            border: 2px solid #e5e7eb;
+            color: #6b7280;
+        }
+
+        .btn-cancel:hover {
+            border-color: #d1d5db;
+            background: #f9fafb;
+        }
+
         .file-upload {
             border: 2px dashed #cbd5e1;
             border-radius: 8px;
@@ -219,27 +266,6 @@
             color: #6b7280;
         }
 
-        .success-message {
-            display: none;
-            text-align: center;
-            padding: 40px;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        .success-icon {
-            width: 80px;
-            height: 80px;
-            background: #10b981;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-        }
-
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -249,8 +275,18 @@
                 padding: 20px;
             }
 
-            .header h1 {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .header-left h1 {
                 font-size: 28px;
+            }
+
+            .user-info {
+                text-align: center;
+                margin-top: 10px;
             }
 
             .progress-bar {
@@ -266,11 +302,31 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>NOVACAPITAL</h1>
-            <p>Solicitud de Préstamo por Libranza</p>
+            <div class="header-left">
+                <h1>NOVACAPITAL</h1>
+                <p>Solicitud de Préstamo por Libranza</p>
+            </div>
+            {% if user %}
+            <div class="user-info">
+                <p><strong>{{ user.nombre }}</strong></p>
+                <p>{{ user.email }}</p>
+                <a href="/logout">Cerrar Sesión</a>
+            </div>
+            {% endif %}
         </div>
 
         <div class="form-card">
+            <!-- Mensajes Flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
             <!-- Progress Bar -->
             <div class="progress-bar">
                 <div class="progress-step">
@@ -287,11 +343,11 @@
                 </div>
                 <div class="progress-step">
                     <div class="step-circle" id="step4-circle">4</div>
-                    <span class="step-label">Documentos</span>
+                    <span class="step-label">Datos Bancarios</span>
                 </div>
             </div>
 
-            <form id="loanForm">
+            <form id="loanForm" method="POST" action="/solicitud" enctype="multipart/form-data">
                 <!-- Paso 1: Datos Personales -->
                 <div class="form-section active" id="step1">
                     <h2 class="section-title">Datos Personales</h2>
@@ -300,74 +356,54 @@
                             <label>Tipo de Documento <span class="required">*</span></label>
                             <select name="tipo_documento" required>
                                 <option value="">Seleccione...</option>
-                                <option value="CC">Cédula de Ciudadanía</option>
-                                <option value="CE">Cédula de Extranjería</option>
-                                <option value="PA">Pasaporte</option>
+                                <option value="CC" {% if cliente and cliente.tipo_documento == 'CC' %}selected{% endif %}>Cédula de Ciudadanía</option>
+                                <option value="CE" {% if cliente and cliente.tipo_documento == 'CE' %}selected{% endif %}>Cédula de Extranjería</option>
+                                <option value="PP" {% if cliente and cliente.tipo_documento == 'PP' %}selected{% endif %}>Pasaporte</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Número de Documento <span class="required">*</span></label>
-                            <input type="text" name="numero_documento" placeholder="Ej: 1234567890" required>
+                            <input type="text" name="numero_documento" value="{{ cliente.numero_documento if cliente else '' }}" placeholder="Ej: 1234567890" readonly style="background: #f3f4f6;">
                         </div>
                         <div class="form-group">
                             <label>Nombres <span class="required">*</span></label>
-                            <input type="text" name="nombres" placeholder="Nombres completos" required>
+                            <input type="text" name="nombres" value="{{ cliente.nombres if cliente else user.nombre }}" placeholder="Nombres completos" required>
                         </div>
                         <div class="form-group">
                             <label>Apellidos <span class="required">*</span></label>
-                            <input type="text" name="apellidos" placeholder="Apellidos completos" required>
+                            <input type="text" name="apellidos" value="{{ cliente.apellidos if cliente else '' }}" placeholder="Apellidos completos" required>
                         </div>
                         <div class="form-group">
                             <label>Fecha de Nacimiento <span class="required">*</span></label>
-                            <input type="date" name="fecha_nacimiento" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Género <span class="required">*</span></label>
-                            <select name="genero" required>
-                                <option value="">Seleccione...</option>
-                                <option value="M">Masculino</option>
-                                <option value="F">Femenino</option>
-                                <option value="Otro">Otro</option>
-                            </select>
+                            <input type="date" name="fecha_nacimiento" value="{{ cliente.fecha_nacimiento if cliente else '' }}" required>
                         </div>
                         <div class="form-group">
                             <label>Email <span class="required">*</span></label>
-                            <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+                            <input type="email" name="email" value="{{ user.email }}" readonly style="background: #f3f4f6;">
                         </div>
                         <div class="form-group">
                             <label>Celular <span class="required">*</span></label>
-                            <input type="tel" name="celular" placeholder="3001234567" required>
+                            <input type="tel" name="celular" value="{{ cliente.celular if cliente else '' }}" placeholder="3001234567" required>
                         </div>
                         <div class="form-group">
                             <label>Teléfono Fijo</label>
-                            <input type="tel" name="telefono" placeholder="6012345678">
-                        </div>
-                        <div class="form-group">
-                            <label>Estado Civil <span class="required">*</span></label>
-                            <select name="estado_civil" required>
-                                <option value="">Seleccione...</option>
-                                <option value="Soltero">Soltero(a)</option>
-                                <option value="Casado">Casado(a)</option>
-                                <option value="Unión Libre">Unión Libre</option>
-                                <option value="Divorciado">Divorciado(a)</option>
-                                <option value="Viudo">Viudo(a)</option>
-                            </select>
+                            <input type="tel" name="telefono" value="{{ cliente.telefono if cliente else '' }}" placeholder="6012345678">
                         </div>
                         <div class="form-group full-width">
                             <label>Dirección de Residencia <span class="required">*</span></label>
-                            <input type="text" name="direccion" placeholder="Calle, Carrera, Número, Apartamento" required>
+                            <input type="text" name="direccion" value="{{ cliente.direccion if cliente else '' }}" placeholder="Calle, Carrera, Número, Apartamento" required>
                         </div>
                         <div class="form-group">
                             <label>Ciudad <span class="required">*</span></label>
-                            <input type="text" name="ciudad" placeholder="Ej: Bogotá" required>
+                            <input type="text" name="ciudad" value="{{ cliente.ciudad if cliente else '' }}" placeholder="Ej: Bogotá" required>
                         </div>
                         <div class="form-group">
                             <label>Departamento <span class="required">*</span></label>
-                            <input type="text" name="departamento" placeholder="Ej: Cundinamarca" required>
+                            <input type="text" name="departamento" value="{{ cliente.departamento if cliente else '' }}" placeholder="Ej: Cundinamarca" required>
                         </div>
                     </div>
                     <div class="button-group">
-                        <div></div>
+                        <a href="/"><button type="button" class="btn-cancel">Cancelar</button></a>
                         <button type="button" class="btn-next" onclick="nextStep(1)">Siguiente</button>
                     </div>
                 </div>
@@ -380,13 +416,13 @@
                             <label>Tipo de Empleado <span class="required">*</span></label>
                             <select name="tipo_empleado" required>
                                 <option value="">Seleccione...</option>
-                                <option value="Público">Empleado Público</option>
-                                <option value="Pensionado">Pensionado</option>
+                                <option value="empleado_publico" {% if cliente and cliente.tipo_cliente == 'empleado_publico' %}selected{% endif %}>Empleado Público</option>
+                                <option value="pensionado" {% if cliente and cliente.tipo_cliente == 'pensionado' %}selected{% endif %}>Pensionado</option>
                             </select>
                         </div>
                         <div class="form-group full-width">
                             <label>Entidad Empleadora / Fondo de Pensiones <span class="required">*</span></label>
-                            <input type="text" name="entidad_empleadora" placeholder="Nombre de la entidad" required>
+                            <input type="text" name="entidad_empleadora" value="{{ cliente.entidad_empleadora if cliente else '' }}" placeholder="Nombre de la entidad" required>
                         </div>
                         <div class="form-group">
                             <label>Cargo Actual <span class="required">*</span></label>
@@ -397,8 +433,8 @@
                             <input type="date" name="fecha_ingreso" required>
                         </div>
                         <div class="form-group">
-                            <label>Salario Mensual <span class="required">*</span></label>
-                            <input type="number" name="salario" placeholder="Ej: 2500000" min="0" step="1000" required>
+                            <label>Salario/Pensión Mensual <span class="required">*</span></label>
+                            <input type="number" name="salario" value="{{ cliente.salario_mensual if cliente else '' }}" placeholder="Ej: 2500000" min="0" step="1000" required>
                         </div>
                         <div class="form-group">
                             <label>Otros Ingresos Mensuales</label>
@@ -436,7 +472,7 @@
                         </div>
                         <div class="form-group">
                             <label>Cuota Mensual Estimada</label>
-                            <input type="text" id="cuotaEstimada" readonly style="background: #f3f4f6;" placeholder="Se calculará automáticamente">
+                            <input type="text" id="cuotaEstimada" name="cuota_estimada" readonly style="background: #f3f4f6;" placeholder="Se calculará automáticamente">
                         </div>
                         <div class="form-group full-width">
                             <label>Destino del Préstamo <span class="required">*</span></label>
@@ -462,45 +498,49 @@
                     </div>
                 </div>
 
-                <!-- Paso 4: Documentos -->
+                <!-- Paso 4: Datos Bancarios -->
                 <div class="form-section" id="step4">
-                    <h2 class="section-title">Carga de Documentos</h2>
-                    <p style="color: #6b7280; margin-bottom: 20px;">Por favor adjunta los siguientes documentos en formato PDF o imagen (JPG, PNG)</p>
-
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Cédula de Ciudadanía (ambas caras) <span class="required">*</span></label>
-                        <div class="file-upload" onclick="document.getElementById('cedula').click()">
-                            <input type="file" id="cedula" name="cedula" accept=".pdf,.jpg,.jpeg,.png" required onchange="updateFileName(this)">
-                            <svg width="48" height="48" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin: 0 auto 10px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p><strong>Clic para seleccionar archivo</strong></p>
-                            <p class="file-info">PDF, JPG o PNG - Máx. 5MB</p>
+                    <h2 class="section-title">Datos Bancarios para Desembolso</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Banco <span class="required">*</span></label>
+                            <select name="banco" required>
+                                <option value="">Seleccionar banco</option>
+                                <option value="Bancolombia">Bancolombia</option>
+                                <option value="Banco de Bogotá">Banco de Bogotá</option>
+                                <option value="BBVA">BBVA</option>
+                                <option value="Davivienda">Davivienda</option>
+                                <option value="Banco Popular">Banco Popular</option>
+                                <option value="Colpatria">Colpatria</option>
+                                <option value="Banco de Occidente">Banco de Occidente</option>
+                                <option value="Banco Caja Social">Banco Caja Social</option>
+                                <option value="Banco AV Villas">Banco AV Villas</option>
+                                <option value="Nequi">Nequi</option>
+                                <option value="Daviplata">Daviplata</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Número de Cuenta <span class="required">*</span></label>
+                            <input type="text" name="cuenta_bancaria" placeholder="Ej: 12345678901" required>
                         </div>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Certificado Laboral <span class="required">*</span></label>
-                        <div class="file-upload" onclick="document.getElementById('certificado').click()">
-                            <input type="file" id="certificado" name="certificado" accept=".pdf,.jpg,.jpeg,.png" required onchange="updateFileName(this)">
-                            <svg width="48" height="48" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin: 0 auto 10px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p><strong>Clic para seleccionar archivo</strong></p>
-                            <p class="file-info">PDF, JPG o PNG - Máx. 5MB</p>
-                        </div>
+                    <div style="background: #f0f9ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 15px; margin-top: 20px;">
+                        <p style="color: #1e40af; font-size: 14px; margin-bottom: 10px;">
+                            <strong>📋 Nota importante:</strong>
+                        </p>
+                        <p style="color: #1e40af; font-size: 13px;">
+                            Una vez enviada tu solicitud, uno de nuestros asesores se pondrá en contacto contigo para solicitarte los documentos necesarios (cédula, certificado laboral, nóminas, etc.)
+                        </p>
                     </div>
 
-                    <div class="form-group" style="margin-bottom: 20px;">
-                        <label>Últimos 3 Desprendibles de Nómina <span class="required">*</span></label>
-                        <div class="file-upload" onclick="document.getElementById('nomina').click()">
-                            <input type="file" id="nomina" name="nomina" accept=".pdf,.jpg,.jpeg,.png" multiple required onchange="updateFileName(this)">
-                            <svg width="48" height="48" fill="none" stroke="#94a3b8" viewBox="0 0 24 24" style="margin: 0 auto 10px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                            </svg>
-                            <p><strong>Clic para seleccionar archivos</strong></p>
-                            <p class="file-info">PDF, JPG o PNG - Máx. 5MB cada uno</p>
-                        </div>
+                    <div style="margin-top: 20px;">
+                        <label style="display: flex; align-items: start; cursor: pointer;">
+                            <input type="checkbox" name="terminos" required style="margin-top: 3px; margin-right: 10px;">
+                            <span style="font-size: 13px; color: #374151;">
+                                Acepto los términos y condiciones y autorizo a Novacapital para consultar mi información en centrales de riesgo y realizar el descuento de cuotas directamente de mi nómina o pensión.
+                            </span>
+                        </label>
                     </div>
 
                     <div class="button-group">
@@ -509,19 +549,6 @@
                     </div>
                 </div>
             </form>
-
-            <!-- Mensaje de Éxito -->
-            <div class="success-message" id="successMessage">
-                <div class="success-icon">
-                    <svg width="40" height="40" fill="none" stroke="white" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                    </svg>
-                </div>
-                <h2 style="color: #1f2937; margin-bottom: 10px;">¡Solicitud Enviada Exitosamente!</h2>
-                <p style="color: #6b7280; margin-bottom: 20px;">Hemos recibido tu solicitud. Te contactaremos en las próximas 24 horas.</p>
-                <p style="color: #6b7280; margin-bottom: 30px;">Número de solicitud: <strong>#SOL-2026-00123</strong></p>
-                <button class="btn-next" onclick="window.location.href='index.html'">Volver al Inicio</button>
-            </div>
         </div>
     </div>
 
@@ -568,18 +595,6 @@
             return true;
         }
 
-        function updateFileName(input) {
-            const fileInfo = input.parentElement.querySelector('.file-info');
-            if (input.files.length > 0) {
-                if (input.files.length === 1) {
-                    fileInfo.textContent = input.files[0].name;
-                } else {
-                    fileInfo.textContent = input.files.length + ' archivos seleccionados';
-                }
-                fileInfo.style.color = '#10b981';
-            }
-        }
-
         // Calculadora de cuota
         document.getElementById('montoInput').addEventListener('input', calcularCuota);
         document.getElementById('plazoSelect').addEventListener('change', calcularCuota);
@@ -594,18 +609,6 @@
                 document.getElementById('cuotaEstimada').value = '$' + Math.round(cuota).toLocaleString('es-CO');
             }
         }
-
-        // Envío del formulario
-        document.getElementById('loanForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // Aquí iría la lógica para enviar el formulario al backend
-            // Por ahora solo mostramos el mensaje de éxito
-
-            document.querySelector('.form-card > form').style.display = 'none';
-            document.querySelector('.progress-bar').style.display = 'none';
-            document.getElementById('successMessage').classList.add('show');
-        });
     </script>
 </body>
 </html>

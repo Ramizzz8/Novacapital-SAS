@@ -1,10 +1,6 @@
 
-# ================================
-# requirements.txt
-# ================================
 Flask==3.0.0
 Flask-MySQLdb==2.0.0
 python-dotenv==1.0.0
 bcrypt==4.1.2
-PyJWT==2.8.0
 Werkzeug==3.0.1
