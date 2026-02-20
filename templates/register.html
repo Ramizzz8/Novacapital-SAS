@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Novacapital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .register-container {
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .register-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 1rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .logo-section h1 {
+            font-size: 1.75rem;
+            color: #1e3a8a;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-section p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .password-group {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #6b7280;
+            font-size: 1.25rem;
+        }
+
+        .password-strength {
+            margin-top: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            margin-top: 0.25rem;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .strength-weak {
+            width: 33%;
+            background: #ef4444;
+        }
+
+        .strength-medium {
+            width: 66%;
+            background: #f59e0b;
+        }
+
+        .strength-strong {
+            width: 100%;
+            background: #10b981;
+        }
+
+        .checkbox-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .checkbox-label input {
+            width: 1rem;
+            height: 1rem;
+            cursor: pointer;
+            margin-top: 0.25rem;
+            flex-shrink: 0;
+        }
+
+        .checkbox-label a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+
+        .checkbox-label a:hover {
+            text-decoration: underline;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 2rem 0;
+            color: #9ca3af;
+            font-size: 0.875rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .login-section {
+            text-align: center;
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .login-link {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+
+        .back-home a {
+            color: white;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-home a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .register-card {
+                padding: 2rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-card">
+            <div class="logo-section">
+                <div class="logo">N</div>
+                <h1>Crea tu cuenta</h1>
+                <p>Únete a Novacapital y accede a los mejores créditos</p>
+            </div>
+
+            <!-- Mensajes de alerta -->
+            {% if error %}
+            <div class="alert alert-error">
+                {{ error }}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="/register" id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre</label>
+                        <input 
+                            type="text" 
+                            id="nombre" 
+                            name="nombre" 
+                            placeholder="Juan" 
+                            required
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="apellido">Apellido</label>
+                        <input 
+                            type="text" 
+                            id="apellido" 
+                            name="apellido" 
+                            placeholder="Pérez" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Correo electrónico</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        placeholder="tu@email.com" 
+                        required
+                    >
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo_documento">Tipo de documento</label>
+                        <select id="tipo_documento" name="tipo_documento" required>
+                            <option value="">Seleccionar</option>
+                            <option value="CC">Cédula de Ciudadanía</option>
+                            <option value="CE">Cédula de Extranjería</option>
+                            <option value="TI">Tarjeta de Identidad</option>
+                            <option value="PP">Pasaporte</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="numero_documento">Número de documento</label>
+                        <input 
+                            type="text" 
+                            id="numero_documento" 
+                            name="numero_documento" 
+                            placeholder="1234567890" 
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="celular">Celular</label>
+                    <input 
+                        type="tel" 
+                        id="celular" 
+                        name="celular" 
+                        placeholder="3001234567" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <div class="password-group">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            name="password" 
+                            placeholder="Mínimo 8 caracteres" 
+                            required
+                            oninput="checkPasswordStrength()"
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('password')">
+                            👁️
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <span id="strengthText"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirm_password">Confirmar contraseña</label>
+                    <div class="password-group">
+                        <input 
+                            type="password" 
+                            id="confirm_password" 
+                            name="confirm_password" 
+                            placeholder="Repite tu contraseña" 
+                            required
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('confirm_password')">
+                            👁️
+                        </button>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="terms" id="terms" required>
+                        <span>Acepto los <a href="#">términos y condiciones</a> y la <a href="#">política de privacidad</a> de Novacapital</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-register" id="submitBtn">
+                    Crear cuenta
+                </button>
+            </form>
+
+            <div class="divider">
+                <span>O</span>
+            </div>
+
+            <div class="login-section">
+                <p>¿Ya tienes una cuenta? <a href="/login" class="login-link">Inicia sesión</a></p>
+            </div>
+        </div>
+
+        <div class="back-home">
+            <a href="/">← Volver al inicio</a>
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const toggleBtn = passwordInput.nextElementSibling;
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleBtn.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleBtn.textContent = '👁️';
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const strengthFill = document.getElementById('strengthFill');
+            const strengthText = document.getElementById('strengthText');
+            
+            let strength = 0;
+            
+            if (password.length >= 8) strength++;
+            if (password.match(/[a-z]/) && password.match(/[A-Z]/)) strength++;
+            if (password.match(/\d/)) strength++;
+            if (password.match(/[^a-zA-Z\d]/)) strength++;
+            
+            strengthFill.className = 'strength-fill';
+            
+            if (strength <= 1) {
+                strengthFill.classList.add('strength-weak');
+                strengthText.textContent = 'Débil';
+                strengthText.style.color = '#ef4444';
+            } else if (strength <= 2) {
+                strengthFill.classList.add('strength-medium');
+                strengthText.textContent = 'Media';
+                strengthText.style.color = '#f59e0b';
+            } else {
+                strengthFill.classList.add('strength-strong');
+                strengthText.textContent = 'Fuerte';
+                strengthText.style.color = '#10b981';
+            }
+        }
+
+        // Validación del formulario
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const nombre = document.getElementById('nombre').value;
+            const apellido = document.getElementById('apellido').value;
+            const email = document.getElementById('email').value;
+            const tipoDoc = document.getElementById('tipo_documento').value;
+            const numDoc = document.getElementById('numero_documento').value;
+            const celular = document.getElementById('celular').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+            const terms = document.getElementById('terms').checked;
+
+            // Validar campos vacíos
+            if (!nombre || !apellido || !email || !tipoDoc || !numDoc || !celular || !password || !confirmPassword) {
+                e.preventDefault();
+                alert('Por favor completa todos los campos');
+                return false;
+            }
+
+            // Validar email
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                e.preventDefault();
+                alert('Por favor ingresa un email válido');
+                return false;
+            }
+
+            // Validar celular colombiano
+            const celularPattern = /^3\d{9}$/;
+            if (!celularPattern.test(celular.replace(/\s/g, ''))) {
+                e.preventDefault();
+                alert('Por favor ingresa un número de celular válido (10 dígitos, comenzando con 3)');
+                return false;
+            }
+
+            // Validar contraseña
+            if (password.length < 8) {
+                e.preventDefault();
+                alert('La contraseña debe tener al menos 8 caracteres');
+                return false;
+            }
+
+            // Validar coincidencia de contraseñas
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden');
+                return false;
+            }
+
+            // Validar términos
+            if (!terms) {
+                e.preventDefault();
+                alert('Debes aceptar los términos y condiciones');
+                return false;
+            }
+
+            // Deshabilitar botón para evitar doble envío
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitBtn').textContent = 'Creando cuenta...';
+        });
+    </script>
+</body>
+</html>

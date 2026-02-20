@@ -1,8 +1,10 @@
+
+# ================================
+# requirements.txt
+# ================================
 Flask==3.0.0
 Flask-MySQLdb==2.0.0
 python-dotenv==1.0.0
 bcrypt==4.1.2
 PyJWT==2.8.0
-reportlab==4.0.9
-openpyxl==3.1.2
-pandas==2.1.4
+Werkzeug==3.0.1
