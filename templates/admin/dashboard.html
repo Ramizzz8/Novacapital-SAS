@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Novacapital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-link {
+            transition: all 0.3s;
+        }
+        .sidebar-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        .sidebar-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            border-left: 4px solid white;
+        }
+        .stat-card {
+            transition: transform 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex-shrink-0">
+            <div class="p-6 border-b border-blue-700">
+                <h1 class="text-2xl font-bold">NOVACAPITAL</h1>
+                <p class="text-sm text-blue-200">Panel de Administración</p>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto p-4">
+                <a href="/admin/dashboard" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>📊</span>
+                    <span>Dashboard</span>
+                </a>
+                <a href="/admin/clientes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>👥</span>
+                    <span>Gestión de Clientes</span>
+                </a>
+                <a href="/admin/solicitudes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>📋</span>
+                    <span>Solicitudes</span>
+                </a>
+                <a href="/admin/asesores" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>👔</span>
+                    <span>Gestión de Asesores</span>
+                </a>
+                <a href="/admin/documentos" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>📁</span>
+                    <span>Documentos</span>
+                </a>
+                <a href="/admin/notificaciones" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>🔔</span>
+                    <span>Notificaciones</span>
+                    {% if notificaciones_pendientes > 0 %}
+                    <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">{{ notificaciones_pendientes }}</span>
+                    {% endif %}
+                </a>
+                <a href="/admin/reportes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
+                    <span>📊</span>
+                    <span>Reportes</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-blue-700">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-lg">👤</span>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-semibold text-sm">{{ session.user_nombre }}</p>
+                        <p class="text-xs text-blue-200">Administrador</p>
+                    </div>
+                </div>
+                <a href="/logout" class="block text-center bg-blue-700 hover:bg-blue-600 py-2 rounded-lg text-sm transition">
+                    Cerrar Sesión
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Header -->
+            <header class="bg-white shadow-sm sticky top-0 z-10">
+                <div class="px-8 py-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 class="text-2xl font-bold text-gray-900">Dashboard General</h2>
+                            <p class="text-gray-600">Vista general del sistema</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button class="relative p-2 hover:bg-gray-100 rounded-lg">
+                                <span class="text-2xl">🔔</span>
+                                {% if notificaciones_pendientes > 0 %}
+                                <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
+                                    {{ notificaciones_pendientes }}
+                                </span>
+                                {% endif %}
+                            </button>
+                            <div class="text-right">
+                                <p class="text-sm font-semibold text-gray-700">{{ session.user_email }}</p>
+                                <p class="text-xs text-gray-500">{{ now.strftime('%d/%m/%Y %H:%M') }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="p-8">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700 border border-red-300{% else %}bg-green-100 text-green-700 border border-green-300{% endif %}">
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Estadísticas Principales -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Total Clientes -->
+                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-blue-100 text-sm">Total Clientes</p>
+                                <h3 class="text-4xl font-bold mt-2">{{ stats.total_clientes or 0 }}</h3>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                                <span class="text-3xl">👥</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="bg-white bg-opacity-20 px-2 py-1 rounded">
+                                {{ stats.clientes_activos or 0 }} activos
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Solicitudes Pendientes -->
+                    <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-orange-100 text-sm">Solicitudes Pendientes</p>
+                                <h3 class="text-4xl font-bold mt-2">{{ stats.solicitudes_pendientes or 0 }}</h3>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                                <span class="text-3xl">⏳</span>
+                            </div>
+                        </div>
+                        <a href="/admin/solicitudes" class="text-sm hover:underline">Ver todas →</a>
+                    </div>
+
+                    <!-- Préstamos Activos -->
+                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-green-100 text-sm">Préstamos Activos</p>
+                                <h3 class="text-4xl font-bold mt-2">{{ stats.prestamos_activos or 0 }}</h3>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                                <span class="text-3xl">💰</span>
+                            </div>
+                        </div>
+                        <p class="text-sm">{{ "${:,.0f}".format(stats.cartera_total or 0) }} COP</p>
+                    </div>
+
+                    <!-- Total Asesores -->
+                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <p class="text-purple-100 text-sm">Asesores Activos</p>
+                                <h3 class="text-4xl font-bold mt-2">{{ stats.total_asesores or 0 }}</h3>
+                            </div>
+                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
+                                <span class="text-3xl">👔</span>
+                            </div>
+                        </div>
+                        <a href="/admin/asesores" class="text-sm hover:underline">Gestionar →</a>
+                    </div>
+                </div>
+
+                <!-- Sección de Solicitudes Recientes y Actividad -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- Solicitudes Recientes -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-900">Solicitudes Recientes</h3>
+                            <a href="/admin/solicitudes" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
+                                Ver todas →
+                            </a>
+                        </div>
+                        <div class="space-y-3">
+                            {% if solicitudes_recientes %}
+                                {% for solicitud in solicitudes_recientes[:5] %}
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                                            {{ solicitud.cliente_nombres[0] }}{{ solicitud.cliente_apellidos[0] }}
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-sm text-gray-900">
+                                                {{ solicitud.cliente_nombres }} {{ solicitud.cliente_apellidos }}
+                                            </p>
+                                            <p class="text-xs text-gray-500">
+                                                {{ "${:,.0f}".format(solicitud.monto_solicitado) }} - {{ solicitud.plazo_meses }} meses
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-semibold">
+                                            {{ solicitud.estado }}
+                                        </span>
+                                        <p class="text-xs text-gray-500 mt-1">{{ solicitud.fecha_solicitud.strftime('%d/%m/%Y') }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-gray-500 text-center py-8">No hay solicitudes recientes</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Actividad de Asesores -->
+                    <div class="bg-white rounded-xl shadow-md p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-gray-900">Rendimiento de Asesores</h3>
+                            <a href="/admin/asesores" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
+                                Ver todos →
+                            </a>
+                        </div>
+                        <div class="space-y-3">
+                            {% if asesores %}
+                                {% for asesor in asesores[:5] %}
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
+                                            <span class="text-lg">👔</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-sm text-gray-900">{{ asesor.nombre }}</p>
+                                            <p class="text-xs text-gray-500">{{ asesor.total_clientes or 0 }} clientes asignados</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="text-sm font-semibold text-gray-900">{{ asesor.solicitudes_pendientes or 0 }}</p>
+                                        <p class="text-xs text-gray-500">pendientes</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-gray-500 text-center py-8">No hay asesores registrados</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="bg-white rounded-xl shadow-md p-6">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4">Acciones Rápidas</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <a href="/admin/clientes" class="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
+                            <span class="text-4xl mb-2">👥</span>
+                            <span class="text-sm font-semibold text-blue-900">Ver Clientes</span>
+                        </a>
+                        <a href="/admin/solicitudes" class="flex flex-col items-center justify-center p-6 bg-orange-50 hover:bg-orange-100 rounded-lg transition">
+                            <span class="text-4xl mb-2">📋</span>
+                            <span class="text-sm font-semibold text-orange-900">Revisar Solicitudes</span>
+                        </a>
+                        <a href="/admin/asesores" class="flex flex-col items-center justify-center p-6 bg-purple-50 hover:bg-purple-100 rounded-lg transition">
+                            <span class="text-4xl mb-2">➕</span>
+                            <span class="text-sm font-semibold text-purple-900">Nuevo Asesor</span>
+                        </a>
+                        <a href="/admin/notificaciones" class="flex flex-col items-center justify-center p-6 bg-green-50 hover:bg-green-100 rounded-lg transition">
+                            <span class="text-4xl mb-2">📢</span>
+                            <span class="text-sm font-semibold text-green-900">Enviar Notificación</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
