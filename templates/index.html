@@ -24,6 +24,12 @@
         cursor: pointer;
         border: none;
       }
+      #novalogo {
+        width: 300px;
+        height: 300px;
+        object-fit: contain;
+        padding-top: 10px;
+      }
     </style>
   </head>
   <body class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -33,11 +39,7 @@
         <div class="flex justify-between items-center h-16">
           <div class="flex items-center">
             <div class="flex-shrink-0">
-              <h1
-                class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent"
-              >
-                Novacapital
-              </h1>
+              <img src="/Novacapital-SAS/novalogo.png" id="novalogo" />
               <p class="text-xs text-gray-500">Préstamos por Libranza</p>
             </div>
           </div>
@@ -53,8 +55,7 @@
                 >Beneficios</a
               >
 
-              <a href="/contacto" class="text-gray-700 hover:text-blue-600 transition"
-                >Contacto</a>
+              <a href="/contacto" class="text-gray-700 hover:text-blue-600 transition">Contacto</a>
               <a href="/login" class="text-gray-700 hover:text-blue-600 transition">Login</a>
               <a href="/solicitud"
                 ><button
