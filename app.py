@@ -1,8 +1,3 @@
-"""
-NOVACAPITAL SAS - Sistema de Préstamos por Libranza
-Backend completo en un solo archivo - VERSIÓN CORREGIDA
-"""
-
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
 from flask_mysqldb import MySQL
 import bcrypt
@@ -68,59 +63,54 @@ def admin_required(f):
 # FUNCIONES DE BASE DE DATOS
 # ================================
 
-def crear_usuario(nombre, email, password, tipo_documento, numero_documento, apellido, celular, rol='cliente'):
-    """Crea un nuevo usuario en la base de datos - VERSIÓN CORREGIDA"""
+def crear_usuario(nombres, email, password, tipo_documento, numero_documento,
+                  apellidos, celular, rol='cliente',
+                  fecha_nacimiento=None, telefono=None, direccion=None,
+                  ciudad=None, departamento=None, tipo_cliente=None,
+                  entidad_empleadora=None, salario_mensual=None):
     try:
         cursor = mysql.connection.cursor()
-        
-        # Verificar si el email ya existe
+
         cursor.execute("SELECT id FROM usuarios WHERE email = %s", (email,))
         if cursor.fetchone():
             cursor.close()
             return None, "El email ya está registrado"
-        
-        # Verificar si el documento ya existe
+
         cursor.execute("SELECT id FROM clientes WHERE numero_documento = %s", (numero_documento,))
         if cursor.fetchone():
             cursor.close()
             return None, "El número de documento ya está registrado"
-        
-        # Hash de la contraseña - CORREGIDO
+
         password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        # Convertir bytes a string para almacenar en MySQL
         password_hash_str = password_hash.decode('utf-8')
-        
-        print(f"DEBUG: Creando usuario con hash: {password_hash_str[:50]}...")  # Para debugging
-        
-        # Insertar usuario
+
         query_usuario = """
-            INSERT INTO usuarios (nombre, email, password_hash, rol, activo) 
+            INSERT INTO usuarios (nombre, email, password_hash, rol, activo)
             VALUES (%s, %s, %s, %s, %s)
         """
-        cursor.execute(query_usuario, (nombre, email, password_hash_str, rol, True))
+        cursor.execute(query_usuario, (nombres, email, password_hash_str, rol, True))
         usuario_id = cursor.lastrowid
-        
-        print(f"DEBUG: Usuario creado con ID: {usuario_id}")  # Para debugging
-        
-        # Insertar cliente - CORREGIDO: asegurar que usuario_id existe en la tabla
+
         query_cliente = """
-            INSERT INTO clientes 
-            (usuario_id, tipo_documento, numero_documento, nombres, apellidos, email, celular, estado) 
-            VALUES (%s, %s, %s, %s, %s, %s, %s, 'activo')
+            INSERT INTO clientes
+            (usuario_id, tipo_documento, numero_documento, nombres, apellidos,
+             email, celular, fecha_nacimiento, telefono, direccion, ciudad,
+             departamento, tipo_cliente, entidad_empleadora, salario_mensual, estado)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'activo')
         """
-        cursor.execute(query_cliente, 
-                     (usuario_id, tipo_documento, numero_documento, nombre, apellido, email, celular))
-        
+        cursor.execute(query_cliente, (
+            usuario_id, tipo_documento, numero_documento, nombres, apellidos,
+            email, celular, fecha_nacimiento, telefono, direccion, ciudad,
+            departamento, tipo_cliente, entidad_empleadora, salario_mensual
+        ))
+
         mysql.connection.commit()
         cursor.close()
-        
-        print(f"DEBUG: Cliente creado exitosamente")  # Para debugging
-        
         return usuario_id, None
-        
+
     except Exception as e:
         mysql.connection.rollback()
-        print(f"ERROR: {str(e)}")  # Para debugging
+        print(f"ERROR: {str(e)}")
         return None, f"Error al crear usuario: {str(e)}"
 
 def verificar_credenciales(email, password):
@@ -322,23 +312,17 @@ def check_session():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Página de inicio de sesión"""
+    """Página de inicio de sesión - ACTUALIZADO"""
     if 'user_id' in session:
-        next_url = session.pop('next_url', None)
-        if next_url:
-            return redirect(next_url)
-        
-        if session.get('user_rol') in ['admin', 'asesor']:
-            return redirect(url_for('admin_dashboard'))
-        else:
-            return redirect(url_for('index'))
+        # Si ya está logueado, redirigir según rol
+        return redirect_by_role()
     
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
         remember = request.form.get('remember')
         
-        print(f"DEBUG: Intento de login para: {email}")  # Para debugging
+        print(f"DEBUG: Intento de login para: {email}")
         
         usuario, error = verificar_credenciales(email, password)
         
@@ -355,84 +339,84 @@ def login():
         if remember:
             session.permanent = True
         
-        print(f"DEBUG: Login exitoso para {email}")
+        print(f"DEBUG: Login exitoso para {email} - Rol: {usuario['rol']}")
         
-        # Redirigir
-        next_url = session.pop('next_url', None)
-        if next_url:
-            return redirect(next_url)
-        
-        if usuario['rol'] in ['admin', 'asesor']:
-            return redirect(url_for('admin_dashboard'))
-        else:
-            return redirect(url_for('solicitud'))
+        # Redirigir según el rol del usuario
+        return redirect_by_role()
     
     return render_template('login.html')
 
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Página de registro"""
+    """Página de registro - ACTUALIZADO"""
     if 'user_id' in session:
-        return redirect(url_for('index'))
+        return redirect_by_role()
     
     if request.method == 'POST':
-        nombre = request.form.get('nombre')
-        apellido = request.form.get('apellido')
-        email = request.form.get('email')
-        tipo_documento = request.form.get('tipo_documento')
-        numero_documento = request.form.get('numero_documento')
-        celular = request.form.get('celular')
-        password = request.form.get('password')
-        confirm_password = request.form.get('confirm_password')
-        
-        print(f"DEBUG: Intento de registro para: {email}")  # Para debugging
-        
+        # Campos obligatorios (nombres nuevos del formulario)
+        nombres          = request.form.get('nombres', '').strip()
+        apellidos        = request.form.get('apellidos', '').strip()
+        email            = request.form.get('email', '').strip()
+        tipo_documento   = request.form.get('tipo_documento', '').strip()
+        numero_documento = request.form.get('numero_documento', '').strip()
+        fecha_nacimiento = request.form.get('fecha_nacimiento', '').strip()
+        celular          = request.form.get('celular', '').strip()
+        tipo_cliente     = request.form.get('tipo_cliente', '').strip()
+        password         = request.form.get('password', '')
+        confirm_password = request.form.get('confirm_password', '')
+
+        # Campos opcionales
+        telefono           = request.form.get('telefono', '').strip() or None
+        direccion          = request.form.get('direccion', '').strip() or None
+        ciudad             = request.form.get('ciudad', '').strip() or None
+        departamento       = request.form.get('departamento', '').strip() or None
+        entidad_empleadora = request.form.get('entidad_empleadora', '').strip() or None
+        salario_mensual    = request.form.get('salario_mensual', '').strip() or None
+
         # Validaciones
-        if not all([nombre, apellido, email, tipo_documento, numero_documento, 
-                   celular, password, confirm_password]):
-            return render_template('register.html', 
-                                 error='Todos los campos son obligatorios')
-        
+        if not all([nombres, apellidos, email, tipo_documento, numero_documento,
+                    fecha_nacimiento, celular, tipo_cliente, password, confirm_password]):
+            return render_template('register.html',
+                                   error='Todos los campos obligatorios deben completarse')
+
         if password != confirm_password:
-            return render_template('register.html', 
-                                 error='Las contraseñas no coinciden')
-        
+            return render_template('register.html', error='Las contraseñas no coinciden')
+
         if len(password) < 8:
-            return render_template('register.html', 
-                                 error='La contraseña debe tener al menos 8 caracteres')
-        
-        # Crear usuario
+            return render_template('register.html',
+                                   error='La contraseña debe tener al menos 8 caracteres')
+
         usuario_id, error = crear_usuario(
-            nombre=nombre,
+            nombres=nombres,
             email=email,
             password=password,
             tipo_documento=tipo_documento,
             numero_documento=numero_documento,
-            apellido=apellido,
+            apellidos=apellidos,
             celular=celular,
-            rol='cliente'
+            rol='cliente',
+            fecha_nacimiento=fecha_nacimiento if fecha_nacimiento else None,
+            telefono=telefono,
+            direccion=direccion,
+            ciudad=ciudad,
+            departamento=departamento,
+            tipo_cliente=tipo_cliente,
+            entidad_empleadora=entidad_empleadora,
+            salario_mensual=salario_mensual
         )
-        
+
         if error:
-            print(f"DEBUG: Error al crear usuario: {error}")
             return render_template('register.html', error=error)
-        
-        print(f"DEBUG: Usuario creado exitosamente: {email}")
-        
-        # Login automático después del registro
+
         usuario, _ = verificar_credenciales(email, password)
         if usuario:
-            session['user_id'] = usuario['id']
+            session['user_id']     = usuario['id']
             session['user_nombre'] = usuario['nombre']
-            session['user_email'] = usuario['email']
-            session['user_rol'] = usuario['rol']
-            
-            next_url = session.pop('next_url', None)
-            if next_url:
-                return redirect(next_url)
-            
-            return redirect(url_for('solicitud'))
-        
+            session['user_email']  = usuario['email']
+            session['user_rol']    = usuario['rol']
+            return redirect_by_role()
+
         return redirect(url_for('login'))
     
     return render_template('register.html')
@@ -440,9 +424,28 @@ def register():
 @app.route('/logout')
 def logout():
     """Cerrar sesión"""
+    nombre = session.get('user_nombre', 'Usuario')
     session.clear()
-    flash('Sesión cerrada exitosamente', 'success')
+    flash(f'Hasta pronto, {nombre}. Sesión cerrada correctamente.', 'success')
     return redirect(url_for('index'))
+
+
+# ================================================
+# FUNCIÓN AUXILIAR PARA REDIRECCIÓN POR ROL
+# ================================================
+
+def redirect_by_role():
+    """Redirige al dashboard correcto según el rol del usuario"""
+    rol = session.get('user_rol', 'cliente')
+    
+    if rol == 'admin':
+        return redirect(url_for('admin_dashboard'))
+    elif rol == 'asesor':
+        return redirect(url_for('asesor_dashboard'))
+    else:  # cliente
+        return redirect(url_for('cliente_dashboard'))
+
+
 
 # ================================
 # RUTAS DE SOLICITUD
@@ -526,36 +529,53 @@ def solicitud_exitosa():
 @admin_required
 def admin_dashboard():
     """Dashboard principal del administrador"""
+    cursor = mysql.connection.cursor()
+    stats = {}
+
     try:
-        cursor = mysql.connection.cursor()
-        
-        # Estadísticas generales
-        stats = {}
-        
-        # Total clientes
         cursor.execute("SELECT COUNT(*) as total FROM clientes")
         stats['total_clientes'] = cursor.fetchone()['total']
-        
+    except Exception as e:
+        print(f"ERR total_clientes: {e}")
+        stats['total_clientes'] = 0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM clientes WHERE estado = 'activo'")
         stats['clientes_activos'] = cursor.fetchone()['total']
-        
-        # Solicitudes pendientes
+    except Exception as e:
+        print(f"ERR clientes_activos: {e}")
+        stats['clientes_activos'] = 0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'solicitado'")
         stats['solicitudes_pendientes'] = cursor.fetchone()['total']
-        
-        # Préstamos activos
+    except Exception as e:
+        print(f"ERR solicitudes_pendientes: {e}")
+        stats['solicitudes_pendientes'] = 0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'desembolsado'")
         stats['prestamos_activos'] = cursor.fetchone()['total']
-        
-        # Cartera total
+    except Exception as e:
+        print(f"ERR prestamos_activos: {e}")
+        stats['prestamos_activos'] = 0
+
+    try:
         cursor.execute("SELECT COALESCE(SUM(monto_aprobado), 0) as total FROM prestamos WHERE estado = 'desembolsado'")
-        stats['cartera_total'] = cursor.fetchone()['total']
-        
-        # Total asesores activos
+        stats['cartera_total'] = float(cursor.fetchone()['total'])
+    except Exception as e:
+        print(f"ERR cartera_total: {e}")
+        stats['cartera_total'] = 0.0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM usuarios WHERE rol = 'asesor' AND activo = TRUE")
         stats['total_asesores'] = cursor.fetchone()['total']
-        
-        # Solicitudes recientes
+    except Exception as e:
+        print(f"ERR total_asesores: {e}")
+        stats['total_asesores'] = 0
+
+    solicitudes_recientes = []
+    try:
         cursor.execute("""
             SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
             FROM prestamos p
@@ -564,43 +584,30 @@ def admin_dashboard():
             LIMIT 5
         """)
         solicitudes_recientes = cursor.fetchall()
-        
-        # Asesores con estadísticas
+    except Exception as e:
+        print(f"ERR solicitudes_recientes: {e}")
+
+    asesores = []
+    try:
         cursor.execute("""
-            SELECT u.id, u.nombre, u.email,
-                   COUNT(DISTINCT c.id) as total_clientes,
-                   COUNT(DISTINCT CASE WHEN p.estado = 'solicitado' THEN p.id END) as solicitudes_pendientes
-            FROM usuarios u
-            LEFT JOIN clientes c ON c.asesor_id = u.id
-            LEFT JOIN prestamos p ON p.cliente_id = c.id
-            WHERE u.rol = 'asesor' AND u.activo = TRUE
-            GROUP BY u.id, u.nombre, u.email
-            ORDER BY total_clientes DESC
+            SELECT id, nombre, email
+            FROM usuarios
+            WHERE rol = 'asesor' AND activo = TRUE
+            ORDER BY nombre
             LIMIT 5
         """)
         asesores = cursor.fetchall()
-        
-        # Notificaciones pendientes
-        cursor.execute("""
-            SELECT COUNT(*) as total 
-            FROM notificaciones 
-            WHERE leida = FALSE AND destinatario_tipo = 'admin'
-        """)
-        notificaciones_pendientes = cursor.fetchone()['total']
-        
-        cursor.close()
-        
-        return render_template('admin/dashboard.html',
-                             stats=stats,
-                             solicitudes_recientes=solicitudes_recientes,
-                             asesores=asesores,
-                             notificaciones_pendientes=notificaciones_pendientes,
-                             now=datetime.now())
-        
     except Exception as e:
-        flash(f'Error al cargar dashboard: {str(e)}', 'error')
-        return redirect(url_for('index'))
+        print(f"ERR asesores: {e}")
 
+    cursor.close()
+
+    return render_template('admin/dashboard.html',
+                           stats=stats,
+                           solicitudes_recientes=solicitudes_recientes,
+                           asesores=asesores,
+                           notificaciones_pendientes=0,
+                           now=datetime.now())
 
 @app.route('/admin/clientes')
 @admin_required
@@ -822,6 +829,161 @@ def admin_solicitudes():
     except Exception as e:
         flash(f'Error al cargar solicitudes: {str(e)}', 'error')
         return redirect(url_for('admin_dashboard'))
+    
+
+
+# ================================================
+# DASHBOARD DEL CLIENTE
+# ================================================
+
+@app.route('/cliente/dashboard')
+@login_required
+def cliente_dashboard():
+    """Dashboard principal del cliente"""
+    try:
+        # Verificar que el usuario sea cliente
+        if session.get('user_rol') not in ['cliente']:
+            flash('No tienes permisos para acceder a esta página', 'error')
+            return redirect_by_role()
+        
+        cursor = mysql.connection.cursor()
+        
+        # Obtener información del cliente
+        cursor.execute("""
+            SELECT c.*, u.email as usuario_email
+            FROM clientes c
+            LEFT JOIN usuarios u ON c.usuario_id = u.id
+            WHERE c.usuario_id = %s
+        """, (session.get('user_id'),))
+        cliente = cursor.fetchone()
+        
+        if not cliente:
+            flash('No se encontró información del cliente', 'error')
+            return redirect(url_for('index'))
+        
+        # Obtener solicitudes del cliente
+        cursor.execute("""
+            SELECT * FROM prestamos
+            WHERE cliente_id = %s
+            ORDER BY fecha_solicitud DESC
+        """, (cliente['id'],))
+        prestamos = cursor.fetchall()
+        
+        # Obtener notificaciones no leídas
+        cursor.execute("""
+            SELECT * FROM notificaciones
+            WHERE usuario_id = %s AND leida = FALSE
+            ORDER BY fecha_creacion DESC
+            LIMIT 5
+        """, (session.get('user_id'),))
+        notificaciones = cursor.fetchall()
+        
+        # Contar notificaciones pendientes
+        cursor.execute("""
+            SELECT COUNT(*) as total FROM notificaciones
+            WHERE usuario_id = %s AND leida = FALSE
+        """, (session.get('user_id'),))
+        notificaciones_pendientes = cursor.fetchone()['total']
+        
+        # Estadísticas
+        stats = {
+            'total_solicitudes': len(prestamos),
+            'solicitudes_pendientes': sum(1 for p in prestamos if p['estado'] == 'solicitado'),
+            'prestamos_aprobados': sum(1 for p in prestamos if p['estado'] in ['aprobado', 'desembolsado']),
+            'prestamos_activos': sum(1 for p in prestamos if p['estado'] == 'desembolsado'),
+        }
+        
+        cursor.close()
+        
+        return render_template('cliente/dashboard.html',
+                             cliente=cliente,
+                             prestamos=prestamos,
+                             notificaciones=notificaciones,
+                             notificaciones_pendientes=notificaciones_pendientes,
+                             stats=stats,
+                             now=datetime.now())
+        
+    except Exception as e:
+        flash(f'Error al cargar dashboard: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
+# ================================
+# DASHBOARD DEL ASESOR
+# ================================
+
+@app.route('/asesor/dashboard')
+@login_required
+def asesor_dashboard():
+    """Dashboard principal del asesor"""
+    try:
+        if session.get('user_rol') != 'asesor':
+            flash('No tienes permisos para acceder a esta página', 'error')
+            return redirect_by_role()
+
+        cursor = mysql.connection.cursor()
+        asesor_id = session.get('user_id')
+
+        # Clientes asignados - usando asignaciones_asesores ya que clientes no tiene asesor_id directo
+        clientes = []
+        try:
+            cursor.execute("""
+                SELECT c.*,
+                       COUNT(DISTINCT p.id) as total_prestamos,
+                       SUM(CASE WHEN p.estado = 'solicitado' THEN 1 ELSE 0 END) as pendientes
+                FROM clientes c
+                JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
+                LEFT JOIN prestamos p ON p.cliente_id = c.id
+                WHERE aa.asesor_id = %s
+                GROUP BY c.id
+                ORDER BY c.fecha_registro DESC
+            """, (asesor_id,))
+            clientes = cursor.fetchall()
+        except Exception as e:
+            print(f"ERR clientes asesor: {e}")
+
+        solicitudes_pendientes = []
+        try:
+            cursor.execute("""
+                SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
+                FROM prestamos p
+                JOIN clientes c ON p.cliente_id = c.id
+                JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
+                WHERE aa.asesor_id = %s AND p.estado = 'solicitado'
+                ORDER BY p.fecha_solicitud DESC
+                LIMIT 10
+            """, (asesor_id,))
+            solicitudes_pendientes = cursor.fetchall()
+        except Exception as e:
+            print(f"ERR solicitudes asesor: {e}")
+
+        notificaciones_pendientes = 0
+        try:
+            cursor.execute("""
+                SELECT COUNT(*) as total FROM notificaciones
+                WHERE usuario_id = %s AND leida = FALSE
+            """, (asesor_id,))
+            notificaciones_pendientes = cursor.fetchone()['total']
+        except Exception as e:
+            print(f"ERR notif asesor: {e}")
+
+        stats = {
+            'total_clientes':        len(clientes),
+            'solicitudes_pendientes': len(solicitudes_pendientes),
+            'clientes_activos':      sum(1 for c in clientes if c['estado'] == 'activo'),
+        }
+
+        cursor.close()
+
+        return render_template('asesor/dashboard.html',
+                               clientes=clientes,
+                               solicitudes_pendientes=solicitudes_pendientes,
+                               notificaciones_pendientes=notificaciones_pendientes,
+                               stats=stats,
+                               now=datetime.now())
+
+    except Exception as e:
+        flash(f'Error al cargar dashboard: {str(e)}', 'error')
+        return redirect(url_for('index'))
 
 # ================================
 # GESTIÓN DE ASESORES
