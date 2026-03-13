@@ -55,14 +55,33 @@
               >
 
               <a href="/contacto" class="text-gray-700 hover:text-blue-600 transition">Contacto</a>
+
+              {% if session.get('user_id') %}
+              <!-- Sesión activa -->
+              <div class="flex items-center gap-3">
+                <span class="text-sm text-gray-500">
+                  Hola, <strong class="text-gray-700">{{ session.get('user_nombre', '') }}</strong>
+                </span>
+                <a href="{{ url_for('admin_dashboard') if session.get('user_rol') == 'admin' else url_for('asesor_dashboard') if session.get('user_rol') == 'asesor' else url_for('cliente_dashboard') }}">
+                  <button class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition shadow-md text-sm font-semibold">
+                    Mi Dashboard
+                  </button>
+                </a>
+                <a href="/logout">
+                  <button class="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition text-sm">
+                    Cerrar sesión
+                  </button>
+                </a>
+              </div>
+              {% else %}
+              <!-- Sin sesión -->
               <a href="/login" class="text-gray-700 hover:text-blue-600 transition">Login</a>
-              <a href="/solicitud"
-                ><button
-                  class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-md"
-                >
+              <a href="/solicitud">
+                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition shadow-md">
                   Solicitar Ahora
                 </button>
               </a>
+              {% endif %}
             </div>
           </div>
 
@@ -79,10 +98,23 @@
             <a href="#simulador" class="text-gray-700 hover:text-blue-600">Simulador</a>
             <a href="#beneficios" class="text-gray-700 hover:text-blue-600">Beneficios</a>
             <a href="#proceso" class="text-gray-700 hover:text-blue-600">Proceso</a>
-            <a href="#contacto" class="text-gray-700 hover:text-blue-600">Contacto</a>
-            <button class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full">
-              Solicitar Ahora
-            </button>
+            <a href="/contacto" class="text-gray-700 hover:text-blue-600">Contacto</a>
+            {% if session.get('user_id') %}
+            <div class="pt-2 border-t border-gray-100">
+              <p class="text-sm text-gray-500 mb-2">Hola, <strong>{{ session.get('user_nombre', '') }}</strong></p>
+              <a href="{{ url_for('admin_dashboard') if session.get('user_rol') == 'admin' else url_for('asesor_dashboard') if session.get('user_rol') == 'asesor' else url_for('cliente_dashboard') }}">
+                <button class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full mb-2">Mi Dashboard</button>
+              </a>
+              <a href="/logout">
+                <button class="border border-gray-300 text-gray-600 px-6 py-2 rounded-lg w-full">Cerrar sesión</button>
+              </a>
+            </div>
+            {% else %}
+            <a href="/login" class="text-gray-700 hover:text-blue-600">Login</a>
+            <a href="/solicitud">
+              <button class="bg-blue-600 text-white px-6 py-2 rounded-lg w-full">Solicitar Ahora</button>
+            </a>
+            {% endif %}
           </div>
         </div>
       </nav>
