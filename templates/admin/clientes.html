@@ -5,295 +5,312 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Clientes - Novacapital</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .sidebar-gradient { background: linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 100%); }
+        .nav-item { transition: all 0.15s; }
+        .nav-item.active { background: rgba(255,255,255,0.15); }
+        .nav-item:hover { background: rgba(255,255,255,0.1); }
+        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .fade-in { animation: fadeIn 0.35s ease forwards; }
+        input:focus, select:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+    </style>
 </head>
-<body class="bg-gray-50">
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar (mismo del dashboard) -->
-        <aside class="w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex-shrink-0">
-            <div class="p-6 border-b border-blue-700">
-                <h1 class="text-2xl font-bold">NOVACAPITAL</h1>
-                <p class="text-sm text-blue-200">Panel de Administración</p>
-            </div>
-            <nav class="flex-1 overflow-y-auto p-4">
-                <a href="/admin/dashboard" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>📊</span><span>Dashboard</span>
-                </a>
-                <a href="/admin/clientes" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg mb-2 bg-white bg-opacity-15 border-l-4 border-white">
-                    <span>👥</span><span>Gestión de Clientes</span>
-                </a>
-                <a href="/admin/solicitudes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>📋</span><span>Solicitudes</span>
-                </a>
-                <a href="/admin/asesores" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>👔</span><span>Gestión de Asesores</span>
-                </a>
-            </nav>
-            <div class="p-4 border-t border-blue-700">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span class="text-lg">👤</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-semibold text-sm">{{ session.user_nombre }}</p>
-                        <p class="text-xs text-blue-200">Administrador</p>
-                    </div>
-                </div>
-                <a href="/logout" class="block text-center bg-blue-700 hover:bg-blue-600 py-2 rounded-lg text-sm transition">
-                    Cerrar Sesión
-                </a>
-            </div>
-        </aside>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto">
-            <!-- Header -->
-            <header class="bg-white shadow-sm sticky top-0 z-10">
-                <div class="px-8 py-4">
-                    <h2 class="text-2xl font-bold text-gray-900">Gestión de Clientes</h2>
-                    <p class="text-gray-600">Administra todos los clientes del sistema</p>
+    <!-- SIDEBAR -->
+    <aside class="w-64 sidebar-gradient text-white flex flex-col shadow-xl z-20 shrink-0">
+        <div class="px-5 py-4 border-b border-white/10 flex items-center justify-center">
+            <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" class="h-12 object-contain">
+        </div>
+        <nav class="flex-1 overflow-y-auto py-5 px-3 space-y-0.5">
+            <a href="/admin/dashboard" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                <span class="text-sm font-medium">Dashboard</span>
+            </a>
+            <a href="/admin/clientes" class="nav-item active flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span class="text-sm font-medium">Gestión de Clientes</span>
+            </a>
+            <a href="/admin/solicitudes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span class="text-sm font-medium">Solicitudes</span>
+            </a>
+            <a href="/admin/prestamos" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <span class="text-sm font-medium">Préstamos</span>
+            </a>
+            <a href="/admin/asesores" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                <span class="text-sm font-medium">Gestión de Asesores</span>
+            </a>
+            <a href="/admin/reportes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span class="text-sm font-medium">Reportes</span>
+            </a>
+        </nav>
+        <div class="px-4 py-4 border-t border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
                 </div>
-            </header>
+                <div class="flex-1 min-w-0">
+                    <p class="text-sm font-semibold truncate">{{ session.get('user_nombre', 'Admin') }}</p>
+                    <p class="text-xs text-blue-200">Administrador</p>
+                </div>
+                <a href="/logout" class="text-blue-200 hover:text-white p-1 rounded transition" title="Cerrar sesión">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                </a>
+            </div>
+        </div>
+    </aside>
 
-            <!-- Content -->
-            <div class="p-8">
-                <!-- Filtros y Búsqueda -->
-                <div class="bg-white rounded-xl shadow-md p-6 mb-6">
-                    <form method="GET" action="/admin/clientes" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input type="text" name="buscar" placeholder="Buscar por nombre, documento..." 
-                               value="{{ request.args.get('buscar', '') }}"
-                               class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        
-                        <select name="estado" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">Todos los estados</option>
-                            <option value="activo" {% if request.args.get('estado') == 'activo' %}selected{% endif %}>Activo</option>
-                            <option value="inactivo" {% if request.args.get('estado') == 'inactivo' %}selected{% endif %}>Inactivo</option>
+    <!-- MAIN -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm shrink-0">
+            <div>
+                <p class="text-xs text-gray-400 uppercase tracking-wider">Administración</p>
+                <h1 class="text-xl font-bold text-gray-800">Gestión de Clientes</h1>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">{{ total_clientes }} clientes registrados</div>
+            </div>
+        </header>
+        <div class="flex-1 overflow-y-auto p-8 fade-in">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for category, message in messages %}
+            <div class="px-4 py-3 rounded-lg text-sm font-medium
+                {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
+                {% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200
+                {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+            <!-- KPIs -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                    <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <p class="text-2xl font-bold text-gray-800">{{ total_clientes }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Total clientes registrados</p>
+                </div>
+                <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <p class="text-2xl font-bold text-gray-800">{{ clientes | selectattr('estado', 'equalto', 'activo') | list | length }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Clientes activos</p>
+                </div>
+                <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                    <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center mb-3">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <p class="text-2xl font-bold text-gray-800">{{ clientes | sum(attribute='solicitudes_pendientes') }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Solicitudes pendientes</p>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 mb-5">
+                <form method="GET" action="/admin/clientes" class="flex flex-wrap gap-3 items-end">
+                    <div class="flex-1 min-w-40">
+                        <label class="block text-xs text-gray-500 mb-1 font-medium">Buscar</label>
+                        <input type="text" name="buscar" value="{{ request.args.get('buscar','') }}"
+                            placeholder="Nombre, documento, email…"
+                            class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm transition">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1 font-medium">Estado</label>
+                        <select name="estado" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white transition">
+                            <option value="">Todos</option>
+                            <option value="activo" {% if request.args.get('estado')=='activo' %}selected{% endif %}>Activo</option>
+                            <option value="inactivo" {% if request.args.get('estado')=='inactivo' %}selected{% endif %}>Inactivo</option>
+                            <option value="bloqueado" {% if request.args.get('estado')=='bloqueado' %}selected{% endif %}>Bloqueado</option>
                         </select>
-                        
-                        <select name="asesor" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-                            <option value="">Todos los asesores</option>
-                            <option value="sin_asignar">Sin asignar</option>
-                            {% for asesor in asesores %}
-                            <option value="{{ asesor.id }}" {% if request.args.get('asesor') == asesor.id|string %}selected{% endif %}>
-                                {{ asesor.nombre }}
-                            </option>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1 font-medium">Asesor</label>
+                        <select name="asesor" class="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white transition">
+                            <option value="">Todos</option>
+                            <option value="sin_asignar" {% if request.args.get('asesor')=='sin_asignar' %}selected{% endif %}>Sin asignar</option>
+                            {% for a in asesores %}
+                            <option value="{{ a.id }}" {% if request.args.get('asesor')==a.id|string %}selected{% endif %}>{{ a.nombre }}</option>
                             {% endfor %}
                         </select>
-                        
-                        <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                            🔍 Buscar
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Tabla de Clientes -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full">
-                            <thead class="bg-gray-50 border-b border-gray-200">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Cliente</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Documento</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Contacto</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Asesor</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Préstamos</th>
-                                    <th class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Estado</th>
-                                    <th class="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                {% if clientes %}
-                                    {% for cliente in clientes %}
-                                    <tr class="hover:bg-gray-50 transition">
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
-                                                    {{ cliente.nombres[0] }}{{ cliente.apellidos[0] }}
-                                                </div>
-                                                <div>
-                                                    <p class="font-semibold text-gray-900">{{ cliente.nombres }} {{ cliente.apellidos }}</p>
-                                                    <p class="text-sm text-gray-500">{{ cliente.tipo_cliente or 'No especificado' }}</p>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-sm text-gray-900">{{ cliente.tipo_documento }}</p>
-                                            <p class="text-sm text-gray-500">{{ cliente.numero_documento }}</p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <p class="text-sm text-gray-900">{{ cliente.email }}</p>
-                                            <p class="text-sm text-gray-500">{{ cliente.celular }}</p>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {% if cliente.asesor_nombre %}
-                                                <span class="inline-flex items-center px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
-                                                    👔 {{ cliente.asesor_nombre }}
-                                                </span>
-                                            {% else %}
-                                                <span class="text-sm text-gray-400">Sin asignar</span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center gap-2">
-                                                <span class="text-sm font-semibold text-gray-900">{{ cliente.total_prestamos or 0 }}</span>
-                                                {% if cliente.solicitudes_pendientes > 0 %}
-                                                <span class="px-2 py-1 bg-orange-100 text-orange-700 text-xs rounded-full">
-                                                    {{ cliente.solicitudes_pendientes }} pendiente(s)
-                                                </span>
-                                                {% endif %}
-                                            </div>
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            {% if cliente.estado == 'activo' %}
-                                                <span class="px-3 py-1 bg-green-100 text-green-700 text-xs rounded-full font-semibold">
-                                                    Activo
-                                                </span>
-                                            {% else %}
-                                                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full font-semibold">
-                                                    Inactivo
-                                                </span>
-                                            {% endif %}
-                                        </td>
-                                        <td class="px-6 py-4">
-                                            <div class="flex items-center justify-center gap-2">
-                                                <button onclick="verDetalle({{ cliente.id }})" 
-                                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" 
-                                                        title="Ver detalle">
-                                                    👁️
-                                                </button>
-                                                <button onclick="asignarAsesor({{ cliente.id}}, '{{ cliente.nombres }} {{ cliente.apellidos }}')" 
-                                                        class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition"
-                                                        title="Asignar asesor">
-                                                    👔
-                                                </button>
-                                                <button onclick="enviarNotificacion({{cliente.id}}, '{{ cliente.nombres }} {{ cliente.apellidos }}')" 
-                                                        class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition"
-                                                        title="Enviar notificación">
-                                                    📧
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                {% else %}
-                                    <tr>
-                                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
-                                            No se encontraron clientes
-                                        </td>
-                                    </tr>
-                                {% endif %}
-                            </tbody>
-                        </table>
                     </div>
-
-                    <!-- Paginación -->
-                    <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
-                        <p class="text-sm text-gray-600">
-                            Mostrando <span class="font-semibold">{{ clientes|length }}</span> clientes de 
-                            <span class="font-semibold">{{ total_clientes }}</span>
-                        </p>
-                    </div>
-                </div>
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">
+                        Filtrar
+                    </button>
+                    {% if request.args.get('buscar') or request.args.get('estado') or request.args.get('asesor') %}
+                    <a href="/admin/clientes" class="text-gray-500 hover:text-gray-700 px-3 py-2 text-sm">Limpiar</a>
+                    {% endif %}
+                </form>
             </div>
-        </main>
-    </div>
 
-    <!-- Modal: Asignar Asesor -->
-    <div id="modalAsesor" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Asignar Asesor</h3>
-            <p class="text-gray-600 mb-4">Cliente: <span id="clienteNombre" class="font-semibold"></span></p>
-            
-            <form id="formAsesor" method="POST" action="/admin/asignar-asesor">
-                <input type="hidden" name="cliente_id" id="clienteId">
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Seleccionar Asesor</label>
-                    <select name="asesor_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+            <!-- Tabla -->
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h2 class="font-bold text-gray-800">Clientes <span class="text-gray-400 font-normal text-sm">({{ clientes | length }})</span></h2>
+                </div>
+                {% if clientes %}
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left font-medium">Cliente</th>
+                                <th class="px-6 py-3 text-left font-medium">Documento</th>
+                                <th class="px-6 py-3 text-left font-medium">Contacto</th>
+                                <th class="px-6 py-3 text-left font-medium">Tipo</th>
+                                <th class="px-6 py-3 text-center font-medium">Préstamos</th>
+                                <th class="px-6 py-3 text-left font-medium">Asesor</th>
+                                <th class="px-6 py-3 text-center font-medium">Estado</th>
+                                <th class="px-6 py-3 text-center font-medium">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% for c in clientes %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                            <span class="text-blue-700 font-bold text-xs">{{ c.nombres[0].upper() }}</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-semibold text-gray-800">{{ c.nombres }} {{ c.apellidos }}</p>
+                                            <p class="text-xs text-gray-400">{{ c.email or '—' }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-3 text-xs font-mono text-gray-600">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
+                                <td class="px-6 py-3 text-gray-600 text-xs">{{ c.celular }}</td>
+                                <td class="px-6 py-3 text-xs text-gray-600 capitalize">{{ (c.tipo_cliente or '—').replace('_',' ') }}</td>
+                                <td class="px-6 py-3 text-center">
+                                    <span class="font-semibold text-gray-800">{{ c.total_prestamos or 0 }}</span>
+                                    {% if c.solicitudes_pendientes and c.solicitudes_pendientes > 0 %}
+                                    <span class="ml-1 text-xs bg-yellow-100 text-yellow-700 font-bold px-1.5 py-0.5 rounded-full">{{ c.solicitudes_pendientes }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-3 text-xs text-gray-600">{{ c.asesor_nombre or '—' }}</td>
+                                <td class="px-6 py-3 text-center">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                        {% if c.estado == 'activo' %}bg-green-100 text-green-700
+                                        {% elif c.estado == 'inactivo' %}bg-gray-100 text-gray-500
+                                        {% else %}bg-red-100 text-red-700{% endif %}">
+                                        {{ c.estado.capitalize() }}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <!-- Asignar asesor -->
+                                        <button onclick="openAsignar({{ c.id }}, '{{ c.nombres }} {{ c.apellidos }}')"
+                                            class="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Asignar asesor">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        </button>
+                                        <!-- Notificación -->
+                                        <button onclick="openNotif({{ c.id }}, '{{ c.nombres }} {{ c.apellidos }}')"
+                                            class="p-1.5 text-gray-500 hover:bg-gray-100 rounded-lg transition" title="Enviar notificación">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="px-6 py-16 text-center">
+                    <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-7 h-7 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <p class="text-gray-500 text-sm">No se encontraron clientes</p>
+                </div>
+                {% endif %}
+            </div>
+
+    <!-- Modal asignar asesor -->
+    <div id="modal-asignar" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-gray-800">Asignar Asesor</h3>
+                <button onclick="document.getElementById('modal-asignar').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form method="POST" action="/admin/asignar-asesor" class="px-6 py-5 space-y-4">
+                <input type="hidden" name="cliente_id" id="asignar-cliente-id">
+                <p class="text-sm text-gray-600">Cliente: <strong id="asignar-cliente-nombre"></strong></p>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Seleccionar asesor</label>
+                    <select name="asesor_id" required class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:border-blue-400 transition">
                         <option value="">-- Seleccionar --</option>
-                        {% for asesor in asesores %}
-                        <option value="{{ asesor.id }}">{{ asesor.nombre }} ({{ asesor.total_clientes or 0 }} clientes)</option>
+                        {% for a in asesores %}
+                        <option value="{{ a.id }}">{{ a.nombre }}</option>
                         {% endfor %}
                     </select>
                 </div>
-                
-                <div class="flex gap-3">
-                    <button type="button" onclick="cerrarModal('modalAsesor')" 
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
-                        Asignar
-                    </button>
+                <div class="flex gap-3 pt-1">
+                    <button type="button" onclick="document.getElementById('modal-asignar').classList.add('hidden')"
+                        class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg hover:bg-gray-50 transition text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">Asignar</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal: Enviar Notificación -->
-    <div id="modalNotificacion" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div class="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 p-6">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Enviar Notificación</h3>
-            <p class="text-gray-600 mb-4">Para: <span id="clienteNombreNotif" class="font-semibold"></span></p>
-            
-            <form id="formNotificacion" method="POST" action="/admin/enviar-notificacion">
-                <input type="hidden" name="cliente_id" id="clienteIdNotif">
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Título</label>
-                    <input type="text" name="titulo" required maxlength="200"
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                           placeholder="Título de la notificación">
+    <!-- Modal notificación -->
+    <div id="modal-notif" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4">
+            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <h3 class="font-bold text-gray-800">Enviar Notificación</h3>
+                <button onclick="document.getElementById('modal-notif').classList.add('hidden')" class="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <form method="POST" action="/admin/enviar-notificacion" class="px-6 py-5 space-y-4">
+                <input type="hidden" name="cliente_id" id="notif-cliente-id">
+                <p class="text-sm text-gray-600">Para: <strong id="notif-cliente-nombre"></strong></p>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Título</label>
+                    <input type="text" name="titulo" required placeholder="Asunto de la notificación"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-400 transition">
                 </div>
-                
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Mensaje</label>
-                    <textarea name="mensaje" required rows="4"
-                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                              placeholder="Escribe tu mensaje aquí..."></textarea>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Mensaje</label>
+                    <textarea name="mensaje" required rows="3" placeholder="Escribe el mensaje…"
+                        class="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm focus:border-blue-400 transition resize-none"></textarea>
                 </div>
-                
-                <div class="flex gap-3">
-                    <button type="button" onclick="cerrarModal('modalNotificacion')" 
-                            class="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
-                        Cancelar
-                    </button>
-                    <button type="submit" class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
-                        Enviar
-                    </button>
+                <div class="flex gap-3 pt-1">
+                    <button type="button" onclick="document.getElementById('modal-notif').classList.add('hidden')"
+                        class="flex-1 border border-gray-200 text-gray-600 py-2.5 rounded-lg hover:bg-gray-50 transition text-sm">Cancelar</button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-2.5 rounded-lg hover:bg-blue-700 transition text-sm font-semibold">Enviar</button>
                 </div>
             </form>
         </div>
     </div>
-
     <script>
-        function asignarAsesor(clienteId, clienteNombre) {
-            document.getElementById('clienteId').value = clienteId;
-            document.getElementById('clienteNombre').textContent = clienteNombre;
-            document.getElementById('modalAsesor').classList.remove('hidden');
-        }
-
-        function enviarNotificacion(clienteId, clienteNombre) {
-            document.getElementById('clienteIdNotif').value = clienteId;
-            document.getElementById('clienteNombreNotif').textContent = clienteNombre;
-            document.getElementById('modalNotificacion').classList.remove('hidden');
-        }
-
-        function cerrarModal(modalId) {
-            document.getElementById(modalId).classList.add('hidden');
-        }
-
-        function verDetalle(clienteId) {
-            window.location.href = `/admin/cliente/${clienteId}`;
-        }
-
-        // Cerrar modal al hacer click fuera
-        document.querySelectorAll('[id^="modal"]').forEach(modal => {
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    cerrarModal(this.id);
-                }
-            });
-        });
+    function openAsignar(id, nombre) {
+        document.getElementById('asignar-cliente-id').value = id;
+        document.getElementById('asignar-cliente-nombre').textContent = nombre;
+        document.getElementById('modal-asignar').classList.remove('hidden');
+    }
+    function openNotif(id, nombre) {
+        document.getElementById('notif-cliente-id').value = id;
+        document.getElementById('notif-cliente-nombre').textContent = nombre;
+        document.getElementById('modal-notif').classList.remove('hidden');
+    }
+    ['modal-asignar','modal-notif'].forEach(id => {
+        document.getElementById(id).addEventListener('click', function(e){ if(e.target===this) this.classList.add('hidden'); });
+    });
     </script>
+        </div>
+    </div>
 </body>
 </html>

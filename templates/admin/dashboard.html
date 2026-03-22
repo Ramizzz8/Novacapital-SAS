@@ -6,287 +6,280 @@
     <title>Dashboard Admin - Novacapital</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .sidebar-link {
-            transition: all 0.3s;
-        }
-        .sidebar-link:hover {
-            background: rgba(255, 255, 255, 0.1);
-            transform: translateX(5px);
-        }
-        .sidebar-link.active {
-            background: rgba(255, 255, 255, 0.15);
-            border-left: 4px solid white;
-        }
-        .stat-card {
-            transition: transform 0.3s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
+        .sidebar-gradient { background: linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 100%); }
+        .nav-item { transition: all 0.15s; }
+        .nav-item.active { background: rgba(255,255,255,0.15); }
+        .nav-item:hover { background: rgba(255,255,255,0.1); }
+        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        .fade-in { animation: fadeIn 0.35s ease forwards; }
     </style>
 </head>
-<body class="bg-gray-50">
-    <div class="flex h-screen overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex-shrink-0">
-            <div class="p-6 border-b border-blue-700">
-                <h1 class="text-2xl font-bold">NOVACAPITAL</h1>
-                <p class="text-sm text-blue-200">Panel de Administración</p>
-            </div>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
 
-            <nav class="flex-1 overflow-y-auto p-4">
-                <a href="/admin/dashboard" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>📊</span>
-                    <span>Dashboard</span>
-                </a>
-                <a href="/admin/clientes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>👥</span>
-                    <span>Gestión de Clientes</span>
-                </a>
-                <a href="/admin/solicitudes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>📋</span>
-                    <span>Solicitudes</span>
-                </a>
-                <a href="/admin/asesores" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>👔</span>
-                    <span>Gestión de Asesores</span>
-                </a>
-                <a href="/admin/documentos" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>📁</span>
-                    <span>Documentos</span>
-                </a>
-                <a href="/admin/notificaciones" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>🔔</span>
-                    <span>Notificaciones</span>
-                    {% if notificaciones_pendientes > 0 %}
-                    <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">{{ notificaciones_pendientes }}</span>
-                    {% endif %}
-                </a>
-                <a href="/admin/reportes" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg mb-2">
-                    <span>📊</span>
-                    <span>Reportes</span>
-                </a>
-            </nav>
-
-            <div class="p-4 border-t border-blue-700">
-                <div class="flex items-center gap-3 mb-2">
-                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <span class="text-lg">👤</span>
-                    </div>
-                    <div class="flex-1">
-                        <p class="font-semibold text-sm">{{ session.user_nombre }}</p>
-                        <p class="text-xs text-blue-200">Administrador</p>
-                    </div>
-                </div>
-                <a href="/logout" class="block text-center bg-blue-700 hover:bg-blue-600 py-2 rounded-lg text-sm transition">
-                    Cerrar Sesión
-                </a>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto">
-            <!-- Header -->
-            <header class="bg-white shadow-sm sticky top-0 z-10">
-                <div class="px-8 py-4">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-2xl font-bold text-gray-900">Dashboard General</h2>
-                            <p class="text-gray-600">Vista general del sistema</p>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <button class="relative p-2 hover:bg-gray-100 rounded-lg">
-                                <span class="text-2xl">🔔</span>
-                                {% if notificaciones_pendientes > 0 %}
-                                <span class="absolute top-0 right-0 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                                    {{ notificaciones_pendientes }}
-                                </span>
-                                {% endif %}
-                            </button>
-                            <div class="text-right">
-                                <p class="text-sm font-semibold text-gray-700">{{ session.user_email }}</p>
-                                <p class="text-xs text-gray-500">{{ now.strftime('%d/%m/%Y %H:%M') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Content -->
-            <div class="p-8">
-                <!-- Flash Messages -->
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                        <div class="mb-4 p-4 rounded-lg {% if category == 'error' %}bg-red-100 text-red-700 border border-red-300{% else %}bg-green-100 text-green-700 border border-green-300{% endif %}">
-                            {{ message }}
-                        </div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-
-                <!-- Estadísticas Principales -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <!-- Total Clientes -->
-                    <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-lg">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <p class="text-blue-100 text-sm">Total Clientes</p>
-                                <h3 class="text-4xl font-bold mt-2">{{ stats.total_clientes or 0 }}</h3>
-                            </div>
-                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                <span class="text-3xl">👥</span>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 text-sm">
-                            <span class="bg-white bg-opacity-20 px-2 py-1 rounded">
-                                {{ stats.clientes_activos or 0 }} activos
-                            </span>
-                        </div>
-                    </div>
-
-                    <!-- Solicitudes Pendientes -->
-                    <div class="stat-card bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <p class="text-orange-100 text-sm">Solicitudes Pendientes</p>
-                                <h3 class="text-4xl font-bold mt-2">{{ stats.solicitudes_pendientes or 0 }}</h3>
-                            </div>
-                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                <span class="text-3xl">⏳</span>
-                            </div>
-                        </div>
-                        <a href="/admin/solicitudes" class="text-sm hover:underline">Ver todas →</a>
-                    </div>
-
-                    <!-- Préstamos Activos -->
-                    <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-6 shadow-lg">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <p class="text-green-100 text-sm">Préstamos Activos</p>
-                                <h3 class="text-4xl font-bold mt-2">{{ stats.prestamos_activos or 0 }}</h3>
-                            </div>
-                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                <span class="text-3xl">💰</span>
-                            </div>
-                        </div>
-                        <p class="text-sm">{{ "${:,.0f}".format(stats.cartera_total or 0) }} COP</p>
-                    </div>
-
-                    <!-- Total Asesores -->
-                    <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-6 shadow-lg">
-                        <div class="flex justify-between items-start mb-4">
-                            <div>
-                                <p class="text-purple-100 text-sm">Asesores Activos</p>
-                                <h3 class="text-4xl font-bold mt-2">{{ stats.total_asesores or 0 }}</h3>
-                            </div>
-                            <div class="bg-white bg-opacity-20 p-3 rounded-lg">
-                                <span class="text-3xl">👔</span>
-                            </div>
-                        </div>
-                        <a href="/admin/asesores" class="text-sm hover:underline">Gestionar →</a>
-                    </div>
-                </div>
-
-                <!-- Sección de Solicitudes Recientes y Actividad -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <!-- Solicitudes Recientes -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-gray-900">Solicitudes Recientes</h3>
-                            <a href="/admin/solicitudes" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
-                                Ver todas →
-                            </a>
-                        </div>
-                        <div class="space-y-3">
-                            {% if solicitudes_recientes %}
-                                {% for solicitud in solicitudes_recientes[:5] %}
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
-                                            {{ solicitud.cliente_nombres[0] }}{{ solicitud.cliente_apellidos[0] }}
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-sm text-gray-900">
-                                                {{ solicitud.cliente_nombres }} {{ solicitud.cliente_apellidos }}
-                                            </p>
-                                            <p class="text-xs text-gray-500">
-                                                {{ "${:,.0f}".format(solicitud.monto_solicitado) }} - {{ solicitud.plazo_meses }} meses
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs rounded-full font-semibold">
-                                            {{ solicitud.estado }}
-                                        </span>
-                                        <p class="text-xs text-gray-500 mt-1">{{ solicitud.fecha_solicitud.strftime('%d/%m/%Y') }}</p>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <p class="text-gray-500 text-center py-8">No hay solicitudes recientes</p>
-                            {% endif %}
-                        </div>
-                    </div>
-
-                    <!-- Actividad de Asesores -->
-                    <div class="bg-white rounded-xl shadow-md p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-gray-900">Rendimiento de Asesores</h3>
-                            <a href="/admin/asesores" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
-                                Ver todos →
-                            </a>
-                        </div>
-                        <div class="space-y-3">
-                            {% if asesores %}
-                                {% for asesor in asesores[:5] %}
-                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center">
-                                            <span class="text-lg">👔</span>
-                                        </div>
-                                        <div>
-                                            <p class="font-semibold text-sm text-gray-900">{{ asesor.nombre }}</p>
-                                            <p class="text-xs text-gray-500">{{ asesor.total_clientes or 0 }} clientes asignados</p>
-                                        </div>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-sm font-semibold text-gray-900">{{ asesor.solicitudes_pendientes or 0 }}</p>
-                                        <p class="text-xs text-gray-500">pendientes</p>
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            {% else %}
-                                <p class="text-gray-500 text-center py-8">No hay asesores registrados</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Acciones Rápidas -->
-                <div class="bg-white rounded-xl shadow-md p-6">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Acciones Rápidas</h3>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <a href="/admin/clientes" class="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 rounded-lg transition">
-                            <span class="text-4xl mb-2">👥</span>
-                            <span class="text-sm font-semibold text-blue-900">Ver Clientes</span>
-                        </a>
-                        <a href="/admin/solicitudes" class="flex flex-col items-center justify-center p-6 bg-orange-50 hover:bg-orange-100 rounded-lg transition">
-                            <span class="text-4xl mb-2">📋</span>
-                            <span class="text-sm font-semibold text-orange-900">Revisar Solicitudes</span>
-                        </a>
-                        <a href="/admin/asesores" class="flex flex-col items-center justify-center p-6 bg-purple-50 hover:bg-purple-100 rounded-lg transition">
-                            <span class="text-4xl mb-2">➕</span>
-                            <span class="text-sm font-semibold text-purple-900">Nuevo Asesor</span>
-                        </a>
-                        <a href="/admin/notificaciones" class="flex flex-col items-center justify-center p-6 bg-green-50 hover:bg-green-100 rounded-lg transition">
-                            <span class="text-4xl mb-2">📢</span>
-                            <span class="text-sm font-semibold text-green-900">Enviar Notificación</span>
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </main>
+<!-- SIDEBAR -->
+<aside class="w-64 sidebar-gradient text-white flex flex-col shadow-xl z-20 shrink-0">
+            <div class="px-5 py-4 border-b border-white/10 flex items-center justify-center">
+        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" class="h-12 object-contain">
     </div>
+
+    <nav class="flex-1 overflow-y-auto py-5 px-3 space-y-0.5">
+        <a href="/admin/dashboard" class="nav-item active flex items-center gap-3 px-4 py-2.5 rounded-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span class="text-sm font-semibold">Dashboard</span>
+        </a>
+        <a href="/admin/clientes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-sm font-medium">Gestión de Clientes</span>
+        </a>
+        <a href="/admin/solicitudes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span class="text-sm font-medium">Solicitudes</span>
+            {% if stats.solicitudes_pendientes > 0 %}
+            <span class="ml-auto text-xs bg-yellow-400 text-yellow-900 font-bold px-1.5 py-0.5 rounded-full">{{ stats.solicitudes_pendientes }}</span>
+            {% endif %}
+        </a>
+        <a href="/admin/prestamos" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            <span class="text-sm font-medium">Préstamos</span>
+        </a>
+        <a href="/admin/asesores" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span class="text-sm font-medium">Gestión de Asesores</span>
+        </a>
+        <a href="/admin/reportes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span class="text-sm font-medium">Reportes</span>
+        </a>
+    </nav>
+
+    <div class="px-4 py-4 border-t border-white/10">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-sm font-semibold truncate">{{ session.get('user_nombre', 'Admin') }}</p>
+                <p class="text-xs text-blue-200">Administrador</p>
+            </div>
+            <a href="/logout" class="text-blue-200 hover:text-white p-1 rounded transition" title="Cerrar sesión">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<div class="flex-1 flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm shrink-0">
+        <div>
+            <p class="text-xs text-gray-400 uppercase tracking-wider">Administración</p>
+            <h1 class="text-xl font-bold text-gray-800">Vista general del sistema</h1>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">
+                {{ now.strftime('%d %b %Y — %H:%M') }}
+            </div>
+            <div class="flex items-center gap-2 pl-3 border-l border-gray-200">
+                <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+                </div>
+                <span class="text-sm font-medium text-gray-700">{{ session.get('user_nombre', 'Admin') }}</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <div class="flex-1 overflow-y-auto p-8 fade-in">
+
+        <!-- Flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+            {% for category, message in messages %}
+            <div class="px-4 py-3 rounded-lg text-sm font-medium
+                {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
+                {% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200
+                {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+
+            <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <span class="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full font-semibold">{{ stats.clientes_activos or 0 }} activos</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ stats.total_clientes or 0 }}</p>
+                <p class="text-xs text-gray-500 mt-1">Total clientes</p>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    {% if stats.solicitudes_pendientes > 0 %}
+                    <span class="text-xs text-yellow-700 bg-yellow-50 px-2 py-0.5 rounded-full font-semibold">Requieren atención</span>
+                    {% endif %}
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ stats.solicitudes_pendientes or 0 }}</p>
+                <p class="text-xs text-gray-500 mt-1">Solicitudes pendientes</p>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-semibold">Desembolsados</span>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ stats.prestamos_activos or 0 }}</p>
+                <p class="text-xs text-gray-500 mt-1">${{ "{:,.0f}".format(stats.cartera_total or 0) }} COP</p>
+            </div>
+
+            <div class="stat-card bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <a href="/admin/asesores" class="text-xs text-purple-600 hover:text-purple-700 font-medium">Gestionar</a>
+                </div>
+                <p class="text-2xl font-bold text-gray-800">{{ stats.total_asesores or 0 }}</p>
+                <p class="text-xs text-gray-500 mt-1">Asesores activos</p>
+            </div>
+        </div>
+
+        <!-- Solicitudes recientes + Asesores -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+            <!-- Solicitudes recientes (2/3) -->
+            <div class="lg:col-span-2 bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h2 class="font-bold text-gray-800">Solicitudes Recientes</h2>
+                    <a href="/admin/solicitudes" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Ver todas</a>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead>
+                            <tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider">
+                                <th class="px-6 py-3 text-left font-medium">Cliente</th>
+                                <th class="px-6 py-3 text-left font-medium">Monto</th>
+                                <th class="px-6 py-3 text-left font-medium">Fecha</th>
+                                <th class="px-6 py-3 text-left font-medium">Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-50">
+                            {% if solicitudes_recientes %}
+                            {% for s in solicitudes_recientes %}
+                            <tr class="hover:bg-gray-50 transition">
+                                <td class="px-6 py-3">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-7 h-7 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                            <span class="text-blue-700 font-bold text-xs">{{ s.cliente_nombres[0] }}</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-gray-800 text-xs">{{ s.cliente_nombres }} {{ s.cliente_apellidos }}</p>
+                                            <p class="text-gray-400 text-xs font-mono">{{ s.numero_prestamo }}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-3 font-semibold text-gray-800 text-xs">${{ "{:,.0f}".format(s.monto_solicitado) }}</td>
+                                <td class="px-6 py-3 text-gray-500 text-xs">{{ s.fecha_solicitud.strftime('%d/%m/%Y') if s.fecha_solicitud else '—' }}</td>
+                                <td class="px-6 py-3">
+                                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                                        {% if s.estado == 'solicitado' %}bg-yellow-100 text-yellow-700
+                                        {% elif s.estado == 'aprobado' %}bg-green-100 text-green-700
+                                        {% elif s.estado == 'rechazado' %}bg-red-100 text-red-700
+                                        {% elif s.estado == 'desembolsado' %}bg-blue-100 text-blue-700
+                                        {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                        {{ s.estado.replace('_',' ').title() }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr><td colspan="4" class="px-6 py-10 text-center text-gray-400 text-sm">Sin solicitudes recientes</td></tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Asesores (1/3) -->
+            <div class="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <h2 class="font-bold text-gray-800">Asesores</h2>
+                    <a href="/admin/asesores" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Ver todos</a>
+                </div>
+                <div class="divide-y divide-gray-50">
+                    {% if asesores %}
+                    {% for a in asesores %}
+                    <div class="px-5 py-3 hover:bg-gray-50 transition">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
+                                <span class="text-blue-700 font-bold text-xs">{{ a.nombre[0].upper() }}</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm font-semibold text-gray-800 truncate">{{ a.nombre }}</p>
+                                <p class="text-xs text-gray-400">{{ a.total_clientes or 0 }} clientes</p>
+                            </div>
+                            {% if a.solicitudes_pendientes and a.solicitudes_pendientes > 0 %}
+                            <span class="text-xs bg-yellow-100 text-yellow-700 font-bold px-1.5 py-0.5 rounded-full">{{ a.solicitudes_pendientes }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="px-5 py-10 text-center text-gray-400 text-sm">Sin asesores registrados</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Acciones rápidas -->
+        <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
+            <h2 class="font-bold text-gray-800 mb-4">Acciones Rápidas</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <a href="/admin/clientes" class="flex flex-col items-center gap-2 p-4 bg-blue-50 hover:bg-blue-100 rounded-xl transition group">
+                    <div class="w-10 h-10 bg-blue-100 group-hover:bg-blue-200 rounded-lg flex items-center justify-center transition">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    </div>
+                    <span class="text-xs font-semibold text-blue-900">Ver Clientes</span>
+                </a>
+                <a href="/admin/solicitudes" class="flex flex-col items-center gap-2 p-4 bg-yellow-50 hover:bg-yellow-100 rounded-xl transition group">
+                    <div class="w-10 h-10 bg-yellow-100 group-hover:bg-yellow-200 rounded-lg flex items-center justify-center transition">
+                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <span class="text-xs font-semibold text-yellow-900">Revisar Solicitudes</span>
+                </a>
+                <a href="/admin/asesores" class="flex flex-col items-center gap-2 p-4 bg-purple-50 hover:bg-purple-100 rounded-xl transition group">
+                    <div class="w-10 h-10 bg-purple-100 group-hover:bg-purple-200 rounded-lg flex items-center justify-center transition">
+                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    </div>
+                    <span class="text-xs font-semibold text-purple-900">Nuevo Asesor</span>
+                </a>
+                <a href="/admin/reportes" class="flex flex-col items-center gap-2 p-4 bg-green-50 hover:bg-green-100 rounded-xl transition group">
+                    <div class="w-10 h-10 bg-green-100 group-hover:bg-green-200 rounded-lg flex items-center justify-center transition">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
+                    <span class="text-xs font-semibold text-green-900">Reportes</span>
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>
 </body>
 </html>
