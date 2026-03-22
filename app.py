@@ -682,58 +682,56 @@ def admin_clientes():
 @app.route('/admin/asignar-asesor', methods=['POST'])
 @admin_required
 def asignar_asesor():
-    """Asigna un asesor a un cliente"""
     try:
         cliente_id = request.form.get('cliente_id')
         asesor_id = request.form.get('asesor_id')
-        
+
         if not cliente_id or not asesor_id:
             flash('Datos incompletos', 'error')
             return redirect(url_for('admin_clientes'))
-        
+
         cursor = mysql.connection.cursor()
-        
-        # Actualizar cliente
+
+        # Desactivar asignación anterior si existe
         cursor.execute("""
-            UPDATE clientes 
-            SET asesor_id = %s 
-            WHERE id = %s
-        """, (asesor_id, cliente_id))
-        
-        # Registrar en historial de asignaciones
+            UPDATE asignaciones_asesores 
+            SET activa = FALSE, fecha_desasignacion = NOW()
+            WHERE cliente_id = %s AND activa = TRUE
+        """, (cliente_id,))
+
+        # Crear nueva asignación
         cursor.execute("""
             INSERT INTO asignaciones_asesores 
             (cliente_id, asesor_id, activa, notas)
             VALUES (%s, %s, TRUE, 'Asignación desde panel admin')
         """, (cliente_id, asesor_id))
-        
+
         # Obtener nombres para notificación
         cursor.execute("SELECT nombres, apellidos FROM clientes WHERE id = %s", (cliente_id,))
         cliente = cursor.fetchone()
-        
+
         cursor.execute("SELECT nombre FROM usuarios WHERE id = %s", (asesor_id,))
         asesor = cursor.fetchone()
-        
-        # Crear notificación para el asesor
+
+        # Notificación al asesor
         cursor.execute("""
             INSERT INTO notificaciones 
-            (usuario_id, titulo, mensaje, tipo, destinatario_tipo)
-            VALUES (%s, %s, %s, 'info', 'asesor')
+            (usuario_id, titulo, mensaje, tipo, leida)
+            VALUES (%s, %s, %s, 'info', FALSE)
         """, (
             asesor_id,
             'Nuevo cliente asignado',
             f'Se te ha asignado el cliente {cliente["nombres"]} {cliente["apellidos"]}'
         ))
-        
+
         mysql.connection.commit()
         cursor.close()
-        
         flash(f'Asesor {asesor["nombre"]} asignado correctamente', 'success')
-        
+
     except Exception as e:
         mysql.connection.rollback()
         flash(f'Error al asignar asesor: {str(e)}', 'error')
-    
+
     return redirect(url_for('admin_clientes'))
 
 
