@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solicitud Enviada - Novacapital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .fade-up { animation: fadeUp 0.5s ease forwards; }
+        .fade-up-1 { animation: fadeUp 0.5s 0.2s ease both; }
+        .fade-up-2 { animation: fadeUp 0.5s 0.35s ease both; }
+        .fade-up-3 { animation: fadeUp 0.5s 0.5s ease both; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-6">
+
+    <div class="w-full max-w-lg">
+
+        <!-- Card -->
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+            <!-- Top banner -->
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-10 text-center">
+                <!-- Check circle -->
+                <div class="scale-in w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="fade-up text-2xl font-bold text-white mb-1">¡Solicitud Enviada!</h1>
+                <p class="fade-up-1 text-green-100 text-sm">Tu solicitud fue recibida correctamente</p>
+            </div>
+
+            <!-- Content -->
+            <div class="px-8 py-8">
+
+                <!-- Número de solicitud -->
+                <div class="fade-up-1 bg-gray-50 rounded-xl p-5 mb-6 text-center border border-gray-100">
+                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Número de solicitud</p>
+                    <p class="text-2xl font-bold font-mono text-blue-700">{{ numero_prestamo }}</p>
+                    <p class="text-xs text-gray-400 mt-1">Guarda este número para hacer seguimiento</p>
+                </div>
+
+                <!-- Pasos siguientes -->
+                <div class="fade-up-2 mb-8">
+                    <p class="text-sm font-semibold text-gray-700 mb-3">¿Qué sigue?</p>
+                    <div class="space-y-3">
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                <span class="text-blue-700 font-bold text-xs">1</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Un asesor revisará tu solicitud en las próximas <strong>24 horas</strong>.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                <span class="text-blue-700 font-bold text-xs">2</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Te contactaremos por correo o celular para informarte el resultado.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                                <span class="text-blue-700 font-bold text-xs">3</span>
+                            </div>
+                            <p class="text-sm text-gray-600">Una vez aprobado, el desembolso se realiza directamente a tu cuenta bancaria.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="fade-up-3 flex flex-col sm:flex-row gap-3">
+                    <a href="/cliente/dashboard" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold text-sm transition">
+                        Ver mis solicitudes
+                    </a>
+                    <a href="/" class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 text-center py-3 rounded-xl font-medium text-sm transition">
+                        Volver al inicio
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Footer -->
+            <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
+                <p class="text-xs text-gray-400">
+                    ¿Tienes dudas? Llámanos al <strong class="text-gray-600">01 8000 123 456</strong> o escríbenos a <strong class="text-gray-600">info@novacapital.com</strong>
+                </p>
+            </div>
+        </div>
+
+        <!-- Logo -->
+        <div class="text-center mt-6">
+            <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" class="h-10 object-contain mx-auto opacity-80">
+        </div>
+
+    </div>
+</body>
+</html>
