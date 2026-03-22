@@ -528,38 +528,47 @@ def solicitud_exitosa():
 @app.route('/admin/dashboard')
 @admin_required
 def admin_dashboard():
-    """Dashboard principal del administrador"""
+    cursor = mysql.connection.cursor()
+    stats = {}
+
     try:
-        print(">>> ENTRANDO A ADMIN DASHBOARD <<<")  # ← agrega solo esta línea
-        cursor = mysql.connection.cursor()
-        
-        # Estadísticas generales
-        stats = {}
-        
-        # Total clientes
         cursor.execute("SELECT COUNT(*) as total FROM clientes")
         stats['total_clientes'] = cursor.fetchone()['total']
-        
+    except Exception as e:
+        stats['total_clientes'] = 0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM clientes WHERE estado = 'activo'")
         stats['clientes_activos'] = cursor.fetchone()['total']
-        
-        # Solicitudes pendientes
+    except Exception as e:
+        stats['clientes_activos'] = 0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'solicitado'")
         stats['solicitudes_pendientes'] = cursor.fetchone()['total']
-        
-        # Préstamos activos
+    except Exception as e:
+        stats['solicitudes_pendientes'] = 0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'desembolsado'")
         stats['prestamos_activos'] = cursor.fetchone()['total']
-        
-        # Cartera total
+    except Exception as e:
+        stats['prestamos_activos'] = 0
+
+    try:
         cursor.execute("SELECT COALESCE(SUM(monto_aprobado), 0) as total FROM prestamos WHERE estado = 'desembolsado'")
-        stats['cartera_total'] = cursor.fetchone()['total']
-        
-        # Total asesores activos
+        stats['cartera_total'] = float(cursor.fetchone()['total'])
+    except Exception as e:
+        stats['cartera_total'] = 0.0
+
+    try:
         cursor.execute("SELECT COUNT(*) as total FROM usuarios WHERE rol = 'asesor' AND activo = TRUE")
         stats['total_asesores'] = cursor.fetchone()['total']
-        
-        # Solicitudes recientes
+    except Exception as e:
+        stats['total_asesores'] = 0
+
+    solicitudes_recientes = []
+    try:
         cursor.execute("""
             SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
             FROM prestamos p
@@ -568,8 +577,11 @@ def admin_dashboard():
             LIMIT 5
         """)
         solicitudes_recientes = cursor.fetchall()
-        
-        # Asesores con estadísticas
+    except Exception as e:
+        print(f"ERR solicitudes_recientes: {e}")
+
+    asesores = []
+    try:
         cursor.execute("""
             SELECT u.id, u.nombre, u.email,
                    COUNT(DISTINCT aa.cliente_id) as total_clientes,
@@ -583,21 +595,16 @@ def admin_dashboard():
             LIMIT 5
         """)
         asesores = cursor.fetchall()
-        
-        # ✅ PON ESTO en su lugar:
-        notificaciones_pendientes = 0
-        
-        return render_template('admin/dashboard.html',
-                             stats=stats,
-                             solicitudes_recientes=solicitudes_recientes,
-                             asesores=asesores,
-                             notificaciones_pendientes=notificaciones_pendientes,
-                             now=datetime.now())
-        
     except Exception as e:
-        print(f"ERROR REAL: {str(e)}")  # ← agrega esta línea
-        flash(f'Error al cargar dashboard: {str(e)}', 'error')
-        return redirect(url_for('index'))
+        print(f"ERR asesores: {e}")
+
+    cursor.close()
+    return render_template('admin/dashboard.html',
+                           stats=stats,
+                           solicitudes_recientes=solicitudes_recientes,
+                           asesores=asesores,
+                           notificaciones_pendientes=0,
+                           now=datetime.now())
 
 
 @app.route('/admin/clientes')
@@ -646,7 +653,7 @@ def admin_clientes():
             query += " AND aa.asesor_id = %s"
             params.append(asesor_filter)
         
-        query += " GROUP BY c.id ORDER BY c.fecha_registro DESC"
+        query += " GROUP BY c.id, u.email, a.nombre ORDER BY c.fecha_registro DESC"
         
         cursor.execute(query, params)
         clientes = cursor.fetchall()
@@ -657,7 +664,7 @@ def admin_clientes():
         
         # Obtener lista de asesores para filtros
         cursor.execute("""
-            SELECT u.id, u.nombre, u.email, 
+            SELECT u.id, u.nombre, u.email,
                    COUNT(aa.cliente_id) as total_clientes
             FROM usuarios u
             LEFT JOIN asignaciones_asesores aa ON aa.asesor_id = u.id AND aa.activa = TRUE
@@ -717,8 +724,8 @@ def asignar_asesor():
         # Crear notificación para el asesor
         cursor.execute("""
             INSERT INTO notificaciones 
-            (usuario_id, titulo, mensaje, tipo, destinatario_tipo)
-            VALUES (%s, %s, %s, 'info', 'asesor')
+            (usuario_id, titulo, mensaje, tipo)
+            VALUES (%s, %s, %s, 'info')
         """, (
             asesor_id,
             'Nuevo cliente asignado',
@@ -763,8 +770,8 @@ def enviar_notificacion():
         # Crear notificación
         cursor.execute("""
             INSERT INTO notificaciones 
-            (usuario_id, titulo, mensaje, tipo, destinatario_tipo, leida)
-            VALUES (%s, %s, %s, 'info', 'cliente', FALSE)
+            (usuario_id, titulo, mensaje, tipo, leida)
+            VALUES (%s, %s, %s, 'info', FALSE)
         """, (cliente['usuario_id'], titulo, mensaje))
         
         mysql.connection.commit()
@@ -917,37 +924,47 @@ def asesor_dashboard():
         asesor_id = session.get('user_id')
 
         # Clientes asignados al asesor
-        cursor.execute("""
-            SELECT c.*,
-                   COUNT(DISTINCT p.id) as total_prestamos,
-                   SUM(CASE WHEN p.estado = 'solicitado' THEN 1 ELSE 0 END) as pendientes
-            FROM clientes c
-            JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
-            LEFT JOIN prestamos p ON p.cliente_id = c.id
-            WHERE aa.asesor_id = %s
-            GROUP BY c.id
-            ORDER BY c.fecha_registro DESC
-        """, (asesor_id,))
-        clientes = cursor.fetchall()
+        clientes = []
+        try:
+            cursor.execute("""
+                SELECT c.*,
+                       COUNT(DISTINCT p.id) as total_prestamos,
+                       SUM(CASE WHEN p.estado = 'solicitado' THEN 1 ELSE 0 END) as pendientes
+                FROM clientes c
+                JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
+                LEFT JOIN prestamos p ON p.cliente_id = c.id
+                WHERE aa.asesor_id = %s
+                GROUP BY c.id
+                ORDER BY c.fecha_registro DESC
+            """, (asesor_id,))
+            clientes = cursor.fetchall()
+        except Exception as e:
+            print(f"ERR asesor clientes: {e}")
 
-        # Solicitudes pendientes de sus clientes
-        cursor.execute("""
-            SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
-            FROM prestamos p
-            JOIN clientes c ON p.cliente_id = c.id
-            JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
-            WHERE aa.asesor_id = %s AND p.estado = 'solicitado'
-            ORDER BY p.fecha_solicitud DESC
-            LIMIT 10
-        """, (asesor_id,))
-        solicitudes_pendientes = cursor.fetchall()
+        solicitudes_pendientes = []
+        try:
+            cursor.execute("""
+                SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
+                FROM prestamos p
+                JOIN clientes c ON p.cliente_id = c.id
+                JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
+                WHERE aa.asesor_id = %s AND p.estado = 'solicitado'
+                ORDER BY p.fecha_solicitud DESC
+                LIMIT 10
+            """, (asesor_id,))
+            solicitudes_pendientes = cursor.fetchall()
+        except Exception as e:
+            print(f"ERR asesor solicitudes: {e}")
 
-        # Notificaciones no leídas
-        cursor.execute("""
-            SELECT COUNT(*) as total FROM notificaciones
-            WHERE usuario_id = %s AND leida = FALSE
-        """, (asesor_id,))
-        notificaciones_pendientes = cursor.fetchone()['total']
+        notificaciones_pendientes = 0
+        try:
+            cursor.execute("""
+                SELECT COUNT(*) as total FROM notificaciones
+                WHERE usuario_id = %s AND leida = FALSE
+            """, (asesor_id,))
+            notificaciones_pendientes = cursor.fetchone()['total']
+        except Exception as e:
+            print(f"ERR asesor notif: {e}")
 
         stats = {
             'total_clientes':        len(clientes),
@@ -1016,14 +1033,16 @@ def crear_asesor():
         password = request.form.get('password', 'Asesor123!')  # Password por defecto
         
         usuario_id, error = crear_usuario(
-            nombre=nombre,
+            nombres=nombre,
             email=email,
             password=password,
             tipo_documento='CC',
-            numero_documento='0000000000',  # Temporal
-            apellido='',
-            celular='0000000000',  # Temporal
-            rol='asesor'
+            numero_documento=f'ASR{str(hash(email))[-6:]}',
+            apellidos='',
+            celular='0000000000',
+            rol='asesor',
+            tipo_cliente='empleado_publico',
+            fecha_nacimiento='1990-01-01'
         )
         
         if error:
@@ -1095,6 +1114,34 @@ def admin_prestamos():
     except Exception as e:
         flash(f'Error al cargar préstamos: {str(e)}', 'error')
         return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/editar-asesor', methods=['POST'])
+@admin_required
+def editar_asesor():
+    try:
+        asesor_id = request.form.get('asesor_id')
+        nombre    = request.form.get('nombre', '').strip()
+        email     = request.form.get('email', '').strip()
+        password  = request.form.get('password', '').strip()
+        if not all([asesor_id, nombre, email]):
+            flash('Nombre y email son obligatorios', 'error')
+            return redirect(url_for('admin_asesores'))
+        cursor = mysql.connection.cursor()
+        if password:
+            ph = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            cursor.execute("UPDATE usuarios SET nombre=%s, email=%s, password_hash=%s WHERE id=%s AND rol='asesor'",
+                           (nombre, email, ph, asesor_id))
+        else:
+            cursor.execute("UPDATE usuarios SET nombre=%s, email=%s WHERE id=%s AND rol='asesor'",
+                           (nombre, email, asesor_id))
+        mysql.connection.commit()
+        cursor.close()
+        flash('Asesor actualizado correctamente', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al editar asesor: {str(e)}', 'error')
+    return redirect(url_for('admin_asesores'))
 
 # ================================
 # MANEJADORES DE ERRORES
