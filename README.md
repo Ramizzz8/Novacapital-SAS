@@ -178,9 +178,3 @@ Consulta el documento completo aquí:
 
 - **[`MANUAL_USUARIO.md`](./MANUAL_USUARIO.md)**
 
-## 11) Mejoras recomendadas
-
-- Migrar a patrón `create_app()` (el archivo `run.py` lo asume actualmente).
-- Incorporar pruebas automáticas (unitarias e integración).
-- Centralizar configuración por entorno (dev/staging/prod).
-- Endurecer seguridad en producción (cookies seguras, CSRF, límites de intentos de login).
