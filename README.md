@@ -1,6 +1,6 @@
 # Novacapital SAS – Plataforma de Préstamos por Libranza
 
-Aplicación web construida con **Flask + MySQL** para gestionar el ciclo de originación de créditos por libranza: registro de clientes, autenticación por roles, solicitud de préstamo y operación interna para administradores y asesores.
+Esta aplicación web fue construida con **Flask + MySQL** y sirve para gestionar el ciclo de originación de créditos por libranza: registro de clientes, autenticación por roles, solicitud de préstamo y operación interna para administradores y asesores.
 
 ## 1) Características principales
 
