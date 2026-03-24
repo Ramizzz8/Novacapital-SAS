@@ -1,6 +1,6 @@
 # Manual de Usuario – Novacapital SAS
 
-Este manual explica cómo usar la plataforma de Novacapital desde el punto de vista de cada tipo de usuario: **Cliente**, **Asesor** y **Administrador**.
+En este manual se explica cómo usar la plataforma de Novacapital desde el punto de vista de cada tipo de usuario: **Cliente**, **Asesor** y **Administrador**.
 
 ---
 
