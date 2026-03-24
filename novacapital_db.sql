@@ -29,14 +29,14 @@ CREATE TABLE `asignaciones_asesores` (
   `fecha_asignacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_desasignacion` timestamp NULL DEFAULT NULL,
   `activa` tinyint(1) DEFAULT '1',
-  `notas` text COLLATE utf8mb4_unicode_ci,
+  `notas` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
   PRIMARY KEY (`id`),
   KEY `idx_cliente` (`cliente_id`),
   KEY `idx_asesor` (`asesor_id`),
   KEY `idx_activa` (`activa`),
   CONSTRAINT `asignaciones_asesores_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON DELETE CASCADE,
   CONSTRAINT `asignaciones_asesores_ibfk_2` FOREIGN KEY (`asesor_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,6 +45,7 @@ CREATE TABLE `asignaciones_asesores` (
 
 LOCK TABLES `asignaciones_asesores` WRITE;
 /*!40000 ALTER TABLE `asignaciones_asesores` DISABLE KEYS */;
+INSERT INTO `asignaciones_asesores` VALUES (1,2,10,'2026-03-22 22:14:49','2026-03-24 09:15:19',0,'Asignación desde panel admin'),(2,1,10,'2026-03-22 22:18:49',NULL,1,'Asignación desde panel admin'),(3,2,10,'2026-03-24 09:15:19',NULL,1,'Asignación desde panel admin');
 /*!40000 ALTER TABLE `asignaciones_asesores` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -59,6 +60,7 @@ CREATE TABLE `bitacora` (
   `id` int NOT NULL AUTO_INCREMENT,
   `usuario_id` int NOT NULL,
   `accion` varchar(100) NOT NULL,
+  `modulo` varchar(50) DEFAULT NULL,
   `tabla_afectada` varchar(50) DEFAULT NULL,
   `registro_id` int DEFAULT NULL,
   `descripcion` text,
@@ -67,7 +69,7 @@ CREATE TABLE `bitacora` (
   PRIMARY KEY (`id`),
   KEY `usuario_id` (`usuario_id`),
   CONSTRAINT `bitacora_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,6 +78,7 @@ CREATE TABLE `bitacora` (
 
 LOCK TABLES `bitacora` WRITE;
 /*!40000 ALTER TABLE `bitacora` DISABLE KEYS */;
+INSERT INTO `bitacora` VALUES (3,7,'INSERT',NULL,'prestamos',4,'Préstamo creado: PRE202600001',NULL,'2026-03-22 19:09:09'),(4,7,'INSERT',NULL,'prestamos',5,'Préstamo creado: PRE202600002',NULL,'2026-03-22 20:13:57');
 /*!40000 ALTER TABLE `bitacora` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -141,7 +144,7 @@ CREATE TABLE `clientes` (
   KEY `idx_clientes_documento` (`numero_documento`),
   KEY `idx_usuario_id` (`usuario_id`),
   FULLTEXT KEY `idx_fulltext_clientes` (`nombres`,`apellidos`,`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,7 +153,7 @@ CREATE TABLE `clientes` (
 
 LOCK TABLES `clientes` WRITE;
 /*!40000 ALTER TABLE `clientes` DISABLE KEYS */;
-INSERT INTO `clientes` VALUES (1,14,'CE','z3021431h','Daniel','Calve','2000-04-29','danielcalve@gmail.com','12345678','3003505858','calle falsa 123','bogota','bogota','pensionado','colpensiones',2500000.00,'2026-03-02 10:06:13','activo');
+INSERT INTO `clientes` VALUES (1,14,'CE','z3021431h','Daniel','Calve','2000-04-29','danielcalve@gmail.com','12345678','3003505858','calle falsa 123','bogota','bogota','pensionado','colpensiones',2500000.00,'2026-03-02 10:06:13','activo'),(2,15,'CC','1141117518','Andres','Ramirez','2008-04-29','ajulianrague@gmail.com','None','3197656815','calle falsa 123','Bogota','Bogota','pensionado','Colpensiones',2000000000000.00,'2026-03-22 01:37:35','activo');
 /*!40000 ALTER TABLE `clientes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -163,11 +166,11 @@ DROP TABLE IF EXISTS `configuracion_sistema`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `configuracion_sistema` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `clave` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `valor` text COLLATE utf8mb4_unicode_ci,
-  `tipo` enum('string','number','boolean','json') COLLATE utf8mb4_unicode_ci DEFAULT 'string',
-  `descripcion` text COLLATE utf8mb4_unicode_ci,
-  `categoria` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `clave` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valor` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `tipo` enum('string','number','boolean','json') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'string',
+  `descripcion` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `categoria` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `clave` (`clave`),
@@ -228,11 +231,11 @@ DROP TABLE IF EXISTS `notificaciones`;
 CREATE TABLE `notificaciones` (
   `id` int NOT NULL AUTO_INCREMENT,
   `usuario_id` int NOT NULL,
-  `titulo` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `mensaje` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo` enum('info','success','warning','error') COLLATE utf8mb4_unicode_ci DEFAULT 'info',
+  `titulo` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `mensaje` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo` enum('info','success','warning','error') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT 'info',
   `leida` tinyint(1) DEFAULT '0',
-  `url_accion` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `url_accion` varchar(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `fecha_creacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_lectura` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -240,7 +243,7 @@ CREATE TABLE `notificaciones` (
   KEY `idx_leida` (`leida`),
   KEY `idx_fecha` (`fecha_creacion`),
   CONSTRAINT `notificaciones_ibfk_1` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -249,6 +252,7 @@ CREATE TABLE `notificaciones` (
 
 LOCK TABLES `notificaciones` WRITE;
 /*!40000 ALTER TABLE `notificaciones` DISABLE KEYS */;
+INSERT INTO `notificaciones` VALUES (1,10,'Nuevo cliente asignado','Se te ha asignado el cliente Andres Ramirez','info',0,NULL,'2026-03-22 22:14:49',NULL),(2,10,'Nuevo cliente asignado','Se te ha asignado el cliente Daniel Calve','info',0,NULL,'2026-03-22 22:18:49',NULL),(3,10,'Nuevo cliente asignado','Se te ha asignado el cliente Andres Ramirez','info',0,NULL,'2026-03-24 09:15:19',NULL),(4,15,'Prueba 1','asasa','info',0,NULL,'2026-03-24 21:25:12',NULL);
 /*!40000 ALTER TABLE `notificaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -298,9 +302,9 @@ DROP TABLE IF EXISTS `plantillas_documentos`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `plantillas_documentos` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `nombre` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `tipo` enum('contrato','pagare','carta','certificado','otro') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `contenido_html` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `nombre` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `tipo` enum('contrato','pagare','carta','certificado','otro') CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contenido_html` text CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `variables_disponibles` json DEFAULT NULL,
   `activa` tinyint(1) DEFAULT '1',
   `usuario_creador_id` int DEFAULT NULL,
@@ -344,6 +348,8 @@ CREATE TABLE `prestamos` (
   `fecha_desembolso` timestamp NULL DEFAULT NULL,
   `estado` enum('solicitado','en_analisis','aprobado','rechazado','desembolsado','finalizado') NOT NULL,
   `observaciones` text,
+  `banco` varchar(100) DEFAULT NULL,
+  `cuenta_bancaria` varchar(50) DEFAULT NULL,
   `usuario_aprobador_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `numero_prestamo` (`numero_prestamo`),
@@ -353,7 +359,7 @@ CREATE TABLE `prestamos` (
   FULLTEXT KEY `idx_fulltext_prestamos` (`numero_prestamo`,`observaciones`),
   CONSTRAINT `prestamos_ibfk_1` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`),
   CONSTRAINT `prestamos_ibfk_2` FOREIGN KEY (`usuario_aprobador_id`) REFERENCES `usuarios` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -362,6 +368,7 @@ CREATE TABLE `prestamos` (
 
 LOCK TABLES `prestamos` WRITE;
 /*!40000 ALTER TABLE `prestamos` DISABLE KEYS */;
+INSERT INTO `prestamos` VALUES (4,2,'PRE202600001',123132310.00,NULL,1.90,6,21908170.00,'2026-03-22 19:09:09',NULL,NULL,'solicitado','asa','BBVA','32131312',NULL),(5,2,'PRE202600002',100000000.00,NULL,1.90,48,3194200.00,'2026-03-22 20:13:57',NULL,NULL,'en_analisis','analizandose','Banco de Bogotá','123132123',NULL);
 /*!40000 ALTER TABLE `prestamos` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -374,9 +381,12 @@ UNLOCK TABLES;
 /*!50003 SET sql_mode              = 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `tr_prestamo_insert` AFTER INSERT ON `prestamos` FOR EACH ROW BEGIN
-    INSERT INTO bitacora (usuario_id, accion, modulo, tabla_afectada, registro_id, descripcion)
-    VALUES (COALESCE(NEW.usuario_aprobador_id, 1), 'INSERT', 'prestamos', 'prestamos', NEW.id, 
-            CONCAT('Préstamo creado: ', NEW.numero_prestamo));
+    DECLARE v_usuario INT;
+    SELECT MIN(id) INTO v_usuario FROM usuarios WHERE activo = TRUE;
+    IF v_usuario IS NOT NULL THEN
+        INSERT INTO bitacora (usuario_id, accion, tabla_afectada, registro_id, descripcion)
+        VALUES (v_usuario, 'INSERT', 'prestamos', NEW.id, CONCAT('Préstamo creado: ', NEW.numero_prestamo));
+    END IF;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -402,7 +412,7 @@ CREATE TABLE `usuarios` (
   `ultima_actualizacion` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -411,7 +421,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (7,'Asesor Comercial','asesor@novacapital.com','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeawY5GyYqNn5rF5Hy','asesor',1,'2026-02-24 09:02:09','2026-02-24 09:02:09'),(9,'Administrador Sistema','admin@novacapital.com','$2b$12$GEDiT4/9J/eOL7c3mZC2yumCe1BFKKLLX/8fHBRuwc1Djs95UVUl6','admin',1,'2026-02-24 09:09:34','2026-02-24 09:09:34'),(10,'Asesor Juan Pérez','juan.perez@novacapital.com','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeawY5GyYqNn5rF5Hy','asesor',1,'2026-02-24 09:26:58','2026-02-24 09:26:58'),(11,'Asesora María García','maria.garcia@novacapital.com','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeawY5GyYqNn5rF5Hy','asesor',1,'2026-02-24 09:26:58','2026-02-24 09:26:58'),(14,'Daniel','danielcalve@gmail.com','$2b$12$UcRHhYPsOTIJYk1QRyoj2uIYeSNhLuKQVAW5PVNk540rzzY1i8JsK','cliente',1,'2026-03-02 10:06:13','2026-03-02 10:06:13');
+INSERT INTO `usuarios` VALUES (7,'Asesor Comercial','asesor@novacapital.com','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeawY5GyYqNn5rF5Hy','asesor',1,'2026-02-24 09:02:09','2026-02-24 09:02:09'),(9,'Administrador Sistema','admin@novacapital.com','$2b$12$GEDiT4/9J/eOL7c3mZC2yumCe1BFKKLLX/8fHBRuwc1Djs95UVUl6','admin',1,'2026-02-24 09:09:34','2026-02-24 09:09:34'),(10,'Asesor Juan Pérez','juan.perez@novacapital.com','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeawY5GyYqNn5rF5Hy','asesor',1,'2026-02-24 09:26:58','2026-02-24 09:26:58'),(11,'Asesora María García','maria.garcia@novacapital.com','$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LeawY5GyYqNn5rF5Hy','asesor',1,'2026-02-24 09:26:58','2026-02-24 09:26:58'),(14,'Daniel','danielcalve@gmail.com','$2b$12$UcRHhYPsOTIJYk1QRyoj2uIYeSNhLuKQVAW5PVNk540rzzY1i8JsK','cliente',1,'2026-03-02 10:06:13','2026-03-02 10:06:13'),(15,'Andres','ajulianrague@gmail.com','$2b$12$GGh6Jrw1S/owJ510oitaLO993eSBCeeCehkkAihU.Nie/g039MKli','cliente',1,'2026-03-22 01:37:35','2026-03-22 01:37:35');
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -455,6 +465,14 @@ SET @saved_cs_client     = @@character_set_client;
  1 AS `solicitudes_pendientes`,
  1 AS `solicitudes_hoy`*/;
 SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping events for database 'novacapital_db'
+--
+
+--
+-- Dumping routines for database 'novacapital_db'
+--
 
 --
 -- Final view structure for view `v_cartera_vigente`
@@ -501,4 +519,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-05 14:17:37
+-- Dump completed on 2026-03-24 23:52:53
