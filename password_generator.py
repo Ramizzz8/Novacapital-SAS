@@ -1,6 +1,6 @@
 """
 Script de diagnóstico y corrección - Novacapital
-Ejecuta esto para verificar y corregir problemas
+Ejecutable para verificar y corregir problemas/conflictos entre BD y Codigo
 """
 
 import bcrypt
