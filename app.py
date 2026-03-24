@@ -574,7 +574,7 @@ def admin_dashboard():
                    COUNT(DISTINCT aa.cliente_id) as total_clientes,
                    COUNT(DISTINCT CASE WHEN p.estado = 'solicitado' THEN p.id END) as solicitudes_pendientes
             FROM usuarios u
-            LEFT JOIN asignaciones_asesores aa ON aa.asesor_id = u.id AND aa.activa = TRUE
+            LEFT JOIN asignaciones_asesores aa ON aa.asesor_id = u.id
             LEFT JOIN prestamos p ON p.cliente_id = aa.cliente_id
             WHERE u.rol = 'asesor' AND u.activo = TRUE
             GROUP BY u.id, u.nombre, u.email
@@ -583,19 +583,28 @@ def admin_dashboard():
         """)
         asesores = cursor.fetchall()
         
-        # Notificaciones pendientes
         notificaciones_pendientes = 0
-        
+        try:
+            cursor.execute("""
+                SELECT COUNT(*) as total
+                FROM notificaciones
+                WHERE leida = FALSE AND destinatario_tipo = 'admin'
+            """)
+            notificaciones_pendientes = cursor.fetchone()['total']
+        except Exception:
+            pass
+
         cursor.close()
-        
+
         return render_template('admin/dashboard.html',
                              stats=stats,
                              solicitudes_recientes=solicitudes_recientes,
                              asesores=asesores,
                              notificaciones_pendientes=notificaciones_pendientes,
                              now=datetime.now())
-        
+
     except Exception as e:
+        print(f"ERROR admin_dashboard: {str(e)}")
         flash(f'Error al cargar dashboard: {str(e)}', 'error')
         return redirect(url_for('index'))
 
@@ -614,7 +623,7 @@ def admin_clientes():
         
         # Query base
         query = """
-            SELECT c.*, 
+            SELECT c.*,
                    u.email as usuario_email,
                    a.nombre as asesor_nombre,
                    COUNT(DISTINCT p.id) as total_prestamos,
@@ -626,20 +635,20 @@ def admin_clientes():
             LEFT JOIN prestamos p ON p.cliente_id = c.id
             WHERE 1=1
         """
-        
+
         params = []
-        
+
         # Aplicar filtros
         if buscar:
-            query += """ AND (c.nombres LIKE %s OR c.apellidos LIKE %s 
+            query += """ AND (c.nombres LIKE %s OR c.apellidos LIKE %s
                            OR c.numero_documento LIKE %s OR c.email LIKE %s)"""
             like_buscar = f'%{buscar}%'
             params.extend([like_buscar, like_buscar, like_buscar, like_buscar])
-        
+
         if estado:
             query += " AND c.estado = %s"
             params.append(estado)
-        
+
         if asesor_filter == 'sin_asignar':
             query += " AND aa.asesor_id IS NULL"
         elif asesor_filter:
@@ -682,56 +691,56 @@ def admin_clientes():
 @app.route('/admin/asignar-asesor', methods=['POST'])
 @admin_required
 def asignar_asesor():
+    """Asigna un asesor a un cliente"""
     try:
         cliente_id = request.form.get('cliente_id')
         asesor_id = request.form.get('asesor_id')
-
+        
         if not cliente_id or not asesor_id:
             flash('Datos incompletos', 'error')
             return redirect(url_for('admin_clientes'))
-
+        
         cursor = mysql.connection.cursor()
-
-        # Desactivar asignación anterior si existe
+        
+        # Desactivar asignaciones previas
         cursor.execute("""
-            UPDATE asignaciones_asesores 
-            SET activa = FALSE, fecha_desasignacion = NOW()
-            WHERE cliente_id = %s AND activa = TRUE
+            UPDATE asignaciones_asesores SET activa = FALSE WHERE cliente_id = %s
         """, (cliente_id,))
 
-        # Crear nueva asignación
+        # Registrar nueva asignación
         cursor.execute("""
-            INSERT INTO asignaciones_asesores 
+            INSERT INTO asignaciones_asesores
             (cliente_id, asesor_id, activa, notas)
             VALUES (%s, %s, TRUE, 'Asignación desde panel admin')
         """, (cliente_id, asesor_id))
-
+        
         # Obtener nombres para notificación
         cursor.execute("SELECT nombres, apellidos FROM clientes WHERE id = %s", (cliente_id,))
         cliente = cursor.fetchone()
-
+        
         cursor.execute("SELECT nombre FROM usuarios WHERE id = %s", (asesor_id,))
         asesor = cursor.fetchone()
-
-        # Notificación al asesor
+        
+        # Crear notificación para el asesor
         cursor.execute("""
-            INSERT INTO notificaciones 
-            (usuario_id, titulo, mensaje, tipo, leida)
-            VALUES (%s, %s, %s, 'info', FALSE)
+            INSERT INTO notificaciones
+            (usuario_id, titulo, mensaje, tipo)
+            VALUES (%s, %s, %s, 'info')
         """, (
             asesor_id,
             'Nuevo cliente asignado',
             f'Se te ha asignado el cliente {cliente["nombres"]} {cliente["apellidos"]}'
         ))
-
+        
         mysql.connection.commit()
         cursor.close()
+        
         flash(f'Asesor {asesor["nombre"]} asignado correctamente', 'success')
-
+        
     except Exception as e:
         mysql.connection.rollback()
         flash(f'Error al asignar asesor: {str(e)}', 'error')
-
+    
     return redirect(url_for('admin_clientes'))
 
 
@@ -760,9 +769,9 @@ def enviar_notificacion():
         
         # Crear notificación
         cursor.execute("""
-            INSERT INTO notificaciones 
-            (usuario_id, titulo, mensaje, tipo, destinatario_tipo, leida)
-            VALUES (%s, %s, %s, 'info', 'cliente', FALSE)
+            INSERT INTO notificaciones
+            (usuario_id, titulo, mensaje, tipo, leida)
+            VALUES (%s, %s, %s, 'info', FALSE)
         """, (cliente['usuario_id'], titulo, mensaje))
         
         mysql.connection.commit()
@@ -779,16 +788,29 @@ def enviar_notificacion():
 @app.route('/admin/solicitudes')
 @admin_required
 def admin_solicitudes():
-    """Página de gestión de solicitudes"""
+    """Página de gestión de solicitudes y préstamos"""
     try:
         cursor = mysql.connection.cursor()
-        
-        # Filtros
         estado_filter = request.args.get('estado', '')
-        
+
+        # Stats de cartera
+        stats = {}
+        try:
+            cursor.execute("SELECT COUNT(*) as t FROM prestamos WHERE estado='solicitado'")
+            stats['pendientes'] = cursor.fetchone()['t']
+            cursor.execute("SELECT COUNT(*) as t FROM prestamos WHERE estado='desembolsado'")
+            stats['desembolsados'] = cursor.fetchone()['t']
+            cursor.execute("SELECT COALESCE(SUM(monto_aprobado),0) as t FROM prestamos WHERE estado='desembolsado'")
+            stats['cartera'] = float(cursor.fetchone()['t'])
+            cursor.execute("SELECT COUNT(*) as t FROM prestamos")
+            stats['total'] = cursor.fetchone()['t']
+        except Exception as e:
+            print(f'ERR stats: {e}')
+            stats = {'pendientes':0,'desembolsados':0,'cartera':0.0,'total':0}
+
         query = """
-            SELECT p.*, 
-                   c.nombres as cliente_nombres, 
+            SELECT p.*,
+                   c.nombres as cliente_nombres,
                    c.apellidos as cliente_apellidos,
                    c.numero_documento as cliente_documento,
                    c.email as cliente_email,
@@ -800,23 +822,20 @@ def admin_solicitudes():
             LEFT JOIN usuarios a ON a.id = aa.asesor_id
             WHERE 1=1
         """
-        
         params = []
-        
         if estado_filter:
             query += " AND p.estado = %s"
             params.append(estado_filter)
-        
-        query += " ORDER BY p.fecha_solicitud DESC LIMIT 100"
-        
+        query += " ORDER BY p.fecha_solicitud DESC LIMIT 200"
         cursor.execute(query, params)
         solicitudes = cursor.fetchall()
-        
         cursor.close()
-        
+
         return render_template('admin/solicitudes.html',
-                             solicitudes=solicitudes)
-        
+                               solicitudes=solicitudes,
+                               stats=stats,
+                               estado_filter=estado_filter)
+
     except Exception as e:
         flash(f'Error al cargar solicitudes: {str(e)}', 'error')
         return redirect(url_for('admin_dashboard'))
@@ -898,6 +917,11 @@ def cliente_dashboard():
         flash(f'Error al cargar dashboard: {str(e)}', 'error')
         return redirect(url_for('index'))
 
+@app.route('/cliente/configuracion')
+@login_required
+def cliente_configuracion():
+    return render_template('cliente/configuracion.html')
+
 # ================================
 # DASHBOARD DEL ASESOR
 # ================================
@@ -915,43 +939,36 @@ def asesor_dashboard():
         asesor_id = session.get('user_id')
 
         # Clientes asignados al asesor
-        clientes = []
-        try:
-            cursor.execute("""
-                SELECT c.*,
-                       COUNT(DISTINCT p.id) as total_prestamos,
-                       SUM(CASE WHEN p.estado = 'solicitado' THEN 1 ELSE 0 END) as pendientes
-                FROM clientes c
-                JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
-                LEFT JOIN prestamos p ON p.cliente_id = c.id
-                WHERE aa.asesor_id = %s
-                GROUP BY c.id ORDER BY c.fecha_registro DESC
-            """, (asesor_id,))
-            clientes = cursor.fetchall()
-        except Exception as e:
-            print(f"ERR asesor clientes: {e}")
-        solicitudes_pendientes = []
-        try:
-            cursor.execute("""
-                SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
-                FROM prestamos p
-                JOIN clientes c ON p.cliente_id = c.id
-                JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.activa = TRUE
-                WHERE aa.asesor_id = %s AND p.estado = 'solicitado'
-                ORDER BY p.fecha_solicitud DESC LIMIT 10
-            """, (asesor_id,))
-            solicitudes_pendientes = cursor.fetchall()
-        except Exception as e:
-            print(f"ERR asesor solicitudes: {e}")
-        notificaciones_pendientes = 0
-        try:
-            cursor.execute("""
-                SELECT COUNT(*) as total FROM notificaciones
-                WHERE usuario_id = %s AND leida = FALSE
-            """, (asesor_id,))
-            notificaciones_pendientes = cursor.fetchone()['total']
-        except Exception as e:
-            print(f"ERR asesor notif: {e}")
+        cursor.execute("""
+            SELECT c.*,
+                   COUNT(DISTINCT p.id) as total_prestamos,
+                   SUM(CASE WHEN p.estado = 'solicitado' THEN 1 ELSE 0 END) as pendientes
+            FROM clientes c
+            JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.asesor_id = %s AND aa.activa = TRUE
+            LEFT JOIN prestamos p ON p.cliente_id = c.id
+            GROUP BY c.id
+            ORDER BY c.fecha_registro DESC
+        """, (asesor_id,))
+        clientes = cursor.fetchall()
+
+        # Solicitudes pendientes de sus clientes
+        cursor.execute("""
+            SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
+            FROM prestamos p
+            JOIN clientes c ON p.cliente_id = c.id
+            JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.asesor_id = %s AND aa.activa = TRUE
+            WHERE p.estado = 'solicitado'
+            ORDER BY p.fecha_solicitud DESC
+            LIMIT 10
+        """, (asesor_id,))
+        solicitudes_pendientes = cursor.fetchall()
+
+        # Notificaciones no leídas
+        cursor.execute("""
+            SELECT COUNT(*) as total FROM notificaciones
+            WHERE usuario_id = %s AND leida = FALSE
+        """, (asesor_id,))
+        notificaciones_pendientes = cursor.fetchone()['total']
 
         stats = {
             'total_clientes':        len(clientes),
@@ -1083,22 +1100,15 @@ def admin_reportes():
 @app.route('/admin/prestamos')
 @admin_required
 def admin_prestamos():
-    """Página de gestión de préstamos"""
-    try:
-        cursor = mysql.connection.cursor()
-        cursor.execute("""
-            SELECT p.*, c.nombres, c.apellidos, c.numero_documento
-            FROM prestamos p
-            JOIN clientes c ON p.cliente_id = c.id
-            ORDER BY p.fecha_solicitud DESC
-            LIMIT 100
-        """)
-        prestamos = cursor.fetchall()
-        cursor.close()
-        return render_template('admin/prestamos.html', prestamos=prestamos)
-    except Exception as e:
-        flash(f'Error al cargar préstamos: {str(e)}', 'error')
-        return redirect(url_for('admin_dashboard'))
+    """Redirige a solicitudes (fusionado)"""
+    return redirect(url_for('admin_solicitudes'))
+
+
+@app.route('/admin/configuracion')
+@admin_required
+def admin_configuracion():
+    """Página de configuración del panel"""
+    return render_template('admin/configuracion.html')
 
 # ================================
 # MANEJADORES DE ERRORES
