@@ -4,152 +4,231 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reportes - Novacapital</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .sidebar-gradient { background: linear-gradient(180deg, #1e3a8a 0%, #1d4ed8 100%); }
-        .nav-item { transition: all 0.15s; }
-        .nav-item.active { background: rgba(255,255,255,0.15); }
-        .nav-item:hover { background: rgba(255,255,255,0.1); }
-        .stat-card { transition: transform 0.2s, box-shadow 0.2s; }
-        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        *, *::before, *::after { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #F1F5F9; }
         @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
         .fade-in { animation: fadeIn 0.35s ease forwards; }
-        input:focus, select:focus { outline: none; box-shadow: 0 0 0 3px rgba(59,130,246,0.12); }
+        /* Dark mode */
+        html.dark body { background: #0f172a !important; color: #e2e8f0; }
+        html.dark .card-bg { background: #1e293b !important; border-color: #334155 !important; }
+        html.dark .text-primary { color: #f1f5f9 !important; }
+        html.dark .text-secondary { color: #cbd5e1 !important; }
+        html.dark .top-header { background: #1e293b !important; border-color: #334155 !important; }
+        html.dark .page-bg { background: #0f172a !important; }
+        /* Density */
+        html.density-compact .nav-link { padding-top: 6px !important; padding-bottom: 6px !important; }
+        html.density-compact .main-pad { padding: 20px !important; }
+        html.density-comfortable .nav-link { padding-top: 12px !important; padding-bottom: 12px !important; }
+        html.density-comfortable .main-pad { padding: 40px !important; }
     </style>
 </head>
-<body class="bg-gray-50 flex h-screen overflow-hidden">
+<body style="display:flex;height:100vh;overflow:hidden;">
 
-    <!-- SIDEBAR -->
-    <aside class="w-64 sidebar-gradient text-white flex flex-col shadow-xl z-20 shrink-0">
-        <div class="px-5 py-4 border-b border-white/10 flex items-center justify-center">
-            <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" class="h-12 object-contain">
-        </div>
-        <nav class="flex-1 overflow-y-auto py-5 px-3 space-y-0.5">
-            <a href="/admin/dashboard" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                <span class="text-sm font-medium">Dashboard</span>
-            </a>
-            <a href="/admin/clientes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span class="text-sm font-medium">Gestión de Clientes</span>
-            </a>
-            <a href="/admin/solicitudes" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span class="text-sm font-medium">Solicitudes</span>
-            </a>
-            <a href="/admin/prestamos" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                <span class="text-sm font-medium">Préstamos</span>
-            </a>
-            <a href="/admin/asesores" class="nav-item flex items-center gap-3 px-4 py-2.5 rounded-lg">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span class="text-sm font-medium">Gestión de Asesores</span>
-            </a>
-            <a href="/admin/reportes" class="nav-item active flex items-center gap-3 px-4 py-2.5 rounded-lg">
-                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                <span class="text-sm font-medium">Reportes</span>
-            </a>
-        </nav>
-        <div class="px-4 py-4 border-t border-white/10">
-            <div class="flex items-center gap-3">
-                <div class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center shrink-0">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-                </div>
-                <div class="flex-1 min-w-0">
-                    <p class="text-sm font-semibold truncate">{{ session.get('user_nombre', 'Admin') }}</p>
-                    <p class="text-xs text-blue-200">Administrador</p>
-                </div>
-                <a href="/logout" class="text-blue-200 hover:text-white p-1 rounded transition" title="Cerrar sesión">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-                </a>
+<!-- SIDEBAR -->
+<aside id="sidebar" style="width:256px;background:linear-gradient(180deg,#0D1B2A 0%,#0A2463 100%);color:#fff;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
+    <div style="padding:20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" style="height:48px;object-fit:contain;">
+    </div>
+    <nav style="flex:1;overflow-y:auto;padding:16px 12px;">
+        <a href="/admin/dashboard" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span>Dashboard</span>
+        </a>
+        <a href="/admin/clientes" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Gestión de Clientes</span>
+        </a>
+        <a href="/admin/solicitudes" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            <span>Solicitudes y Préstamos</span>
+        </a>
+        <a href="/admin/asesores" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Gestión de Asesores</span>
+        </a>
+        <a href="/admin/reportes" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:#fff;font-size:14px;font-weight:600;margin-bottom:2px;background:rgba(255,255,255,0.12);border-left:3px solid #1A56DB;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Reportes</span>
+        </a>
+        <a href="/admin/configuracion" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            <span>Configuración</span>
+        </a>
+    </nav>
+    <div style="padding:16px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
             </div>
+            <div style="flex:1;min-width:0;">
+                <p style="font-size:13px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ session.get('user_nombre', 'Admin') }}</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:0;" data-i18n="Administrator">Administrador</p>
+            </div>
+            <a href="/logout" style="color:rgba(255,255,255,0.5);padding:6px;border-radius:6px;text-decoration:none;display:flex;align-items:center;" title="Cerrar sesión"
+               onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,0.08)';"
+               onmouseout="this.style.color='rgba(255,255,255,0.5)';this.style.background='transparent';">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            </a>
         </div>
-    </aside>
+    </div>
+</aside>
 
-    <!-- MAIN -->
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <header class="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm shrink-0">
-            <div>
-                <p class="text-xs text-gray-400 uppercase tracking-wider">Administración</p>
-                <h1 class="text-xl font-bold text-gray-800">Reportes</h1>
-            </div>
-            <div class="flex items-center gap-3">
-                <div class="text-sm text-gray-500 bg-gray-50 px-3 py-2 rounded-lg">Análisis y exportación</div>
-            </div>
-        </header>
-        <div class="flex-1 overflow-y-auto p-8 fade-in">
+<!-- MAIN -->
+<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <!-- Top header -->
+    <header class="top-header" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+        <div>
+            <p style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 2px 0;" data-i18n="Administration">Administración</p>
+            <h1 style="font-size:20px;font-weight:700;color:#0F172A;margin:0;" data-i18n="Reports">Reportes</h1>
+        </div>
+        <div style="font-size:13px;color:#64748B;background:#F1F5F9;padding:8px 14px;border-radius:8px;" data-i18n="Analysis and export">Análisis y exportación</div>
+    </header>
+
+    <!-- Content -->
+    <div class="main-pad page-bg fade-in" style="flex:1;overflow-y:auto;padding:32px;">
+
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
-        <div class="mb-6 space-y-2">
+        <div style="margin-bottom:20px;">
             {% for category, message in messages %}
-            <div class="px-4 py-3 rounded-lg text-sm font-medium
-                {% if category == 'error' %}bg-red-50 text-red-700 border border-red-200
-                {% elif category == 'success' %}bg-green-50 text-green-700 border border-green-200
-                {% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+            <div style="padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;margin-bottom:8px;
+                {% if category == 'error' %}background:#FEF2F2;color:#DC2626;border:1px solid #FECACA;
+                {% elif category == 'success' %}background:#F0FDF4;color:#059669;border:1px solid #BBF7D0;
+                {% else %}background:#EFF6FF;color:#1A56DB;border:1px solid #BFDBFE;{% endif %}">
                 {{ message }}
             </div>
             {% endfor %}
         </div>
         {% endif %}
         {% endwith %}
-            <!-- Info banner -->
-            <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 mb-6 flex items-start gap-4">
-                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div>
-                    <p class="font-semibold text-blue-800 text-sm">Módulo en desarrollo</p>
-                    <p class="text-blue-600 text-sm mt-0.5">Los reportes avanzados estarán disponibles próximamente. Por ahora puedes exportar datos básicos desde las secciones de clientes, solicitudes y préstamos.</p>
-                </div>
+
+        <!-- Info banner -->
+        <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:14px;padding:20px 24px;margin-bottom:24px;display:flex;align-items:flex-start;gap:16px;">
+            <div style="width:40px;height:40px;background:#DBEAFE;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">
+                <svg width="20" height="20" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
-
-            <!-- Reportes disponibles -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
-                    <div class="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="font-bold text-gray-800">Reporte de Clientes</p>
-                        <p class="text-xs text-gray-500 mt-1">Listado completo de clientes con estado y datos de contacto.</p>
-                    </div>
-                    <a href="/admin/clientes" class="mt-auto text-center bg-blue-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition">Ver clientes</a>
-                </div>
-
-                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
-                    <div class="w-10 h-10 bg-yellow-50 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                    </div>
-                    <div>
-                        <p class="font-bold text-gray-800">Reporte de Solicitudes</p>
-                        <p class="text-xs text-gray-500 mt-1">Estado de todas las solicitudes de crédito del sistema.</p>
-                    </div>
-                    <a href="/admin/solicitudes" class="mt-auto text-center bg-yellow-500 text-white py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 transition">Ver solicitudes</a>
-                </div>
-
-                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
-                    <div class="w-10 h-10 bg-green-50 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                    </div>
-                    <div>
-                        <p class="font-bold text-gray-800">Reporte de Cartera</p>
-                        <p class="text-xs text-gray-500 mt-1">Préstamos activos, montos desembolsados y estado de pagos.</p>
-                    </div>
-                    <a href="/admin/prestamos" class="mt-auto text-center bg-green-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition">Ver préstamos</a>
-                </div>
-
-                <div class="bg-white rounded-xl border border-gray-100 shadow-sm p-6 flex flex-col gap-4">
-                    <div class="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center">
-                        <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    </div>
-                    <div>
-                        <p class="font-bold text-gray-800">Rendimiento de Asesores</p>
-                        <p class="text-xs text-gray-500 mt-1">Clientes asignados, solicitudes gestionadas y métricas por asesor.</p>
-                    </div>
-                    <a href="/admin/asesores" class="mt-auto text-center bg-purple-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-purple-700 transition">Ver asesores</a>
-                </div>
+            <div>
+                <p style="font-weight:600;color:#1E40AF;font-size:14px;margin:0 0 4px 0;" data-i18n="Module in development">Módulo en desarrollo</p>
+                <p style="color:#2563EB;font-size:13px;margin:0;" data-i18n="Advanced reports will be available soon. For now you can export basic data from the clients, applications and loans sections.">Los reportes avanzados estarán disponibles próximamente. Por ahora puedes exportar datos básicos desde las secciones de clientes, solicitudes y préstamos.</p>
             </div>
         </div>
+
+        <!-- Report cards grid -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">
+
+            <!-- Reporte Clientes -->
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+                <div style="width:44px;height:44px;background:#EFF6FF;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 6px 0;" data-i18n="Client Report">Reporte de Clientes</p>
+                    <p style="font-size:12px;color:#64748B;margin:0;line-height:1.5;" data-i18n="Complete list of clients with status and contact information.">Listado completo de clientes con estado y datos de contacto.</p>
+                </div>
+                <a href="/admin/clientes" style="display:block;text-align:center;background:#1A56DB;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;margin-top:auto;transition:background 0.15s;"
+                   onmouseover="this.style.background='#0A2463';" onmouseout="this.style.background='#1A56DB';"
+                   data-i18n="View clients">Ver clientes</a>
+            </div>
+
+            <!-- Reporte Solicitudes -->
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+                <div style="width:44px;height:44px;background:#FFFBEB;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" fill="none" stroke="#D97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 6px 0;" data-i18n="Applications Report">Reporte de Solicitudes</p>
+                    <p style="font-size:12px;color:#64748B;margin:0;line-height:1.5;" data-i18n="Status of all credit applications in the system.">Estado de todas las solicitudes de crédito del sistema.</p>
+                </div>
+                <a href="/admin/solicitudes" style="display:block;text-align:center;background:#D97706;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;margin-top:auto;"
+                   onmouseover="this.style.background='#B45309';" onmouseout="this.style.background='#D97706';"
+                   data-i18n="View applications">Ver solicitudes</a>
+            </div>
+
+            <!-- Reporte Cartera -->
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+                <div style="width:44px;height:44px;background:#ECFDF5;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 6px 0;" data-i18n="Portfolio Report">Reporte de Cartera</p>
+                    <p style="font-size:12px;color:#64748B;margin:0;line-height:1.5;" data-i18n="Active loans, disbursed amounts and payment status.">Préstamos activos, montos desembolsados y estado de pagos.</p>
+                </div>
+                <a href="/admin/prestamos" style="display:block;text-align:center;background:#059669;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;margin-top:auto;"
+                   onmouseover="this.style.background='#047857';" onmouseout="this.style.background='#059669';"
+                   data-i18n="View loans">Ver préstamos</a>
+            </div>
+
+            <!-- Rendimiento Asesores -->
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+                <div style="width:44px;height:44px;background:#F5F3FF;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                    <svg width="22" height="22" fill="none" stroke="#7C3AED" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                </div>
+                <div>
+                    <p style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 6px 0;" data-i18n="Advisor Performance">Rendimiento de Asesores</p>
+                    <p style="font-size:12px;color:#64748B;margin:0;line-height:1.5;" data-i18n="Assigned clients, managed applications and metrics per advisor.">Clientes asignados, solicitudes gestionadas y métricas por asesor.</p>
+                </div>
+                <a href="/admin/asesores" style="display:block;text-align:center;background:#7C3AED;color:#fff;padding:9px 16px;border-radius:8px;font-size:13px;font-weight:600;text-decoration:none;margin-top:auto;"
+                   onmouseover="this.style.background='#6D28D9';" onmouseout="this.style.background='#7C3AED';"
+                   data-i18n="View advisors">Ver asesores</a>
+            </div>
+
+        </div>
     </div>
+</div>
+
+<script>
+(function() {
+    function getSetting(key, def) { try { return localStorage.getItem('nc_' + key) ?? def; } catch { return def; } }
+    var theme = getSetting('theme', 'light');
+    var isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+    var accentMap = {
+        blue:'linear-gradient(180deg,#0D1B2A 0%,#0A2463 100%)',
+        purple:'linear-gradient(180deg,#1e0a3c 0%,#4c1d95 100%)',
+        green:'linear-gradient(180deg,#052e16 0%,#064e3b 100%)',
+        red:'linear-gradient(180deg,#3b0a0a 0%,#7f1d1d 100%)',
+        amber:'linear-gradient(180deg,#2d1505 0%,#78350f 100%)',
+        cyan:'linear-gradient(180deg,#042f3e 0%,#164e63 100%)'
+    };
+    var accent = getSetting('accent', 'blue');
+    var sidebar = document.getElementById('sidebar');
+    if (sidebar) sidebar.style.background = accentMap[accent] || accentMap.blue;
+    var density = getSetting('density', 'normal');
+    document.documentElement.classList.remove('density-compact', 'density-comfortable');
+    if (density !== 'normal') document.documentElement.classList.add('density-' + density);
+    var lang = getSetting('lang', 'es');
+    var navT = {
+        '/admin/dashboard':{'en':'Dashboard'},
+        '/admin/clientes':{'en':'Client Management'},
+        '/admin/solicitudes':{'en':'Applications & Loans'},
+        '/admin/asesores':{'en':'Advisor Management'},
+        '/admin/reportes':{'en':'Reports'},
+        '/admin/configuracion':{'en':'Settings'}
+    };
+    if (lang === 'en') {
+        document.querySelectorAll('.nav-link span').forEach(function(el) {
+            var link = el.closest('a');
+            if (link && navT[link.getAttribute('href')]) el.textContent = navT[link.getAttribute('href')]['en'];
+        });
+        document.querySelectorAll('[data-i18n]').forEach(function(el) {
+            var t = el.getAttribute('data-i18n');
+            if (t) el.textContent = t;
+        });
+    }
+})();
+</script>
 </body>
 </html>
