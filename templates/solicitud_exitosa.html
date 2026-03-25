@@ -1,102 +1,301 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitud Enviada - Novacapital</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        @keyframes scaleIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .scale-in { animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
-        .fade-up { animation: fadeUp 0.5s ease forwards; }
-        .fade-up-1 { animation: fadeUp 0.5s 0.2s ease both; }
-        .fade-up-2 { animation: fadeUp 0.5s 0.35s ease both; }
-        .fade-up-3 { animation: fadeUp 0.5s 0.5s ease both; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Solicitud Enviada - Novacapital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #F8FAFC;
+      color: #0F172A;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── Keyframes ── */
+    @keyframes scaleIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(1);    opacity: 0.6; }
+      50%  { transform: scale(1.12); opacity: 0.25; }
+      100% { transform: scale(1),    opacity: 0.6; }
+    }
+
+    .scale-in   { animation: scaleIn  0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .fade-up    { animation: fadeUp   0.5s ease forwards; }
+    .fade-up-1  { animation: fadeUp   0.5s 0.2s  ease both; }
+    .fade-up-2  { animation: fadeUp   0.5s 0.35s ease both; }
+    .fade-up-3  { animation: fadeUp   0.5s 0.5s  ease both; }
+
+    /* ── Outer wrapper ── */
+    .page-wrapper {
+      width: 100%;
+      max-width: 480px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+    }
+
+    /* ── Main card ── */
+    .card {
+      width: 100%;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    /* ── Top banner ── */
+    .card-banner {
+      background: linear-gradient(135deg, #1A56DB, #0A2463);
+      padding: 48px 32px 40px;
+      text-align: center;
+    }
+
+    /* Outer ring */
+    .check-ring {
+      width: 84px;
+      height: 84px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, pulse-ring 2.5s 1s ease-in-out infinite;
+    }
+    /* Inner white circle */
+    .check-circle {
+      width: 60px;
+      height: 60px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-banner h1 {
+      font-size: 24px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+    .card-banner p {
+      font-size: 14px;
+      color: rgba(255,255,255,0.72);
+    }
+
+    /* ── Card body ── */
+    .card-body { padding: 36px 32px; }
+
+    /* Solicitud number box */
+    .solicitud-box {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .solicitud-box .label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+    .solicitud-box .number {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1A56DB;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+    .solicitud-box .hint {
+      font-size: 12px;
+      color: #94A3B8;
+    }
+
+    /* Steps */
+    .steps-heading {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0F172A;
+      margin-bottom: 16px;
+    }
+    .steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+    .step-item { display: flex; align-items: flex-start; gap: 12px; }
+    .step-badge {
+      width: 24px;
+      height: 24px;
+      background: #EFF6FF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .step-badge span {
+      font-size: 11px;
+      font-weight: 700;
+      color: #1A56DB;
+    }
+    .step-text {
+      font-size: 14px;
+      color: #475569;
+      line-height: 1.5;
+    }
+    .step-text strong { color: #0F172A; font-weight: 600; }
+
+    /* Buttons */
+    .btn-row {
+      display: flex;
+      gap: 12px;
+    }
+    .btn-primary {
+      flex: 1;
+      background: #1A56DB;
+      color: #fff;
+      text-align: center;
+      padding: 13px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover { background: #1748C2; transform: translateY(-1px); }
+    .btn-secondary {
+      flex: 1;
+      background: #fff;
+      color: #64748B;
+      text-align: center;
+      padding: 13px 16px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid #E2E8F0;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-secondary:hover { background: #F8FAFC; color: #0F172A; }
+
+    /* Card footer */
+    .card-footer {
+      padding: 16px 32px;
+      background: #F8FAFC;
+      border-top: 1px solid #E2E8F0;
+      text-align: center;
+    }
+    .card-footer p {
+      font-size: 12px;
+      color: #94A3B8;
+    }
+    .card-footer strong { color: #64748B; }
+
+    /* Logo below card */
+    .logo-below img {
+      height: 32px;
+      object-fit: contain;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 520px) {
+      .btn-row { flex-direction: column; }
+    }
+  </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-6">
+<body>
 
-    <div class="w-full max-w-lg">
+  <div class="page-wrapper">
 
-        <!-- Card -->
-        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+    <!-- Main card -->
+    <div class="card">
 
-            <!-- Top banner -->
-            <div class="bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-10 text-center">
-                <!-- Check circle -->
-                <div class="scale-in w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center">
-                        <svg class="w-8 h-8 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>
-                        </svg>
-                    </div>
-                </div>
-                <h1 class="fade-up text-2xl font-bold text-white mb-1">¡Solicitud Enviada!</h1>
-                <p class="fade-up-1 text-green-100 text-sm">Tu solicitud fue recibida correctamente</p>
-            </div>
+      <!-- Banner -->
+      <div class="card-banner">
+        <div class="check-ring">
+          <div class="check-circle">
+            <svg width="30" height="30" fill="none" stroke="#1A56DB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M5 13l4 4L19 7"/>
+            </svg>
+          </div>
+        </div>
+        <h1 class="fade-up">¡Solicitud Enviada!</h1>
+        <p class="fade-up-1">Tu solicitud fue recibida correctamente</p>
+      </div>
 
-            <!-- Content -->
-            <div class="px-8 py-8">
+      <!-- Body -->
+      <div class="card-body">
 
-                <!-- Número de solicitud -->
-                <div class="fade-up-1 bg-gray-50 rounded-xl p-5 mb-6 text-center border border-gray-100">
-                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Número de solicitud</p>
-                    <p class="text-2xl font-bold font-mono text-blue-700">{{ numero_prestamo }}</p>
-                    <p class="text-xs text-gray-400 mt-1">Guarda este número para hacer seguimiento</p>
-                </div>
-
-                <!-- Pasos siguientes -->
-                <div class="fade-up-2 mb-8">
-                    <p class="text-sm font-semibold text-gray-700 mb-3">¿Qué sigue?</p>
-                    <div class="space-y-3">
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                                <span class="text-blue-700 font-bold text-xs">1</span>
-                            </div>
-                            <p class="text-sm text-gray-600">Un asesor revisará tu solicitud en las próximas <strong>24 horas</strong>.</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                                <span class="text-blue-700 font-bold text-xs">2</span>
-                            </div>
-                            <p class="text-sm text-gray-600">Te contactaremos por correo o celular para informarte el resultado.</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
-                                <span class="text-blue-700 font-bold text-xs">3</span>
-                            </div>
-                            <p class="text-sm text-gray-600">Una vez aprobado, el desembolso se realiza directamente a tu cuenta bancaria.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Botones -->
-                <div class="fade-up-3 flex flex-col sm:flex-row gap-3">
-                    <a href="/cliente/dashboard" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-3 rounded-xl font-semibold text-sm transition">
-                        Ver mis solicitudes
-                    </a>
-                    <a href="/" class="flex-1 border border-gray-200 hover:bg-gray-50 text-gray-600 text-center py-3 rounded-xl font-medium text-sm transition">
-                        Volver al inicio
-                    </a>
-                </div>
-
-            </div>
-
-            <!-- Footer -->
-            <div class="px-8 py-4 bg-gray-50 border-t border-gray-100 text-center">
-                <p class="text-xs text-gray-400">
-                    ¿Tienes dudas? Llámanos al <strong class="text-gray-600">01 8000 123 456</strong> o escríbenos a <strong class="text-gray-600">info@novacapital.com</strong>
-                </p>
-            </div>
+        <!-- Solicitud number -->
+        <div class="solicitud-box fade-up-1">
+          <p class="label">Número de solicitud</p>
+          <p class="number">{{ numero_prestamo }}</p>
+          <p class="hint">Guarda este número para hacer seguimiento</p>
         </div>
 
-        <!-- Logo -->
-        <div class="text-center mt-6">
-            <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" class="h-10 object-contain mx-auto opacity-80">
+        <!-- Next steps -->
+        <div class="fade-up-2">
+          <p class="steps-heading">¿Qué sigue?</p>
+          <div class="steps">
+            <div class="step-item">
+              <div class="step-badge"><span>1</span></div>
+              <p class="step-text">Un asesor revisará tu solicitud en las próximas <strong>24 horas</strong>.</p>
+            </div>
+            <div class="step-item">
+              <div class="step-badge"><span>2</span></div>
+              <p class="step-text">Te contactaremos por correo o celular para informarte el resultado.</p>
+            </div>
+            <div class="step-item">
+              <div class="step-badge"><span>3</span></div>
+              <p class="step-text">Una vez aprobado, el desembolso se realiza directamente a tu cuenta bancaria.</p>
+            </div>
+          </div>
         </div>
+
+        <!-- Buttons -->
+        <div class="btn-row fade-up-3">
+          <a href="/cliente/dashboard" class="btn-primary">Ver mis solicitudes</a>
+          <a href="/" class="btn-secondary">Volver al inicio</a>
+        </div>
+
+      </div>
+
+      <!-- Card footer -->
+      <div class="card-footer">
+        <p>¿Tienes dudas? Llámanos al <strong>01 8000 123 456</strong> o escríbenos a <strong>info@novacapital.com</strong></p>
+      </div>
 
     </div>
+
+    <!-- Logo below -->
+    <div class="logo-below">
+      <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital">
+    </div>
+
+  </div>
+
 </body>
 </html>

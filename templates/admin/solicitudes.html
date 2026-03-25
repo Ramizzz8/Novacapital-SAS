@@ -7,12 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #F1F5F9; }
         .sidebar-gradient { background: linear-gradient(180deg, #0D1B2A 0%, #0A2463 100%); }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.35s ease forwards; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1A56DB !important; box-shadow: 0 0 0 3px rgba(26,86,219,0.10); }
         .dark body { background: #0f172a; color: #e2e8f0; }
         .dark .bg-white { background: #1e293b !important; }
         .dark .main-bg { background: #0f172a !important; }
@@ -24,10 +25,15 @@
         html.density-compact .main-pad { padding: 1.5rem !important; }
         html.density-comfortable .nav-item { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
         html.density-comfortable .main-pad { padding: 3rem !important; }
-        .estado-btn.active-filter { box-shadow: 0 0 0 2px #1A56DB; }
+        .estado-btn.active-filter { box-shadow: 0 0 0 2px #1A56DB; transform: translateY(-1px); }
+        .estado-btn { transition: all 0.15s ease; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
     </style>
 </head>
-<body style="background:#F1F5F9;display:flex;height:100vh;overflow:hidden;">
+<body style="display:flex;height:100vh;overflow:hidden;">
 
 <!-- SIDEBAR -->
 <aside class="sidebar-gradient" style="width:256px;min-width:256px;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
@@ -90,9 +96,10 @@
     </div>
 </aside>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
 
+    <!-- TOP HEADER -->
     <header class="top-header" style="background:#fff;border-bottom:1px solid #E2E8F0;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
         <div>
             <p style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;" data-i18n="Administration">Administracion</p>
@@ -100,8 +107,10 @@
         </div>
     </header>
 
-    <div class="main-pad fade-in" style="flex:1;overflow-y:auto;padding:28px 32px;background:#F1F5F9;">
+    <!-- SCROLLABLE AREA -->
+    <div class="main-pad fade-in" style="flex:1;overflow-y:auto;padding:28px 32px;">
 
+        <!-- FLASH MESSAGES -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div style="margin-bottom:20px;display:flex;flex-direction:column;gap:8px;">
@@ -117,87 +126,103 @@
         {% endif %}
         {% endwith %}
 
-        <!-- KPIs -->
+        <!-- KPI CARDS -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                <div style="width:44px;height:44px;background:#EFF6FF;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <svg width="20" height="20" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+                    <div style="width:44px;height:44px;background:#EFF6FF;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    </div>
                 </div>
                 <div style="font-size:28px;font-weight:700;color:#0F172A;margin-bottom:4px;">{{ stats.total }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Total records">Total registros</div>
             </div>
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                <div style="width:44px;height:44px;background:#FFFBEB;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <svg width="20" height="20" fill="none" stroke="#D97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+                    <div style="width:44px;height:44px;background:#FFFBEB;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" fill="none" stroke="#D97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                 </div>
                 <div style="font-size:28px;font-weight:700;color:#0F172A;margin-bottom:4px;">{{ stats.pendientes }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Pending review">Pendientes de revision</div>
             </div>
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                <div style="width:44px;height:44px;background:#F5F3FF;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <svg width="20" height="20" fill="none" stroke="#7C3AED" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+                    <div style="width:44px;height:44px;background:#F5F3FF;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" fill="none" stroke="#7C3AED" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                    </div>
                 </div>
                 <div style="font-size:28px;font-weight:700;color:#0F172A;margin-bottom:4px;">{{ stats.desembolsados }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Disbursed">Desembolsados</div>
             </div>
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
-                <div style="width:44px;height:44px;background:#ECFDF5;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
-                    <svg width="20" height="20" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+                    <div style="width:44px;height:44px;background:#ECFDF5;border-radius:12px;display:flex;align-items:center;justify-content:center;">
+                        <svg width="20" height="20" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
                 </div>
-                <div style="font-size:16px;font-weight:700;color:#0F172A;margin-bottom:4px;">${{ "{:,.0f}".format(stats.cartera) }}</div>
+                <div style="font-size:20px;font-weight:700;color:#0F172A;margin-bottom:4px;">${{ "{:,.0f}".format(stats.cartera) }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Active portfolio">Cartera activa</div>
             </div>
+
         </div>
 
-        <!-- Filtros y busqueda -->
+        <!-- SEARCH + STATUS FILTER BAR -->
         <div style="background:#fff;border-radius:16px;padding:16px 20px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;">
             <div style="position:relative;">
                 <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" fill="none" stroke="#94A3B8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                <input type="text" id="searchInput" placeholder="Buscar cliente o N° prestamo..."
+                <input type="text" id="searchInput" placeholder="Buscar cliente o N prestamo..."
                     oninput="applyFilters()"
-                    style="padding:9px 14px 9px 34px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;width:260px;outline:none;transition:border-color 0.2s;"
+                    style="padding:9px 14px 9px 34px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;width:280px;transition:border-color 0.2s;"
                     onfocus="this.style.borderColor='#1A56DB'" onblur="this.style.borderColor='#E2E8F0'">
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                <button onclick="filterEstado('')" data-estado="" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #E2E8F0;background:#F1F5F9;color:#475569;cursor:pointer;" data-i18n="All">Todos</button>
-                <button onclick="filterEstado('solicitado')" data-estado="solicitado" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #FEF3C7;background:#FEF3C7;color:#92400E;cursor:pointer;" data-i18n="Requested">Solicitado</button>
-                <button onclick="filterEstado('en_analisis')" data-estado="en_analisis" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #DBEAFE;background:#DBEAFE;color:#1E40AF;cursor:pointer;" data-i18n="Under review">En analisis</button>
-                <button onclick="filterEstado('aprobado')" data-estado="aprobado" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #D1FAE5;background:#D1FAE5;color:#065F46;cursor:pointer;" data-i18n="Approved">Aprobado</button>
-                <button onclick="filterEstado('desembolsado')" data-estado="desembolsado" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #EDE9FE;background:#EDE9FE;color:#5B21B6;cursor:pointer;" data-i18n="Disbursed">Desembolsado</button>
-                <button onclick="filterEstado('rechazado')" data-estado="rechazado" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #FEE2E2;background:#FEE2E2;color:#991B1B;cursor:pointer;" data-i18n="Rejected">Rechazado</button>
-                <button onclick="filterEstado('finalizado')" data-estado="finalizado" class="estado-btn" style="padding:7px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #E2E8F0;background:#F1F5F9;color:#64748B;cursor:pointer;" data-i18n="Completed">Finalizado</button>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+                <button onclick="filterEstado('')" data-estado="" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #E2E8F0;background:#F1F5F9;color:#475569;cursor:pointer;" data-i18n="All">Todos</button>
+                <button onclick="filterEstado('solicitado')" data-estado="solicitado" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #FDE68A;background:#FEF3C7;color:#92400E;cursor:pointer;" data-i18n="Requested">Solicitado</button>
+                <button onclick="filterEstado('en_analisis')" data-estado="en_analisis" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #BFDBFE;background:#DBEAFE;color:#1E40AF;cursor:pointer;" data-i18n="Under review">En analisis</button>
+                <button onclick="filterEstado('aprobado')" data-estado="aprobado" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #A7F3D0;background:#D1FAE5;color:#065F46;cursor:pointer;" data-i18n="Approved">Aprobado</button>
+                <button onclick="filterEstado('desembolsado')" data-estado="desembolsado" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #DDD6FE;background:#EDE9FE;color:#5B21B6;cursor:pointer;" data-i18n="Disbursed">Desembolsado</button>
+                <button onclick="filterEstado('rechazado')" data-estado="rechazado" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #FECACA;background:#FEE2E2;color:#991B1B;cursor:pointer;" data-i18n="Rejected">Rechazado</button>
+                <button onclick="filterEstado('finalizado')" data-estado="finalizado" class="estado-btn" style="padding:6px 14px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #E2E8F0;background:#F1F5F9;color:#64748B;cursor:pointer;" data-i18n="Completed">Finalizado</button>
             </div>
         </div>
 
-        <!-- Tabla -->
+        <!-- SOLICITUDES TABLE -->
         <div style="background:#fff;border-radius:16px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);overflow:hidden;">
             <div style="padding:18px 24px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
-                <h3 style="font-size:14px;font-weight:700;color:#0F172A;" data-i18n="Records">Registros <span style="color:#94A3B8;font-weight:400;font-size:13px;" id="count-label">({{ solicitudes | length }})</span></h3>
+                <h3 style="font-size:14px;font-weight:700;color:#0F172A;" data-i18n="Records">
+                    Registros
+                    <span style="color:#94A3B8;font-weight:400;font-size:13px;" id="count-label">({{ solicitudes | length }})</span>
+                </h3>
             </div>
             {% if solicitudes %}
             <div style="overflow-x:auto;">
-                <table style="border-collapse:separate;border-spacing:0;width:100%;" id="mainTable">
+                <table style="width:100%;border-collapse:collapse;" id="mainTable">
                     <thead>
-                        <tr style="background:#F8FAFC;">
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;white-space:nowrap;" data-i18n="Loan #">N Prestamo</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Name">Cliente</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Amount">Monto sol.</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Approved amount">Monto apr.</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Term">Plazo / Tasa</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Payment">Cuota</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Advisor">Asesor</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Date">Fecha</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:center;" data-i18n="Status">Estado</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:center;" data-i18n="Actions">Accion</th>
+                        <tr style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;">
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;white-space:nowrap;" data-i18n="Loan #">N Prestamo</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Name">Cliente</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Amount">Monto sol.</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Approved amount">Monto apr.</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Term">Plazo / Tasa</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Payment">Cuota</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Advisor">Asesor</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Date">Fecha</th>
+                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Status">Estado</th>
+                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Actions">Accion</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for s in solicitudes %}
                         <tr class="trow" data-estado="{{ s.estado }}" data-search="{{ s.numero_prestamo }} {{ s.cliente_nombres }} {{ s.cliente_apellidos }} {{ s.cliente_documento }}"
                             style="border-bottom:1px solid #F1F5F9;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='#fff'">
-                            <td style="padding:14px 16px;font-family:monospace;font-size:12px;color:#475569;white-space:nowrap;">{{ s.numero_prestamo }}</td>
+                            <td style="padding:14px 16px;font-family:monospace;font-size:12px;color:#1A56DB;font-weight:600;white-space:nowrap;">{{ s.numero_prestamo }}</td>
                             <td style="padding:14px 16px;">
-                                <p style="font-size:13px;font-weight:600;color:#0F172A;">{{ s.cliente_nombres }} {{ s.cliente_apellidos }}</p>
+                                <p style="font-size:13.5px;font-weight:600;color:#0F172A;">{{ s.cliente_nombres }} {{ s.cliente_apellidos }}</p>
                                 <p style="font-size:11px;color:#94A3B8;font-family:monospace;">{{ s.cliente_documento }}</p>
                             </td>
                             <td style="padding:14px 16px;font-size:13px;font-weight:600;color:#0F172A;white-space:nowrap;">${{ "{:,.0f}".format(s.monto_solicitado) }}</td>
@@ -210,7 +235,7 @@
                                 {% if s.cuota_mensual %} ${{ "{:,.0f}".format(s.cuota_mensual) }}
                                 {% else %}<span style="color:#CBD5E1;">—</span>{% endif %}
                             </td>
-                            <td style="padding:14px 16px;font-size:12px;color:#64748B;">{{ s.asesor_nombre or '—' }}</td>
+                            <td style="padding:14px 16px;font-size:12.5px;color:#64748B;">{{ s.asesor_nombre or '—' }}</td>
                             <td style="padding:14px 16px;font-size:12px;color:#64748B;white-space:nowrap;">{{ s.fecha_solicitud.strftime('%d/%m/%Y') if s.fecha_solicitud else '—' }}</td>
                             <td style="padding:14px 16px;text-align:center;">
                                 <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;
@@ -226,9 +251,10 @@
                             </td>
                             <td style="padding:14px 16px;text-align:center;">
                                 <button onclick="openModal({{ s.id }}, '{{ s.numero_prestamo }}', '{{ s.estado }}')"
-                                    style="padding:6px;color:#1A56DB;background:none;border:none;border-radius:8px;cursor:pointer;"
-                                    onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='none'" title="Cambiar estado">
-                                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    style="padding:6px 10px;color:#1A56DB;background:#EFF6FF;border:none;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;margin:0 auto;transition:background 0.15s;"
+                                    onmouseover="this.style.background='#DBEAFE'" onmouseout="this.style.background='#EFF6FF'" title="Cambiar estado">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                                    Estado
                                 </button>
                             </td>
                         </tr>
@@ -237,28 +263,42 @@
                 </table>
             </div>
             {% else %}
-            <div style="padding:60px 24px;text-align:center;font-size:13px;color:#94A3B8;" data-i18n="No records available">No hay registros disponibles</div>
+            <div style="padding:72px 24px;text-align:center;">
+                <div style="width:56px;height:56px;background:#F1F5F9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                    <svg width="24" height="24" fill="none" stroke="#94A3B8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <p style="font-size:14px;font-weight:600;color:#64748B;margin-bottom:4px;" data-i18n="No records available">No hay registros disponibles</p>
+                <p style="font-size:13px;color:#94A3B8;">Las solicitudes apareceran aqui cuando los clientes las envien</p>
+            </div>
             {% endif %}
         </div>
+
     </div>
 </div>
 
-<!-- Modal cambiar estado -->
-<div id="modal" style="display:none;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);">
-    <div style="background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.15);width:100%;max-width:400px;margin:16px;">
-        <div style="padding:20px 24px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
-            <h3 style="font-size:15px;font-weight:700;color:#0F172A;" data-i18n="Update Status">Actualizar Estado</h3>
-            <button onclick="closeModal()" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#94A3B8;"
-                onmouseover="this.style.color='#64748B'" onmouseout="this.style.color='#94A3B8'">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+<!-- MODAL: CAMBIAR ESTADO -->
+<div id="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:0;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
+        <div style="padding:24px 28px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+                <h3 style="font-size:15px;font-weight:700;color:#0F172A;" data-i18n="Update Status">Actualizar Estado</h3>
+                <p style="font-size:12px;color:#94A3B8;margin-top:2px;">Cambia el estado del prestamo y agrega observaciones</p>
+            </div>
+            <button onclick="closeModal()"
+                style="background:#F1F5F9;border:none;cursor:pointer;padding:8px;border-radius:8px;color:#64748B;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+                onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <form method="POST" action="/admin/cambiar-estado-prestamo" style="padding:24px;">
+        <form method="POST" action="/admin/cambiar-estado-prestamo" style="padding:24px 28px;">
             <input type="hidden" name="prestamo_id" id="m-id">
-            <p style="font-size:13px;color:#64748B;margin-bottom:16px;"><span data-i18n="Loan:">Prestamo:</span> <strong id="m-numero" style="font-family:monospace;color:#1A56DB;"></strong></p>
+            <div style="background:#F8FAFC;border-radius:10px;padding:12px 16px;margin-bottom:20px;border:1px solid #E2E8F0;">
+                <p style="font-size:12px;color:#64748B;margin-bottom:2px;" data-i18n="Loan:">Prestamo</p>
+                <p style="font-size:14px;font-weight:700;color:#1A56DB;font-family:monospace;" id="m-numero"></p>
+            </div>
             <div style="margin-bottom:16px;">
-                <label style="display:block;font-size:13px;font-weight:600;color:#0F172A;margin-bottom:7px;" data-i18n="New status">Nuevo estado</label>
-                <select name="nuevo_estado" id="m-estado" required style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;">
+                <label style="display:block;font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;" data-i18n="New status">Nuevo estado</label>
+                <select name="nuevo_estado" id="m-estado" required style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;">
                     <option value="solicitado">Solicitado</option>
                     <option value="en_analisis">En analisis</option>
                     <option value="aprobado">Aprobado</option>
@@ -267,15 +307,18 @@
                     <option value="finalizado">Finalizado</option>
                 </select>
             </div>
-            <div style="margin-bottom:20px;">
-                <label style="display:block;font-size:13px;font-weight:600;color:#0F172A;margin-bottom:7px;" data-i18n="Notes">Observaciones <span style="color:#94A3B8;font-weight:400;">(opcional)</span></label>
-                <textarea name="observaciones" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;resize:none;outline:none;"></textarea>
+            <div style="margin-bottom:24px;">
+                <label style="display:block;font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;" data-i18n="Notes">
+                    Observaciones <span style="color:#94A3B8;font-weight:400;text-transform:none;font-size:11px;">(opcional)</span>
+                </label>
+                <textarea name="observaciones" rows="3" placeholder="Agrega notas sobre esta decision..."
+                    style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;resize:none;transition:all 0.2s;"></textarea>
             </div>
             <div style="display:flex;gap:10px;">
                 <button type="button" onclick="closeModal()"
-                    style="flex:1;padding:10px;border:1.5px solid #E2E8F0;color:#64748B;background:#fff;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Cancel">Cancelar</button>
+                    style="flex:1;padding:10px 20px;background:#F1F5F9;color:#374151;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Cancel">Cancelar</button>
                 <button type="submit"
-                    style="flex:1;padding:10px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Save">Guardar</button>
+                    style="flex:1;padding:10px 20px;background:#1A56DB;color:#fff;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Save">Guardar</button>
             </div>
         </form>
     </div>

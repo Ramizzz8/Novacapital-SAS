@@ -1,664 +1,759 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro - Novacapital</title>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Sora:wght@600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro - Novacapital SAS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e8eef3 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-            padding: 2rem;
-        }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      background: #F1F5F9;
+      color: #0F172A;
+    }
 
-        .register-wrapper {
-            width: 100%;
-            max-width: 680px;
-            padding: 2rem 0;
-        }
+    /* ── Left panel ──────────────────────────────────────── */
+    .left-panel {
+      flex: 0 0 420px;
+      background: linear-gradient(135deg, #0D1B2A 0%, #0A2463 60%, #1A56DB 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+    }
 
-        .register-card {
-            background: white;
-            border-radius: 16px;
-            padding: 3rem 3rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            animation: fadeInUp 0.5s ease;
-        }
+    .left-panel .logo-wrap {
+      margin-bottom: 48px;
+      text-align: center;
+    }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
+    .left-panel .logo-wrap img {
+      width: 200px;
+      object-fit: contain;
+      filter: brightness(0) invert(1);
+    }
 
-        /* ── Logo Section ─────────────────────────────────── */
-        .logo-section {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
+    .left-panel .tagline {
+      font-size: 22px;
+      font-weight: 700;
+      color: #FFFFFF;
+      text-align: center;
+      margin-bottom: 36px;
+      line-height: 1.4;
+      letter-spacing: -0.3px;
+    }
 
-        .logo-section img {
-            width: 280px;
-            height: auto;
-            object-fit: contain;
-            display: block;
-            margin: 0 auto 1.25rem;
-        }
+    .left-panel .benefits {
+      list-style: none;
+      width: 100%;
+    }
 
-        .logo-section h1 {
-            font-family: 'Sora', sans-serif;
-            font-size: 1.5rem;
-            color: #2c3e50;
-            margin-bottom: 0.35rem;
-        }
+    .left-panel .benefits li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: rgba(255, 255, 255, 0.82);
+      font-size: 14px;
+      font-weight: 400;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
 
-        .logo-section p {
-            color: #7f8c9a;
-            font-size: 0.875rem;
-        }
+    .left-panel .benefits li .benefit-icon {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+    }
 
-        /* ── Section dividers ─────────────────────────────── */
-        .section-label {
-            font-family: 'Sora', sans-serif;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #5f7d95;
-            border-bottom: 1.5px solid #e1e8ed;
-            padding-bottom: 0.5rem;
-            margin-bottom: 1.5rem;
-            margin-top: 2rem;
-        }
+    .left-panel .benefits li .benefit-icon svg {
+      width: 11px;
+      height: 11px;
+    }
 
-        .section-label:first-of-type {
-            margin-top: 0;
-        }
+    .left-panel .footer-text {
+      margin-top: auto;
+      padding-top: 48px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+    }
 
-        /* ── Form layout ──────────────────────────────────── */
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
+    /* ── Right panel ─────────────────────────────────────── */
+    .right-panel {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 32px;
+    }
 
-        .form-row-3 {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 1rem;
-        }
+    .form-container {
+      width: 100%;
+      max-width: 520px;
+    }
 
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
+    .form-header {
+      margin-bottom: 32px;
+    }
 
-        .form-group label {
-            display: block;
-            color: #2c3e50;
-            font-weight: 500;
-            margin-bottom: 0.4rem;
-            font-size: 0.85rem;
-        }
+    .form-header h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0F172A;
+      margin-bottom: 6px;
+      letter-spacing: -0.3px;
+    }
 
-        .form-group label .req {
-            color: #c0392b;
-            margin-left: 2px;
-        }
+    .form-header p {
+      font-size: 14px;
+      color: #64748B;
+    }
 
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1.5px solid #e1e8ed;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-family: 'DM Sans', sans-serif;
-            background: #fafbfc;
-            color: #2c3e50;
-            transition: all 0.25s ease;
-            appearance: none;
-            -webkit-appearance: none;
-        }
+    /* ── Alert messages ──────────────────────────────────── */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 24px;
+    }
 
-        .form-group select {
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237f8c9a' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            padding-right: 2.5rem;
-        }
+    .alert-error {
+      background: #FEF2F2;
+      color: #DC2626;
+      border: 1px solid #FECACA;
+    }
 
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #5f7d95;
-            background: white;
-            box-shadow: 0 0 0 3px rgba(95, 125, 149, 0.1);
-        }
+    .alert-success {
+      background: #F0FDF4;
+      color: #16A34A;
+      border: 1px solid #BBF7D0;
+    }
 
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: #b8c5d0;
-        }
+    /* ── Section labels ──────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #64748B;
+      border-bottom: 1px solid #E2E8F0;
+      padding-bottom: 8px;
+      margin-bottom: 20px;
+      margin-top: 28px;
+    }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
+    .section-label:first-of-type {
+      margin-top: 0;
+    }
 
-        /* prefix for currency */
-        .input-prefix-wrap {
-            position: relative;
-        }
+    /* ── Form layout ─────────────────────────────────────── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
 
-        .input-prefix-wrap .prefix {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #7f8c9a;
-            font-size: 0.9rem;
-            pointer-events: none;
-        }
+    .form-group {
+      margin-bottom: 18px;
+    }
 
-        .input-prefix-wrap input {
-            padding-left: 2.2rem;
-        }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 6px;
+    }
 
-        /* ── Password ─────────────────────────────────────── */
-        .password-wrap {
-            position: relative;
-        }
+    .form-group label .req {
+      color: #EF4444;
+      margin-left: 2px;
+    }
 
-        .password-wrap input {
-            padding-right: 3rem;
-        }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: #0F172A;
+      background: #FFFFFF;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
 
-        .password-toggle {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #7f8c9a;
-            font-size: 1.1rem;
-            padding: 0.2rem;
-            transition: color 0.25s;
-        }
+    .form-group input::placeholder {
+      color: #94A3B8;
+    }
 
-        .password-toggle:hover { color: #5f7d95; }
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #1A56DB;
+      box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    }
 
-        .strength-bar {
-            height: 3px;
-            background: #e1e8ed;
-            border-radius: 2px;
-            margin-top: 0.4rem;
-            overflow: hidden;
-        }
+    .form-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%2364748B' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
 
-        .strength-fill {
-            height: 100%;
-            border-radius: 2px;
-            transition: all 0.3s;
-            width: 0;
-        }
+    /* ── Currency prefix ─────────────────────────────────── */
+    .input-prefix-wrap {
+      position: relative;
+    }
 
-        .strength-weak   { width: 33%; background: #e74c3c; }
-        .strength-medium { width: 66%; background: #f39c12; }
-        .strength-strong { width: 100%; background: #27ae60; }
+    .input-prefix-wrap .prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #64748B;
+      font-size: 14px;
+      pointer-events: none;
+      font-family: 'Inter', sans-serif;
+    }
 
-        .strength-text {
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-        }
+    .input-prefix-wrap input {
+      padding-left: 26px;
+    }
 
-        /* ── Terms checkbox ───────────────────────────────── */
-        .terms-group {
-            margin-bottom: 1.5rem;
-        }
+    /* ── Password wrap ───────────────────────────────────── */
+    .password-wrap {
+      position: relative;
+    }
 
-        .terms-label {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.6rem;
-            font-size: 0.85rem;
-            color: #4a5568;
-            cursor: pointer;
-        }
+    .password-wrap input {
+      padding-right: 44px;
+    }
 
-        .terms-label input[type="checkbox"] {
-            width: 1rem;
-            height: 1rem;
-            margin-top: 0.15rem;
-            flex-shrink: 0;
-            accent-color: #5f7d95;
-            cursor: pointer;
-        }
+    .password-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #94A3B8;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
 
-        .terms-label a {
-            color: #5f7d95;
-            text-decoration: none;
-            font-weight: 500;
-        }
+    .password-toggle:hover {
+      color: #1A56DB;
+    }
 
-        .terms-label a:hover { text-decoration: underline; }
+    .password-toggle svg {
+      width: 18px;
+      height: 18px;
+    }
 
-        /* ── Submit button ────────────────────────────────── */
-        .btn-register {
-            width: 100%;
-            padding: 1rem;
-            background: #5f7d95;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            margin-top: 0.5rem;
-        }
+    /* ── Password strength ───────────────────────────────── */
+    .strength-bar {
+      height: 3px;
+      background: #E2E8F0;
+      border-radius: 2px;
+      margin-top: 6px;
+      overflow: hidden;
+    }
 
-        .btn-register:hover {
-            background: #4a6277;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(95, 125, 149, 0.3);
-        }
+    .strength-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.3s, background 0.3s;
+      width: 0;
+    }
 
-        .btn-register:active { transform: translateY(0); }
+    .strength-weak   { width: 33%; background: #EF4444; }
+    .strength-medium { width: 66%; background: #F59E0B; }
+    .strength-strong { width: 100%; background: #10B981; }
 
-        .btn-register:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
+    .strength-text {
+      font-size: 12px;
+      margin-top: 4px;
+      font-weight: 500;
+    }
 
-        /* ── Divider & footer ─────────────────────────────── */
-        .divider {
-            display: flex;
-            align-items: center;
-            margin: 1.75rem 0;
-            color: #b8c5d0;
-            font-size: 0.85rem;
-        }
+    /* ── Terms ───────────────────────────────────────────── */
+    .terms-group {
+      margin-bottom: 24px;
+    }
 
-        .divider::before,
-        .divider::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e1e8ed;
-        }
+    .terms-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      color: #374151;
+      cursor: pointer;
+      line-height: 1.5;
+    }
 
-        .divider span { padding: 0 1rem; }
+    .terms-label input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      accent-color: #1A56DB;
+      cursor: pointer;
+    }
 
-        .login-section {
-            text-align: center;
-            color: #7f8c9a;
-            font-size: 0.875rem;
-        }
+    .terms-label a {
+      color: #1A56DB;
+      text-decoration: none;
+      font-weight: 500;
+    }
 
-        .login-link {
-            color: #5f7d95;
-            text-decoration: none;
-            font-weight: 600;
-        }
+    .terms-label a:hover { text-decoration: underline; }
 
-        .login-link:hover { text-decoration: underline; }
+    /* ── Submit button ───────────────────────────────────── */
+    .btn-register {
+      width: 100%;
+      padding: 12px;
+      background: #1A56DB;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+    }
 
-        /* ── Alerts ───────────────────────────────────────── */
-        .alert {
-            padding: 0.875rem 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            font-size: 0.875rem;
-        }
+    .btn-register:hover {
+      background: #1648C0;
+      box-shadow: 0 4px 14px rgba(26, 86, 219, 0.3);
+    }
 
-        .alert-error {
-            background: #fee;
-            color: #c0392b;
-            border: 1px solid #fcc;
-        }
+    .btn-register:active {
+      transform: translateY(1px);
+    }
 
-        .alert-success {
-            background: #efe;
-            color: #27ae60;
-            border: 1px solid #cfc;
-        }
+    .btn-register:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
 
-        /* ── Back home ────────────────────────────────────── */
-        .back-home {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
+    /* ── Divider ─────────────────────────────────────────── */
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: #94A3B8;
+      font-size: 13px;
+    }
 
-        .back-home a {
-            color: #7f8c9a;
-            text-decoration: none;
-            font-size: 0.875rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: color 0.25s;
-        }
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #E2E8F0;
+    }
 
-        .back-home a:hover {
-            color: #5f7d95;
-            text-decoration: underline;
-        }
+    .divider span { padding: 0 12px; }
 
-        /* ── Responsive ───────────────────────────────────── */
-        @media (max-width: 640px) {
-            body { padding: 1rem; }
+    /* ── Login link ──────────────────────────────────────── */
+    .login-section {
+      text-align: center;
+      font-size: 14px;
+      color: #64748B;
+    }
 
-            .register-card { padding: 2rem 1.5rem; }
+    .login-link {
+      color: #1A56DB;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-            .form-row,
-            .form-row-3 { grid-template-columns: 1fr; }
+    .login-link:hover { text-decoration: underline; }
 
-            .logo-section img { width: 200px; }
-        }
-    </style>
+    /* ── Responsive ──────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .left-panel {
+        display: none;
+      }
+
+      body {
+        background: #F1F5F9;
+      }
+
+      .right-panel {
+        padding: 32px 20px;
+      }
+    }
+
+    @media (max-width: 540px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="register-wrapper">
-        <div class="register-card">
 
-            <!-- Logo -->
-            <div class="logo-section">
-                <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital">
-                <h1>Crea tu cuenta</h1>
-                <p>Únete a Novacapital y accede a los mejores créditos</p>
-            </div>
-
-            <!-- Alertas -->
-            {% if error %}
-            <div class="alert alert-error">{{ error }}</div>
-            {% endif %}
-            {% if success %}
-            <div class="alert alert-success">{{ success }}</div>
-            {% endif %}
-
-            <form method="POST" action="/register" id="registerForm">
-
-                <!-- ═══════════ DATOS PERSONALES ═══════════ -->
-                <div class="section-label">Datos personales</div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="nombres">Nombres <span class="req">*</span></label>
-                        <input type="text" id="nombres" name="nombres"
-                               placeholder="Juan Carlos" required autocomplete="given-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="apellidos">Apellidos <span class="req">*</span></label>
-                        <input type="text" id="apellidos" name="apellidos"
-                               placeholder="Pérez García" required autocomplete="family-name">
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="tipo_documento">Tipo de documento <span class="req">*</span></label>
-                        <select id="tipo_documento" name="tipo_documento" required>
-                            <option value="">Seleccionar</option>
-                            <option value="CC">Cédula de Ciudadanía</option>
-                            <option value="CE">Cédula de Extranjería</option>
-                            <option value="TI">Tarjeta de Identidad</option>
-                            <option value="PP">Pasaporte</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="numero_documento">Número de documento <span class="req">*</span></label>
-                        <input type="text" id="numero_documento" name="numero_documento"
-                               placeholder="1234567890" required>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="fecha_nacimiento">Fecha de nacimiento <span class="req">*</span></label>
-                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
-                </div>
-
-                <!-- ═══════════ CONTACTO ═══════════ -->
-                <div class="section-label">Contacto</div>
-
-                <div class="form-group">
-                    <label for="email">Correo electrónico <span class="req">*</span></label>
-                    <input type="email" id="email" name="email"
-                           placeholder="tu@email.com" required autocomplete="email">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="celular">Celular <span class="req">*</span></label>
-                        <input type="tel" id="celular" name="celular"
-                               placeholder="3001234567" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="telefono">Teléfono fijo</label>
-                        <input type="tel" id="telefono" name="telefono"
-                               placeholder="6011234567">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="direccion">Dirección</label>
-                    <input type="text" id="direccion" name="direccion"
-                           placeholder="Cra 10 # 20-30, Apto 501">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="ciudad">Ciudad</label>
-                        <input type="text" id="ciudad" name="ciudad" placeholder="Bogotá">
-                    </div>
-                    <div class="form-group">
-                        <label for="departamento">Departamento</label>
-                        <input type="text" id="departamento" name="departamento" placeholder="Cundinamarca">
-                    </div>
-                </div>
-
-                <!-- ═══════════ INFORMACIÓN LABORAL ═══════════ -->
-                <div class="section-label">Información laboral</div>
-
-                <div class="form-group">
-                    <label for="tipo_cliente">Tipo de cliente <span class="req">*</span></label>
-                    <select id="tipo_cliente" name="tipo_cliente" required>
-                        <option value="">Seleccionar</option>
-                        <option value="empleado_publico">Empleado Público</option>
-                        <option value="pensionado">Pensionado</option>
-                    </select>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="entidad_empleadora">Entidad empleadora</label>
-                        <input type="text" id="entidad_empleadora" name="entidad_empleadora"
-                               placeholder="Nombre de la entidad">
-                    </div>
-                    <div class="form-group">
-                        <label for="salario_mensual">Salario mensual</label>
-                        <div class="input-prefix-wrap">
-                            <span class="prefix">$</span>
-                            <input type="number" id="salario_mensual" name="salario_mensual"
-                                   placeholder="2.500.000" min="0" step="0.01">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ═══════════ SEGURIDAD ═══════════ -->
-                <div class="section-label">Seguridad</div>
-
-                <div class="form-group">
-                    <label for="password">Contraseña <span class="req">*</span></label>
-                    <div class="password-wrap">
-                        <input type="password" id="password" name="password"
-                               placeholder="Mínimo 8 caracteres" required
-                               oninput="checkPasswordStrength(this.value)" autocomplete="new-password">
-                        <button type="button" class="password-toggle"
-                                onclick="togglePassword('password', this)">👁️</button>
-                    </div>
-                    <div class="strength-bar">
-                        <div class="strength-fill" id="strengthFill"></div>
-                    </div>
-                    <span class="strength-text" id="strengthText"></span>
-                </div>
-
-                <div class="form-group">
-                    <label for="confirm_password">Confirmar contraseña <span class="req">*</span></label>
-                    <div class="password-wrap">
-                        <input type="password" id="confirm_password" name="confirm_password"
-                               placeholder="Repite tu contraseña" required autocomplete="new-password">
-                        <button type="button" class="password-toggle"
-                                onclick="togglePassword('confirm_password', this)">👁️</button>
-                    </div>
-                </div>
-
-                <!-- ═══════════ TÉRMINOS ═══════════ -->
-                <div class="terms-group">
-                    <label class="terms-label">
-                        <input type="checkbox" name="terms" id="terms" required>
-                        <span>Acepto los <a href="#">términos y condiciones</a> y la
-                        <a href="#">política de privacidad</a> de Novacapital</span>
-                    </label>
-                </div>
-
-                <button type="submit" class="btn-register" id="submitBtn">
-                    Crear cuenta
-                </button>
-            </form>
-
-            <div class="divider"><span>O</span></div>
-
-            <div class="login-section">
-                <p>¿Ya tienes una cuenta? <a href="/login" class="login-link">Inicia sesión</a></p>
-            </div>
-        </div>
-
-        <div class="back-home">
-            <a href="/">← Volver al inicio</a>
-        </div>
+  <!-- Left panel -->
+  <aside class="left-panel">
+    <div class="logo-wrap">
+      <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital SAS">
     </div>
 
-    <script>
-        function togglePassword(fieldId, btn) {
-            const input = document.getElementById(fieldId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.textContent = '🙈';
-            } else {
-                input.type = 'password';
-                btn.textContent = '👁️';
-            }
+    <p class="tagline">Crea tu cuenta en segundos</p>
+
+    <ul class="benefits">
+      <li>
+        <span class="benefit-icon">
+          <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 6l3 3 5-5" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Solicita creditos por libranza de forma rapida y segura
+      </li>
+      <li>
+        <span class="benefit-icon">
+          <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 6l3 3 5-5" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Seguimiento en tiempo real del estado de tu solicitud
+      </li>
+      <li>
+        <span class="benefit-icon">
+          <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 6l3 3 5-5" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+        Tasas competitivas para empleados publicos y pensionados
+      </li>
+    </ul>
+
+    <p class="footer-text">Novacapital SAS &copy; 2026</p>
+  </aside>
+
+  <!-- Right panel -->
+  <main class="right-panel">
+    <div class="form-container">
+
+      <div class="form-header">
+        <h1>Crear Cuenta</h1>
+        <p>Registrate para acceder a tu portal</p>
+      </div>
+
+      <!-- Alert messages -->
+      {% if error %}
+      <div class="alert alert-error">{{ error }}</div>
+      {% endif %}
+      {% if success %}
+      <div class="alert alert-success">{{ success }}</div>
+      {% endif %}
+
+      <form method="POST" action="/register" id="registerForm">
+
+        <!-- Datos personales -->
+        <div class="section-label">Datos personales</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="nombres">Nombres <span class="req">*</span></label>
+            <input type="text" id="nombres" name="nombres"
+                   placeholder="Juan Carlos" required autocomplete="given-name">
+          </div>
+          <div class="form-group">
+            <label for="apellidos">Apellidos <span class="req">*</span></label>
+            <input type="text" id="apellidos" name="apellidos"
+                   placeholder="Perez Garcia" required autocomplete="family-name">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipo_documento">Tipo de documento <span class="req">*</span></label>
+            <select id="tipo_documento" name="tipo_documento" required>
+              <option value="">Seleccionar</option>
+              <option value="CC">Cedula de Ciudadania</option>
+              <option value="CE">Cedula de Extranjeria</option>
+              <option value="TI">Tarjeta de Identidad</option>
+              <option value="PP">Pasaporte</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="numero_documento">Numero de documento <span class="req">*</span></label>
+            <input type="text" id="numero_documento" name="numero_documento"
+                   placeholder="1234567890" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="fecha_nacimiento">Fecha de nacimiento <span class="req">*</span></label>
+          <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+        </div>
+
+        <!-- Contacto -->
+        <div class="section-label">Contacto</div>
+
+        <div class="form-group">
+          <label for="email">Correo electronico <span class="req">*</span></label>
+          <input type="email" id="email" name="email"
+                 placeholder="tu@email.com" required autocomplete="email">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="celular">Celular <span class="req">*</span></label>
+            <input type="tel" id="celular" name="celular"
+                   placeholder="3001234567" required>
+          </div>
+          <div class="form-group">
+            <label for="telefono">Telefono fijo</label>
+            <input type="tel" id="telefono" name="telefono"
+                   placeholder="6011234567">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="direccion">Direccion</label>
+          <input type="text" id="direccion" name="direccion"
+                 placeholder="Cra 10 # 20-30, Apto 501">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="ciudad">Ciudad</label>
+            <input type="text" id="ciudad" name="ciudad" placeholder="Bogota">
+          </div>
+          <div class="form-group">
+            <label for="departamento">Departamento</label>
+            <input type="text" id="departamento" name="departamento" placeholder="Cundinamarca">
+          </div>
+        </div>
+
+        <!-- Informacion laboral -->
+        <div class="section-label">Informacion laboral</div>
+
+        <div class="form-group">
+          <label for="tipo_cliente">Tipo de cliente <span class="req">*</span></label>
+          <select id="tipo_cliente" name="tipo_cliente" required>
+            <option value="">Seleccionar</option>
+            <option value="empleado_publico">Empleado Publico</option>
+            <option value="pensionado">Pensionado</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="entidad_empleadora">Entidad empleadora</label>
+            <input type="text" id="entidad_empleadora" name="entidad_empleadora"
+                   placeholder="Nombre de la entidad">
+          </div>
+          <div class="form-group">
+            <label for="salario_mensual">Salario mensual</label>
+            <div class="input-prefix-wrap">
+              <span class="prefix">$</span>
+              <input type="number" id="salario_mensual" name="salario_mensual"
+                     placeholder="2500000" min="0" step="0.01">
+            </div>
+          </div>
+        </div>
+
+        <!-- Seguridad -->
+        <div class="section-label">Seguridad</div>
+
+        <div class="form-group">
+          <label for="password">Contrasena <span class="req">*</span></label>
+          <div class="password-wrap">
+            <input type="password" id="password" name="password"
+                   placeholder="Minimo 8 caracteres" required
+                   oninput="checkPasswordStrength(this.value)" autocomplete="new-password">
+            <button type="button" class="password-toggle"
+                    onclick="togglePassword('password', this)" aria-label="Mostrar contrasena">
+              <svg id="eye-password" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+          <div class="strength-bar">
+            <div class="strength-fill" id="strengthFill"></div>
+          </div>
+          <span class="strength-text" id="strengthText"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="confirm_password">Confirmar contrasena <span class="req">*</span></label>
+          <div class="password-wrap">
+            <input type="password" id="confirm_password" name="confirm_password"
+                   placeholder="Repite tu contrasena" required autocomplete="new-password">
+            <button type="button" class="password-toggle"
+                    onclick="togglePassword('confirm_password', this)" aria-label="Mostrar contrasena">
+              <svg id="eye-confirm_password" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Terminos -->
+        <div class="terms-group">
+          <label class="terms-label">
+            <input type="checkbox" name="terms" id="terms" required>
+            <span>Acepto los <a href="#">terminos y condiciones</a> y la
+            <a href="#">politica de privacidad</a> de Novacapital</span>
+          </label>
+        </div>
+
+        <button type="submit" class="btn-register" id="submitBtn">
+          Crear cuenta
+        </button>
+      </form>
+
+      <div class="divider"><span>O</span></div>
+
+      <div class="login-section">
+        <p>Ya tienes una cuenta? <a href="/login" class="login-link">Inicia sesion</a></p>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    function togglePassword(fieldId, btn) {
+      const input = document.getElementById(fieldId);
+      const svg = document.getElementById('eye-' + fieldId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+      } else {
+        input.type = 'password';
+        svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+      }
+    }
+
+    function checkPasswordStrength(password) {
+      const fill = document.getElementById('strengthFill');
+      const text = document.getElementById('strengthText');
+      let strength = 0;
+      if (password.length >= 8) strength++;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+      if (/\d/.test(password)) strength++;
+      if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+      fill.className = 'strength-fill';
+      if (password.length === 0) {
+        text.textContent = '';
+        return;
+      }
+      if (strength <= 1) {
+        fill.classList.add('strength-weak');
+        text.textContent = 'Debil';
+        text.style.color = '#EF4444';
+      } else if (strength <= 2) {
+        fill.classList.add('strength-medium');
+        text.textContent = 'Media';
+        text.style.color = '#F59E0B';
+      } else {
+        fill.classList.add('strength-strong');
+        text.textContent = 'Fuerte';
+        text.style.color = '#10B981';
+      }
+    }
+
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      const campos = {
+        'nombres':           'Nombres',
+        'apellidos':         'Apellidos',
+        'tipo_documento':    'Tipo de documento',
+        'numero_documento':  'Numero de documento',
+        'fecha_nacimiento':  'Fecha de nacimiento',
+        'email':             'Correo electronico',
+        'celular':           'Celular',
+        'tipo_cliente':      'Tipo de cliente',
+        'password':          'Contrasena',
+        'confirm_password':  'Confirmar contrasena'
+      };
+
+      for (const [id, nombre] of Object.entries(campos)) {
+        if (!document.getElementById(id).value.trim()) {
+          e.preventDefault();
+          alert(`El campo "${nombre}" es obligatorio.`);
+          document.getElementById(id).focus();
+          return false;
         }
+      }
 
-        function checkPasswordStrength(password) {
-            const fill = document.getElementById('strengthFill');
-            const text = document.getElementById('strengthText');
-            let strength = 0;
-            if (password.length >= 8) strength++;
-            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
-            if (/\d/.test(password)) strength++;
-            if (/[^a-zA-Z\d]/.test(password)) strength++;
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(document.getElementById('email').value)) {
+        e.preventDefault();
+        alert('Por favor ingresa un correo electronico valido.');
+        document.getElementById('email').focus();
+        return false;
+      }
 
-            fill.className = 'strength-fill';
-            if (password.length === 0) {
-                text.textContent = '';
-                return;
-            }
-            if (strength <= 1) {
-                fill.classList.add('strength-weak');
-                text.textContent = 'Débil';
-                text.style.color = '#e74c3c';
-            } else if (strength <= 2) {
-                fill.classList.add('strength-medium');
-                text.textContent = 'Media';
-                text.style.color = '#f39c12';
-            } else {
-                fill.classList.add('strength-strong');
-                text.textContent = 'Fuerte';
-                text.style.color = '#27ae60';
-            }
-        }
+      const celular = document.getElementById('celular').value.replace(/\s/g, '');
+      if (!/^3\d{9}$/.test(celular)) {
+        e.preventDefault();
+        alert('El celular debe tener 10 digitos y comenzar con 3.');
+        document.getElementById('celular').focus();
+        return false;
+      }
 
-        document.getElementById('registerForm').addEventListener('submit', function(e) {
-            const campos = {
-                'nombres':           'Nombres',
-                'apellidos':         'Apellidos',
-                'tipo_documento':    'Tipo de documento',
-                'numero_documento':  'Número de documento',
-                'fecha_nacimiento':  'Fecha de nacimiento',
-                'email':             'Correo electrónico',
-                'celular':           'Celular',
-                'tipo_cliente':      'Tipo de cliente',
-                'password':          'Contraseña',
-                'confirm_password':  'Confirmar contraseña'
-            };
+      const password = document.getElementById('password').value;
+      if (password.length < 8) {
+        e.preventDefault();
+        alert('La contrasena debe tener al menos 8 caracteres.');
+        document.getElementById('password').focus();
+        return false;
+      }
 
-            for (const [id, nombre] of Object.entries(campos)) {
-                if (!document.getElementById(id).value.trim()) {
-                    e.preventDefault();
-                    alert(`El campo "${nombre}" es obligatorio.`);
-                    document.getElementById(id).focus();
-                    return false;
-                }
-            }
+      if (password !== document.getElementById('confirm_password').value) {
+        e.preventDefault();
+        alert('Las contrasenas no coinciden.');
+        document.getElementById('confirm_password').focus();
+        return false;
+      }
 
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(document.getElementById('email').value)) {
-                e.preventDefault();
-                alert('Por favor ingresa un correo electrónico válido.');
-                document.getElementById('email').focus();
-                return false;
-            }
+      if (!document.getElementById('terms').checked) {
+        e.preventDefault();
+        alert('Debes aceptar los terminos y condiciones.');
+        return false;
+      }
 
-            const celular = document.getElementById('celular').value.replace(/\s/g, '');
-            if (!/^3\d{9}$/.test(celular)) {
-                e.preventDefault();
-                alert('El celular debe tener 10 dígitos y comenzar con 3.');
-                document.getElementById('celular').focus();
-                return false;
-            }
-
-            const password = document.getElementById('password').value;
-            if (password.length < 8) {
-                e.preventDefault();
-                alert('La contraseña debe tener al menos 8 caracteres.');
-                document.getElementById('password').focus();
-                return false;
-            }
-
-            if (password !== document.getElementById('confirm_password').value) {
-                e.preventDefault();
-                alert('Las contraseñas no coinciden.');
-                document.getElementById('confirm_password').focus();
-                return false;
-            }
-
-            if (!document.getElementById('terms').checked) {
-                e.preventDefault();
-                alert('Debes aceptar los términos y condiciones.');
-                return false;
-            }
-
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Creando cuenta...';
-        });
-    </script>
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creando cuenta...';
+    });
+  </script>
 </body>
 </html>

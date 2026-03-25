@@ -1,0 +1,8 @@
+{"event": "login_exitoso", "timestamp": "2026-03-25T23:10:11", "user_id": 9, "ip": "127.0.0.1", "email": "admin@novacapital.com", "rol": "admin", "resultado": "exitoso"}
+{"event": "logout", "timestamp": "2026-03-25T23:10:54", "user_id": 9, "ip": "127.0.0.1", "email": "admin@novacapital.com"}
+{"event": "login_exitoso", "timestamp": "2026-03-25T23:21:43", "user_id": 9, "ip": "127.0.0.1", "email": "admin@novacapital.com", "rol": "admin", "resultado": "exitoso"}
+{"event": "logout", "timestamp": "2026-03-25T23:21:51", "user_id": 9, "ip": "127.0.0.1", "email": "admin@novacapital.com"}
+{"event": "login_exitoso", "timestamp": "2026-03-25T23:31:25", "user_id": 9, "ip": "127.0.0.1", "email": "admin@novacapital.com", "rol": "admin", "resultado": "exitoso"}
+{"event": "logout", "timestamp": "2026-03-25T23:31:29", "user_id": 9, "ip": "127.0.0.1", "email": "admin@novacapital.com"}
+{"event": "login_exitoso", "timestamp": "2026-03-25T23:31:33", "user_id": 15, "ip": "127.0.0.1", "email": "ajulianrague@gmail.com", "rol": "cliente", "resultado": "exitoso"}
+{"event": "logout", "timestamp": "2026-03-25T23:50:12", "user_id": 15, "ip": "127.0.0.1", "email": "ajulianrague@gmail.com"}

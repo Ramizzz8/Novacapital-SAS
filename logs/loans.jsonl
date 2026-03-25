@@ -1,0 +1,1 @@
+{"event": "cambio_estado_prestamo", "timestamp": "2026-03-25T23:10:41", "user_id": 9, "ip": "127.0.0.1", "prestamo_id": 4, "numero_prestamo": "PRE202600001", "estado_anterior": "solicitado", "estado_nuevo": "en_analisis"}
