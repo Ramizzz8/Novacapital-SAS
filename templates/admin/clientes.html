@@ -7,13 +7,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #F1F5F9; }
         .sidebar-gradient { background: linear-gradient(180deg, #0D1B2A 0%, #0A2463 100%); }
-        @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .fade-in { animation: fadeIn 0.35s ease forwards; }
-        input:focus, select:focus { outline: none; border-color: #1A56DB !important; box-shadow: 0 0 0 3px rgba(26,86,219,0.10); }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #1A56DB !important; box-shadow: 0 0 0 3px rgba(26,86,219,0.10); }
         .dark body { background: #0f172a; color: #e2e8f0; }
         .dark .bg-white { background: #1e293b !important; }
         .dark .main-bg { background: #0f172a !important; }
@@ -26,9 +26,13 @@
         html.density-compact .main-pad { padding: 1.5rem !important; }
         html.density-comfortable .nav-item { padding-top: 0.75rem !important; padding-bottom: 0.75rem !important; }
         html.density-comfortable .main-pad { padding: 3rem !important; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
     </style>
 </head>
-<body style="background:#F1F5F9;display:flex;height:100vh;overflow:hidden;">
+<body style="display:flex;height:100vh;overflow:hidden;">
 
 <!-- SIDEBAR -->
 <aside class="sidebar-gradient" style="width:256px;min-width:256px;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
@@ -88,23 +92,27 @@
     </div>
 </aside>
 
-<!-- MAIN -->
+<!-- MAIN CONTENT -->
 <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
 
+    <!-- TOP HEADER -->
     <header class="top-header" style="background:#fff;border-bottom:1px solid #E2E8F0;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
         <div>
             <p style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;" data-i18n="Administration">Administracion</p>
             <h1 style="font-size:18px;font-weight:700;color:#0F172A;" data-i18n="Client Management">Gestion de Clientes</h1>
         </div>
         <div style="display:flex;align-items:center;gap:12px;">
-            <div style="font-size:13px;color:#64748B;background:#F1F5F9;padding:7px 14px;border-radius:8px;border:1px solid #E2E8F0;">
+            <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#64748B;background:#F1F5F9;padding:7px 14px;border-radius:8px;border:1px solid #E2E8F0;">
+                <svg width="14" height="14" fill="none" stroke="#64748B" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 {{ total_clientes }} clientes registrados
             </div>
         </div>
     </header>
 
-    <div class="main-pad fade-in" style="flex:1;overflow-y:auto;padding:28px 32px;background:#F1F5F9;">
+    <!-- SCROLLABLE AREA -->
+    <div class="main-pad fade-in" style="flex:1;overflow-y:auto;padding:28px 32px;">
 
+        <!-- FLASH MESSAGES -->
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         <div style="margin-bottom:20px;display:flex;flex-direction:column;gap:8px;">
@@ -120,8 +128,9 @@
         {% endif %}
         {% endwith %}
 
-        <!-- KPIs -->
+        <!-- KPI CARDS -->
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px;">
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
                     <div style="width:44px;height:44px;background:#EFF6FF;border-radius:12px;display:flex;align-items:center;justify-content:center;">
@@ -131,6 +140,7 @@
                 <div style="font-size:28px;font-weight:700;color:#0F172A;margin-bottom:4px;">{{ total_clientes }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Total registered clients">Total clientes registrados</div>
             </div>
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
                     <div style="width:44px;height:44px;background:#ECFDF5;border-radius:12px;display:flex;align-items:center;justify-content:center;">
@@ -140,6 +150,7 @@
                 <div style="font-size:28px;font-weight:700;color:#0F172A;margin-bottom:4px;">{{ clientes | selectattr('estado', 'equalto', 'activo') | list | length }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Active clients">Clientes activos</div>
             </div>
+
             <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
                     <div style="width:44px;height:44px;background:#FFFBEB;border-radius:12px;display:flex;align-items:center;justify-content:center;">
@@ -149,23 +160,24 @@
                 <div style="font-size:28px;font-weight:700;color:#0F172A;margin-bottom:4px;">{{ clientes | sum(attribute='solicitudes_pendientes') }}</div>
                 <div style="font-size:13px;color:#64748B;" data-i18n="Pending applications">Solicitudes pendientes</div>
             </div>
+
         </div>
 
-        <!-- Filtros -->
+        <!-- FILTER BAR -->
         <div style="background:#fff;border-radius:16px;padding:20px 24px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);margin-bottom:20px;">
             <form method="GET" action="/admin/clientes" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;">
                 <div style="flex:1;min-width:200px;">
-                    <label style="display:block;font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;" data-i18n="Search">Buscar</label>
+                    <label style="display:block;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;" data-i18n="Search">Buscar</label>
                     <div style="position:relative;">
                         <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;" width="14" height="14" fill="none" stroke="#94A3B8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                         <input type="text" name="buscar" value="{{ request.args.get('buscar','') }}"
                             placeholder="Nombre, documento, email..."
-                            style="width:100%;padding:9px 12px 9px 34px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;transition:all 0.2s;color:#0F172A;">
+                            style="width:100%;padding:9px 12px 9px 34px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;">
                     </div>
                 </div>
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;" data-i18n="Status">Estado</label>
-                    <select name="estado" style="padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;" data-i18n="Status">Estado</label>
+                    <select name="estado" style="padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;height:38px;">
                         <option value="">Todos</option>
                         <option value="activo" {% if request.args.get('estado')=='activo' %}selected{% endif %}>Activo</option>
                         <option value="inactivo" {% if request.args.get('estado')=='inactivo' %}selected{% endif %}>Inactivo</option>
@@ -173,8 +185,8 @@
                     </select>
                 </div>
                 <div>
-                    <label style="display:block;font-size:12px;font-weight:600;color:#64748B;margin-bottom:6px;" data-i18n="Advisor">Asesor</label>
-                    <select name="asesor" style="padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;">
+                    <label style="display:block;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:6px;" data-i18n="Advisor">Asesor</label>
+                    <select name="asesor" style="padding:9px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;height:38px;">
                         <option value="">Todos</option>
                         <option value="sin_asignar" {% if request.args.get('asesor')=='sin_asignar' %}selected{% endif %}>Sin asignar</option>
                         {% for a in asesores %}
@@ -182,34 +194,40 @@
                         {% endfor %}
                     </select>
                 </div>
-                <button type="submit" style="padding:9px 20px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;"
-                    onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='#1A56DB'" data-i18n="Filter">
-                    Filtrar
-                </button>
-                {% if request.args.get('buscar') or request.args.get('estado') or request.args.get('asesor') %}
-                <a href="/admin/clientes" style="padding:9px 16px;font-size:13px;color:#64748B;text-decoration:none;font-weight:500;" data-i18n="Clear">Limpiar</a>
-                {% endif %}
+                <div style="display:flex;gap:8px;align-items:flex-end;">
+                    <button type="submit" style="padding:9px 20px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background 0.2s;height:38px;"
+                        onmouseover="this.style.background='#1e40af'" onmouseout="this.style.background='#1A56DB'" data-i18n="Filter">
+                        Filtrar
+                    </button>
+                    {% if request.args.get('buscar') or request.args.get('estado') or request.args.get('asesor') %}
+                    <a href="/admin/clientes" style="padding:9px 16px;font-size:13px;color:#64748B;text-decoration:none;font-weight:500;height:38px;display:flex;align-items:center;border-radius:10px;border:1.5px solid #E2E8F0;background:#F8FAFC;transition:all 0.2s;"
+                        onmouseover="this.style.borderColor='#CBD5E1'" onmouseout="this.style.borderColor='#E2E8F0'" data-i18n="Clear">Limpiar</a>
+                    {% endif %}
+                </div>
             </form>
         </div>
 
-        <!-- Tabla -->
+        <!-- CLIENT TABLE -->
         <div style="background:#fff;border-radius:16px;border:1px solid #E2E8F0;box-shadow:0 1px 3px rgba(0,0,0,0.06);overflow:hidden;">
             <div style="padding:18px 24px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
-                <h3 style="font-size:14px;font-weight:700;color:#0F172A;" data-i18n="Clients">Clientes <span style="color:#94A3B8;font-weight:400;font-size:13px;">({{ clientes | length }})</span></h3>
+                <h3 style="font-size:14px;font-weight:700;color:#0F172A;" data-i18n="Clients">
+                    Clientes
+                    <span style="color:#94A3B8;font-weight:400;font-size:13px;">({{ clientes | length }})</span>
+                </h3>
             </div>
             {% if clientes %}
             <div style="overflow-x:auto;">
-                <table style="border-collapse:separate;border-spacing:0;width:100%;">
+                <table style="width:100%;border-collapse:collapse;">
                     <thead>
-                        <tr style="background:#F8FAFC;">
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Name">Cliente</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Document">Documento</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Contact">Contacto</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Type">Tipo</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:center;" data-i18n="Loans">Prestamos</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:left;" data-i18n="Advisor">Asesor</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:center;" data-i18n="Status">Estado</th>
-                            <th style="font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;padding:12px 16px;text-align:center;" data-i18n="Actions">Acciones</th>
+                        <tr style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;">
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Name">Cliente</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Document">Documento</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Contact">Contacto</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Type">Tipo</th>
+                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Loans">Prestamos</th>
+                            <th style="padding:12px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Advisor">Asesor</th>
+                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Status">Estado</th>
+                            <th style="padding:12px 16px;text-align:center;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:0.05em;" data-i18n="Actions">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -217,25 +235,25 @@
                         <tr style="border-bottom:1px solid #F1F5F9;" onmouseover="this.style.background='#F8FAFC'" onmouseout="this.style.background='#fff'">
                             <td style="padding:14px 16px;">
                                 <div style="display:flex;align-items:center;gap:10px;">
-                                    <div style="width:34px;height:34px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                                        <span style="font-size:12px;font-weight:700;color:#1A56DB;">{{ c.nombres[0].upper() }}</span>
+                                    <div style="width:36px;height:36px;background:#EFF6FF;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #DBEAFE;">
+                                        <span style="font-size:13px;font-weight:700;color:#1A56DB;">{{ c.nombres[0].upper() }}</span>
                                     </div>
                                     <div>
-                                        <p style="font-size:13px;font-weight:600;color:#0F172A;">{{ c.nombres }} {{ c.apellidos }}</p>
+                                        <p style="font-size:13.5px;font-weight:600;color:#0F172A;">{{ c.nombres }} {{ c.apellidos }}</p>
                                         <p style="font-size:11px;color:#94A3B8;">{{ c.email or '—' }}</p>
                                     </div>
                                 </div>
                             </td>
-                            <td style="padding:14px 16px;font-size:12px;font-family:monospace;color:#475569;">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
+                            <td style="padding:14px 16px;font-size:12px;font-family:monospace;color:#475569;white-space:nowrap;">{{ c.tipo_documento }} {{ c.numero_documento }}</td>
                             <td style="padding:14px 16px;font-size:13px;color:#475569;">{{ c.celular }}</td>
                             <td style="padding:14px 16px;font-size:12px;color:#475569;text-transform:capitalize;">{{ (c.tipo_cliente or '—').replace('_',' ') }}</td>
                             <td style="padding:14px 16px;text-align:center;">
                                 <span style="font-size:13px;font-weight:700;color:#0F172A;">{{ c.total_prestamos or 0 }}</span>
                                 {% if c.solicitudes_pendientes and c.solicitudes_pendientes > 0 %}
-                                <span style="margin-left:4px;font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 6px;border-radius:20px;">{{ c.solicitudes_pendientes }}</span>
+                                <span style="margin-left:4px;font-size:10px;font-weight:700;background:#FEF3C7;color:#92400E;padding:2px 7px;border-radius:20px;">{{ c.solicitudes_pendientes }}</span>
                                 {% endif %}
                             </td>
-                            <td style="padding:14px 16px;font-size:12px;color:#475569;">{{ c.asesor_nombre or '—' }}</td>
+                            <td style="padding:14px 16px;font-size:12.5px;color:#475569;">{{ c.asesor_nombre or '—' }}</td>
                             <td style="padding:14px 16px;text-align:center;">
                                 <span style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;
                                     {% if c.estado == 'activo' %}background:#D1FAE5;color:#065F46;
@@ -247,14 +265,16 @@
                             <td style="padding:14px 16px;">
                                 <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
                                     <button onclick="openAsignar({{ c.id }}, '{{ c.nombres }} {{ c.apellidos }}')"
-                                        style="padding:6px;color:#1A56DB;background:none;border:none;border-radius:8px;cursor:pointer;transition:background 0.15s;"
-                                        onmouseover="this.style.background='#EFF6FF'" onmouseout="this.style.background='none'" title="Asignar asesor">
-                                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        style="padding:6px 8px;color:#1A56DB;background:#EFF6FF;border:none;border-radius:8px;cursor:pointer;transition:background 0.15s;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;"
+                                        onmouseover="this.style.background='#DBEAFE'" onmouseout="this.style.background='#EFF6FF'" title="Asignar asesor">
+                                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                                        Asesor
                                     </button>
                                     <button onclick="openNotif({{ c.id }}, '{{ c.nombres }} {{ c.apellidos }}')"
-                                        style="padding:6px;color:#64748B;background:none;border:none;border-radius:8px;cursor:pointer;transition:background 0.15s;"
-                                        onmouseover="this.style.background='#F1F5F9'" onmouseout="this.style.background='none'" title="Enviar notificacion">
-                                        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                        style="padding:6px 8px;color:#64748B;background:#F1F5F9;border:none;border-radius:8px;cursor:pointer;transition:background 0.15s;display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;font-family:'Inter',sans-serif;"
+                                        onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'" title="Enviar notificacion">
+                                        <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                                        Notif.
                                     </button>
                                 </div>
                             </td>
@@ -264,11 +284,12 @@
                 </table>
             </div>
             {% else %}
-            <div style="padding:60px 24px;text-align:center;">
-                <div style="width:52px;height:52px;background:#F1F5F9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
+            <div style="padding:72px 24px;text-align:center;">
+                <div style="width:56px;height:56px;background:#F1F5F9;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
                     <svg width="24" height="24" fill="none" stroke="#94A3B8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
-                <p style="font-size:13px;color:#94A3B8;" data-i18n="No clients found">No se encontraron clientes</p>
+                <p style="font-size:14px;font-weight:600;color:#64748B;margin-bottom:4px;" data-i18n="No clients found">No se encontraron clientes</p>
+                <p style="font-size:13px;color:#94A3B8;">Ajusta los filtros o registra un nuevo cliente</p>
             </div>
             {% endif %}
         </div>
@@ -276,22 +297,29 @@
     </div>
 </div>
 
-<!-- Modal asignar asesor -->
-<div id="modal-asignar" style="display:none;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);">
-    <div style="background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.15);width:100%;max-width:400px;margin:16px;">
-        <div style="padding:20px 24px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
-            <h3 style="font-size:15px;font-weight:700;color:#0F172A;" data-i18n="Assign Advisor">Asignar Asesor</h3>
-            <button onclick="document.getElementById('modal-asignar').style.display='none'" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#94A3B8;"
-                onmouseover="this.style.color='#64748B'" onmouseout="this.style.color='#94A3B8'">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+<!-- MODAL: ASIGNAR ASESOR -->
+<div id="modal-asignar" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:0;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
+        <div style="padding:24px 28px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+                <h3 style="font-size:15px;font-weight:700;color:#0F172A;" data-i18n="Assign Advisor">Asignar Asesor</h3>
+                <p style="font-size:12px;color:#94A3B8;margin-top:2px;">Vincula un asesor al cliente seleccionado</p>
+            </div>
+            <button onclick="document.getElementById('modal-asignar').style.display='none'"
+                style="background:#F1F5F9;border:none;cursor:pointer;padding:8px;border-radius:8px;color:#64748B;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+                onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <form method="POST" action="/admin/asignar-asesor" style="padding:24px;">
+        <form method="POST" action="/admin/asignar-asesor" style="padding:24px 28px;">
             <input type="hidden" name="cliente_id" id="asignar-cliente-id">
-            <p style="font-size:13px;color:#64748B;margin-bottom:16px;"><span data-i18n="Client:">Cliente:</span> <strong id="asignar-cliente-nombre" style="color:#0F172A;"></strong></p>
-            <div style="margin-bottom:20px;">
-                <label style="display:block;font-size:13px;font-weight:600;color:#0F172A;margin-bottom:7px;" data-i18n="Select advisor">Seleccionar asesor</label>
-                <select name="asesor_id" required style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;">
+            <div style="background:#F8FAFC;border-radius:10px;padding:12px 16px;margin-bottom:20px;border:1px solid #E2E8F0;">
+                <p style="font-size:12px;color:#64748B;margin-bottom:2px;" data-i18n="Client:">Cliente</p>
+                <p style="font-size:14px;font-weight:600;color:#0F172A;" id="asignar-cliente-nombre"></p>
+            </div>
+            <div style="margin-bottom:24px;">
+                <label style="display:block;font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;" data-i18n="Select advisor">Seleccionar asesor</label>
+                <select name="asesor_id" required style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;">
                     <option value="">-- Seleccionar --</option>
                     {% for a in asesores %}
                     <option value="{{ a.id }}">{{ a.nombre }}</option>
@@ -300,42 +328,49 @@
             </div>
             <div style="display:flex;gap:10px;">
                 <button type="button" onclick="document.getElementById('modal-asignar').style.display='none'"
-                    style="flex:1;padding:10px;border:1.5px solid #E2E8F0;color:#64748B;background:#fff;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Cancel">Cancelar</button>
+                    style="flex:1;padding:10px 20px;background:#F1F5F9;color:#374151;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Cancel">Cancelar</button>
                 <button type="submit"
-                    style="flex:1;padding:10px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Assign">Asignar</button>
+                    style="flex:1;padding:10px 20px;background:#1A56DB;color:#fff;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Assign">Asignar</button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal notificacion -->
-<div id="modal-notif" style="display:none;position:fixed;inset:0;z-index:50;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);">
-    <div style="background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,0.15);width:100%;max-width:400px;margin:16px;">
-        <div style="padding:20px 24px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
-            <h3 style="font-size:15px;font-weight:700;color:#0F172A;" data-i18n="Send Notification">Enviar Notificacion</h3>
-            <button onclick="document.getElementById('modal-notif').style.display='none'" style="background:none;border:none;cursor:pointer;padding:4px;border-radius:6px;color:#94A3B8;"
-                onmouseover="this.style.color='#64748B'" onmouseout="this.style.color='#94A3B8'">
-                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+<!-- MODAL: ENVIAR NOTIFICACION -->
+<div id="modal-notif" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:50;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:16px;padding:0;width:480px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,0.2);overflow:hidden;">
+        <div style="padding:24px 28px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+                <h3 style="font-size:15px;font-weight:700;color:#0F172A;" data-i18n="Send Notification">Enviar Notificacion</h3>
+                <p style="font-size:12px;color:#94A3B8;margin-top:2px;">Envia un mensaje directo al cliente</p>
+            </div>
+            <button onclick="document.getElementById('modal-notif').style.display='none'"
+                style="background:#F1F5F9;border:none;cursor:pointer;padding:8px;border-radius:8px;color:#64748B;display:flex;align-items:center;justify-content:center;transition:background 0.15s;"
+                onmouseover="this.style.background='#E2E8F0'" onmouseout="this.style.background='#F1F5F9'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
-        <form method="POST" action="/admin/enviar-notificacion" style="padding:24px;">
+        <form method="POST" action="/admin/enviar-notificacion" style="padding:24px 28px;">
             <input type="hidden" name="cliente_id" id="notif-cliente-id">
-            <p style="font-size:13px;color:#64748B;margin-bottom:16px;"><span data-i18n="To:">Para:</span> <strong id="notif-cliente-nombre" style="color:#0F172A;"></strong></p>
-            <div style="margin-bottom:16px;">
-                <label style="display:block;font-size:13px;font-weight:600;color:#0F172A;margin-bottom:7px;" data-i18n="Title">Titulo</label>
-                <input type="text" name="titulo" required placeholder="Asunto de la notificacion"
-                    style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;">
+            <div style="background:#F8FAFC;border-radius:10px;padding:12px 16px;margin-bottom:20px;border:1px solid #E2E8F0;">
+                <p style="font-size:12px;color:#64748B;margin-bottom:2px;" data-i18n="To:">Para</p>
+                <p style="font-size:14px;font-weight:600;color:#0F172A;" id="notif-cliente-nombre"></p>
             </div>
-            <div style="margin-bottom:20px;">
-                <label style="display:block;font-size:13px;font-weight:600;color:#0F172A;margin-bottom:7px;" data-i18n="Message">Mensaje</label>
-                <textarea name="mensaje" required rows="3" placeholder="Escribe el mensaje..."
-                    style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;resize:none;"></textarea>
+            <div style="margin-bottom:16px;">
+                <label style="display:block;font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;" data-i18n="Title">Titulo</label>
+                <input type="text" name="titulo" required placeholder="Asunto de la notificacion"
+                    style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;transition:all 0.2s;">
+            </div>
+            <div style="margin-bottom:24px;">
+                <label style="display:block;font-size:12px;font-weight:600;color:#374151;text-transform:uppercase;letter-spacing:0.04em;margin-bottom:8px;" data-i18n="Message">Mensaje</label>
+                <textarea name="mensaje" required rows="4" placeholder="Escribe el mensaje..."
+                    style="width:100%;padding:10px 12px;border:1.5px solid #E2E8F0;border-radius:10px;font-size:13.5px;font-family:'Inter',sans-serif;background:#F8FAFC;color:#0F172A;resize:none;transition:all 0.2s;"></textarea>
             </div>
             <div style="display:flex;gap:10px;">
                 <button type="button" onclick="document.getElementById('modal-notif').style.display='none'"
-                    style="flex:1;padding:10px;border:1.5px solid #E2E8F0;color:#64748B;background:#fff;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Cancel">Cancelar</button>
+                    style="flex:1;padding:10px 20px;background:#F1F5F9;color:#374151;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Cancel">Cancelar</button>
                 <button type="submit"
-                    style="flex:1;padding:10px;background:#1A56DB;color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Send">Enviar</button>
+                    style="flex:1;padding:10px 20px;background:#1A56DB;color:#fff;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;font-family:'Inter',sans-serif;" data-i18n="Send">Enviar</button>
             </div>
         </form>
     </div>

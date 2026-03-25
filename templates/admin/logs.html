@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros del Sistema - Novacapital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-gradient { background: linear-gradient(180deg, #0D1B2A 0%, #0A2463 100%); }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+        .fade-in { animation: fadeIn 0.35s ease forwards; }
+        .badge-auth    { background:#EFF6FF; color:#1D4ED8; }
+        .badge-loans   { background:#F0FDF4; color:#15803D; }
+        .badge-admin   { background:#FFF7ED; color:#C2410C; }
+        .badge-exitoso { background:#DCFCE7; color:#166534; }
+        .badge-fallido { background:#FEE2E2; color:#991B1B; }
+        .badge-default { background:#F1F5F9; color:#475569; }
+        .log-row:hover { background:#F8FAFC; }
+        .mono { font-family: 'Courier New', monospace; font-size: 11px; }
+    </style>
+</head>
+<body style="background:#F1F5F9;display:flex;height:100vh;overflow:hidden;">
+
+<!-- SIDEBAR -->
+<aside class="sidebar-gradient" style="width:256px;min-width:256px;display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
+    <div style="padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" style="height:40px;object-fit:contain;">
+    </div>
+    <nav style="flex:1;overflow-y:auto;padding:16px 12px;">
+        <a href="/admin/dashboard" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <span>Dashboard</span>
+        </a>
+        <a href="/admin/clientes" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Gestion de Clientes</span>
+        </a>
+        <a href="/admin/solicitudes" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            <span>Solicitudes y Prestamos</span>
+        </a>
+        <a href="/admin/asesores" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            <span>Gestion de Asesores</span>
+        </a>
+        <a href="/admin/reportes" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <span>Reportes</span>
+        </a>
+        <!-- Registros JSONL — activo -->
+        <a href="/admin/logs" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:#fff;background:rgba(255,255,255,0.12);text-decoration:none;font-size:13.5px;font-weight:600;margin-bottom:2px;border-left:3px solid #1A56DB;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <span>Registros</span>
+        </a>
+        <a href="/admin/configuracion" class="nav-item" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            <span>Configuracion</span>
+        </a>
+    </nav>
+    <div style="padding:16px;border-top:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            </div>
+            <div style="flex:1;min-width:0;">
+                <p style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ session.get('user_nombre', 'Admin') }}</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);">Administrador</p>
+            </div>
+            <a href="/logout" style="color:rgba(255,255,255,0.45);padding:4px;border-radius:6px;transition:color 0.15s;" title="Cerrar sesion"
+                onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.45)'">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            </a>
+        </div>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+
+    <!-- Top Header -->
+    <header style="background:#fff;border-bottom:1px solid #E2E8F0;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+        <div>
+            <p style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;">Administracion</p>
+            <h1 style="font-size:18px;font-weight:700;color:#0F172A;">Registros del Sistema (JSONL)</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="font-size:13px;color:#64748B;background:#F1F5F9;padding:7px 14px;border-radius:8px;border:1px solid #E2E8F0;">
+                {{ now.strftime('%d %b %Y — %H:%M') }}
+            </div>
+        </div>
+    </header>
+
+    <!-- Content -->
+    <main style="flex:1;overflow-y:auto;padding:28px 32px;" class="fade-in">
+
+        <!-- Tarjetas de totales -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+            <a href="?tipo=todos" style="text-decoration:none;">
+                <div style="background:#fff;border-radius:12px;padding:18px 20px;border:2px solid {% if tipo == 'todos' %}#1A56DB{% else %}#E2E8F0{% endif %};cursor:pointer;">
+                    <p style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:.05em;">Todos</p>
+                    <p style="font-size:26px;font-weight:800;color:#0F172A;margin-top:4px;">{{ totales.todos }}</p>
+                </div>
+            </a>
+            <a href="?tipo=auth" style="text-decoration:none;">
+                <div style="background:#fff;border-radius:12px;padding:18px 20px;border:2px solid {% if tipo == 'auth' %}#1D4ED8{% else %}#E2E8F0{% endif %};cursor:pointer;">
+                    <p style="font-size:11px;font-weight:600;color:#1D4ED8;text-transform:uppercase;letter-spacing:.05em;">Autenticacion</p>
+                    <p style="font-size:26px;font-weight:800;color:#0F172A;margin-top:4px;">{{ totales.auth }}</p>
+                </div>
+            </a>
+            <a href="?tipo=loans" style="text-decoration:none;">
+                <div style="background:#fff;border-radius:12px;padding:18px 20px;border:2px solid {% if tipo == 'loans' %}#15803D{% else %}#E2E8F0{% endif %};cursor:pointer;">
+                    <p style="font-size:11px;font-weight:600;color:#15803D;text-transform:uppercase;letter-spacing:.05em;">Prestamos</p>
+                    <p style="font-size:26px;font-weight:800;color:#0F172A;margin-top:4px;">{{ totales.loans }}</p>
+                </div>
+            </a>
+            <a href="?tipo=admin" style="text-decoration:none;">
+                <div style="background:#fff;border-radius:12px;padding:18px 20px;border:2px solid {% if tipo == 'admin' %}#C2410C{% else %}#E2E8F0{% endif %};cursor:pointer;">
+                    <p style="font-size:11px;font-weight:600;color:#C2410C;text-transform:uppercase;letter-spacing:.05em;">Administrativo</p>
+                    <p style="font-size:26px;font-weight:800;color:#0F172A;margin-top:4px;">{{ totales.admin }}</p>
+                </div>
+            </a>
+        </div>
+
+        <!-- Tabla de registros -->
+        <div style="background:#fff;border-radius:12px;border:1px solid #E2E8F0;overflow:hidden;">
+            <div style="padding:16px 20px;border-bottom:1px solid #F1F5F9;display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                    <h2 style="font-size:15px;font-weight:700;color:#0F172A;">
+                        {% if tipo == 'auth' %}Registros de Autenticacion
+                        {% elif tipo == 'loans' %}Registros de Prestamos
+                        {% elif tipo == 'admin' %}Registros Administrativos
+                        {% else %}Todos los Registros
+                        {% endif %}
+                    </h2>
+                    <p style="font-size:12px;color:#94A3B8;margin-top:2px;">Mostrando hasta 200 registros mas recientes — archivo JSONL</p>
+                </div>
+                <span style="font-size:12px;color:#64748B;background:#F8FAFC;padding:5px 12px;border-radius:6px;border:1px solid #E2E8F0;">
+                    {{ entradas|length }} registros
+                </span>
+            </div>
+
+            {% if entradas %}
+            <div style="overflow-x:auto;">
+                <table style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr style="background:#F8FAFC;border-bottom:1px solid #E2E8F0;">
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;">Timestamp</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;">Evento</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;">Usuario</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;">IP</th>
+                            <th style="padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:#64748B;text-transform:uppercase;letter-spacing:.05em;">Detalle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entrada in entradas %}
+                        <tr class="log-row" style="border-bottom:1px solid #F1F5F9;transition:background .1s;">
+                            <!-- Timestamp -->
+                            <td style="padding:10px 16px;white-space:nowrap;">
+                                <span class="mono" style="color:#475569;">
+                                    {{ entrada.get('timestamp', '')[:10] }}
+                                </span>
+                                <span class="mono" style="color:#94A3B8;margin-left:4px;">
+                                    {{ entrada.get('timestamp', '')[11:19] }}
+                                </span>
+                            </td>
+
+                            <!-- Evento con badge de color -->
+                            <td style="padding:10px 16px;">
+                                {% set ev = entrada.get('event', '') %}
+                                {% if 'auth' in tipo or ev in ['login_exitoso','login_fallido','logout','registro_nuevo_cliente'] %}
+                                    {% if ev == 'login_exitoso' %}
+                                        <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-exitoso">login OK</span>
+                                    {% elif ev == 'login_fallido' %}
+                                        <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-fallido">login FALLO</span>
+                                    {% elif ev == 'logout' %}
+                                        <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-default">logout</span>
+                                    {% elif ev == 'registro_nuevo_cliente' %}
+                                        <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-auth">registro</span>
+                                    {% else %}
+                                        <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-auth">{{ ev }}</span>
+                                    {% endif %}
+                                {% elif ev in ['nueva_solicitud','cambio_estado_prestamo'] %}
+                                    <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-loans">{{ ev|replace('_',' ') }}</span>
+                                {% elif ev in ['crear_asesor','toggle_asesor','asignar_asesor'] %}
+                                    <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-admin">{{ ev|replace('_',' ') }}</span>
+                                {% else %}
+                                    <span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;" class="badge-default">{{ ev }}</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Usuario / email -->
+                            <td style="padding:10px 16px;">
+                                {% if entrada.get('email') %}
+                                    <span style="font-size:13px;color:#0F172A;font-weight:500;">{{ entrada.get('email') }}</span>
+                                    {% if entrada.get('rol') %}
+                                        <span style="font-size:11px;color:#94A3B8;margin-left:6px;">({{ entrada.get('rol') }})</span>
+                                    {% endif %}
+                                {% elif entrada.get('user_id') %}
+                                    <span style="font-size:13px;color:#475569;">ID {{ entrada.get('user_id') }}</span>
+                                {% else %}
+                                    <span style="color:#CBD5E1;">—</span>
+                                {% endif %}
+                            </td>
+
+                            <!-- IP -->
+                            <td style="padding:10px 16px;">
+                                <span class="mono" style="color:#64748B;">{{ entrada.get('ip', '—') }}</span>
+                            </td>
+
+                            <!-- Detalle contextual -->
+                            <td style="padding:10px 16px;max-width:320px;">
+                                {% set ev = entrada.get('event', '') %}
+                                {% if ev == 'login_fallido' and entrada.get('razon') %}
+                                    <span style="font-size:12px;color:#B91C1C;">{{ entrada.get('razon') }}</span>
+                                {% elif ev == 'cambio_estado_prestamo' %}
+                                    <span style="font-size:12px;color:#475569;">
+                                        {{ entrada.get('numero_prestamo','') }}
+                                        <span style="color:#94A3B8;">{{ entrada.get('estado_anterior','') }}</span>
+                                        <span style="margin:0 4px;color:#94A3B8;">→</span>
+                                        <span style="font-weight:600;color:#0F172A;">{{ entrada.get('estado_nuevo','') }}</span>
+                                    </span>
+                                {% elif ev == 'nueva_solicitud' %}
+                                    <span style="font-size:12px;color:#475569;">
+                                        {{ entrada.get('numero_prestamo','') }}
+                                        {% if entrada.get('monto') %}
+                                            · ${{ '{:,.0f}'.format(entrada.get('monto')) }}
+                                        {% endif %}
+                                    </span>
+                                {% elif entrada.get('detalle') %}
+                                    <span style="font-size:12px;color:#475569;">{{ entrada.get('detalle') }}</span>
+                                {% else %}
+                                    <span style="color:#CBD5E1;">—</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% else %}
+            <div style="padding:60px;text-align:center;">
+                <svg width="40" height="40" fill="none" stroke="#CBD5E1" viewBox="0 0 24 24" style="margin:0 auto 12px;display:block;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                <p style="color:#94A3B8;font-size:14px;">No hay registros aun en esta categoria.</p>
+                <p style="color:#CBD5E1;font-size:12px;margin-top:4px;">Los registros apareceran aqui cuando ocurran eventos en el sistema.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Info tecnica -->
+        <div style="margin-top:20px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px 20px;">
+            <p style="font-size:12px;font-weight:600;color:#475569;margin-bottom:6px;">Archivos de persistencia JSONL</p>
+            <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                <span class="mono" style="color:#64748B;">logs/auth.jsonl — autenticacion</span>
+                <span class="mono" style="color:#64748B;">logs/loans.jsonl — prestamos</span>
+                <span class="mono" style="color:#64748B;">logs/admin.jsonl — administracion</span>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+</body>
+</html>

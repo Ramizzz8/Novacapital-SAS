@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuración - Novacapital</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #F1F5F9; }
@@ -39,63 +40,85 @@
         html.density-compact .main-pad { padding: 20px !important; }
         html.density-comfortable .nav-link { padding-top: 12px !important; padding-bottom: 12px !important; }
         html.density-comfortable .main-pad { padding: 40px !important; }
+        /* Tailwind toggle utility classes */
+        .sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0; }
+        .w-11 { width: 2.75rem; }
+        .h-6 { height: 1.5rem; }
+        .rounded-full { border-radius: 9999px; }
+        .peer { }
+        .bg-gray-200 { background-color: #e5e7eb; }
+        .peer-checked\:bg-blue-600:has(input:checked) { background-color: #2563eb; }
+        .peer:checked ~ .peer-checked\:bg-blue-600 { background-color: #2563eb; }
+        /* CSS-only toggle */
+        .toggle-wrap { position:relative; display:inline-flex; align-items:center; cursor:pointer; }
+        .toggle-wrap input { position:absolute; opacity:0; width:0; height:0; }
+        .toggle-slider { width:44px; height:24px; background:#E2E8F0; border-radius:9999px; transition:background 0.2s; position:relative; display:block; }
+        .toggle-slider::after { content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; background:#fff; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+        .toggle-wrap input:checked + .toggle-slider { background:#1A56DB; }
+        .toggle-wrap input:checked + .toggle-slider::after { transform:translateX(20px); }
     </style>
 </head>
 <body style="display:flex;height:100vh;overflow:hidden;">
 
 <!-- SIDEBAR -->
-<aside id="sidebar" style="width:256px;background:linear-gradient(180deg,#0D1B2A 0%,#0A2463 100%);color:#fff;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
-    <div style="padding:20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;">
-        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" style="height:48px;object-fit:contain;">
+<aside id="sidebar" style="width:256px;min-width:256px;background:linear-gradient(180deg,#0D1B2A 0%,#0A2463 100%);display:flex;flex-direction:column;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
+    <div style="padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" style="height:40px;object-fit:contain;">
     </div>
     <nav style="flex:1;overflow-y:auto;padding:16px 12px;">
-        <a href="/admin/dashboard" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
-           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        <a href="/admin/dashboard" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
             <span>Dashboard</span>
         </a>
-        <a href="/admin/clientes" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
-           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <a href="/admin/clientes" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             <span>Gestión de Clientes</span>
         </a>
-        <a href="/admin/solicitudes" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
-           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+        <a href="/admin/solicitudes" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
             <span>Solicitudes y Préstamos</span>
         </a>
-        <a href="/admin/asesores" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
-           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <a href="/admin/asesores" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             <span>Gestión de Asesores</span>
         </a>
-        <a href="/admin/reportes" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
-           onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <a href="/admin/reportes" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
             <span>Reportes</span>
         </a>
-        <a href="/admin/configuracion" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:#fff;font-size:14px;font-weight:600;margin-bottom:2px;background:rgba(255,255,255,0.12);border-left:3px solid #1A56DB;">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        <a href="/admin/logs" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
+            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff'"
+            onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)'">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <span>Registros</span>
+        </a>
+        <a href="/admin/configuracion" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:#fff;background:rgba(255,255,255,0.12);text-decoration:none;font-size:13.5px;font-weight:600;margin-bottom:2px;border-left:3px solid #1A56DB;">
+            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
             <span>Configuración</span>
         </a>
     </nav>
-    <div style="padding:16px;border-top:1px solid rgba(255,255,255,0.08);">
-        <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    <div style="padding:16px;border-top:1px solid rgba(255,255,255,0.07);">
+        <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:34px;height:34px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
             </div>
             <div style="flex:1;min-width:0;">
-                <p style="font-size:13px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ session.get('user_nombre','Admin') }}</p>
-                <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:0;" data-i18n="Administrator">Administrador</p>
+                <p style="font-size:13px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0;">{{ session.get('user_nombre','Admin') }}</p>
+                <p style="font-size:11px;color:rgba(255,255,255,0.45);margin:0;" data-i18n="Administrator">Administrador</p>
             </div>
-            <a href="/logout" style="color:rgba(255,255,255,0.5);padding:6px;border-radius:6px;text-decoration:none;display:flex;align-items:center;" title="Cerrar sesión"
+            <a href="/logout" style="color:rgba(255,255,255,0.45);padding:4px;border-radius:6px;display:flex;align-items:center;text-decoration:none;" title="Cerrar sesión"
                onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,0.08)';"
-               onmouseout="this.style.color='rgba(255,255,255,0.5)';this.style.background='transparent';">
+               onmouseout="this.style.color='rgba(255,255,255,0.45)';this.style.background='transparent';">
                 <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
             </a>
         </div>
@@ -104,27 +127,32 @@
 
 <!-- MAIN -->
 <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-    <header class="top-header" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+    <header class="top-header" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
         <div>
-            <p style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 2px 0;" data-i18n="Administration">Administración</p>
-            <h1 style="font-size:20px;font-weight:700;color:#0F172A;margin:0;" id="page-title">Configuración del Panel</h1>
+            <p style="font-size:11px;font-weight:600;color:#94A3B8;text-transform:uppercase;letter-spacing:0.06em;margin:0;" data-i18n="Administration">Administración</p>
+            <h1 style="font-size:18px;font-weight:700;color:#0F172A;margin:0;" id="page-title">Configuración del Panel</h1>
         </div>
         <button onclick="resetSettings()" id="reset-btn"
-            style="font-size:13px;color:#64748B;border:1px solid #E2E8F0;padding:8px 14px;border-radius:8px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;"
+            style="font-size:13px;color:#64748B;border:1px solid #E2E8F0;padding:8px 16px;border-radius:8px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;"
             onmouseover="this.style.background='#F1F5F9';this.style.color='#0F172A';"
             onmouseout="this.style.background='#fff';this.style.color='#64748B';">
             Restablecer valores
         </button>
     </header>
 
-    <div class="main-pad page-bg fade-in" style="flex:1;overflow-y:auto;padding:32px;">
+    <div class="main-pad page-bg fade-in" style="flex:1;overflow-y:auto;padding:32px;background:#F1F5F9;">
         <div style="max-width:640px;display:flex;flex-direction:column;gap:20px;">
 
             <!-- APARIENCIA -->
             <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
-                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;">
-                    <h2 style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 2px 0;" id="section-apariencia">Apariencia</h2>
-                    <p style="font-size:12px;color:#64748B;margin:0;" id="desc-apariencia">Personaliza el aspecto visual del panel</p>
+                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;background:#EFF6FF;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="16" height="16" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-weight:700;color:#0F172A;font-size:14px;margin:0 0 2px 0;" id="section-apariencia">Apariencia</h2>
+                        <p style="font-size:12px;color:#64748B;margin:0;" id="desc-apariencia">Personaliza el aspecto visual del panel</p>
+                    </div>
                 </div>
                 <div style="padding:20px 24px;display:flex;flex-direction:column;gap:24px;">
 
@@ -206,9 +234,14 @@
 
             <!-- IDIOMA -->
             <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
-                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;">
-                    <h2 style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 2px 0;" id="section-idioma">Idioma</h2>
-                    <p style="font-size:12px;color:#64748B;margin:0;" id="desc-idioma">Idioma de la interfaz del panel</p>
+                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;background:#F5F3FF;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="16" height="16" fill="none" stroke="#7C3AED" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-weight:700;color:#0F172A;font-size:14px;margin:0 0 2px 0;" id="section-idioma">Idioma</h2>
+                        <p style="font-size:12px;color:#64748B;margin:0;" id="desc-idioma">Idioma de la interfaz del panel</p>
+                    </div>
                 </div>
                 <div style="padding:20px 24px;">
                     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
@@ -234,39 +267,44 @@
 
             <!-- NOTIFICACIONES -->
             <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
-                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;">
-                    <h2 style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 2px 0;" id="section-notif">Notificaciones</h2>
-                    <p style="font-size:12px;color:#64748B;margin:0;" id="desc-notif">Configura qué alertas deseas recibir</p>
+                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;background:#ECFDF5;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="16" height="16" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-weight:700;color:#0F172A;font-size:14px;margin:0 0 2px 0;" id="section-notif">Notificaciones</h2>
+                        <p style="font-size:12px;color:#64748B;margin:0;" id="desc-notif">Configura qué alertas deseas recibir</p>
+                    </div>
                 </div>
-                <div style="padding:20px 24px;display:flex;flex-direction:column;gap:0;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;">
+                <div style="padding:4px 24px 8px;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #F1F5F9;">
                         <div>
                             <p style="font-size:13px;font-weight:500;color:#0F172A;margin:0 0 2px 0;" id="notif-nuevas">Nuevas solicitudes</p>
                             <p style="font-size:11px;color:#64748B;margin:0;" id="notif-nuevas-desc">Alerta cuando un cliente envíe una solicitud</p>
                         </div>
-                        <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;">
-                            <input type="checkbox" id="toggle-solicitudes" class="sr-only peer" onchange="saveToggle('notif_solicitudes', this.checked)">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <label class="toggle-wrap">
+                            <input type="checkbox" id="toggle-solicitudes" onchange="saveToggle('notif_solicitudes', this.checked)">
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="notif-row" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-top:1px solid #F1F5F9;">
+                    <div class="notif-row" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #F1F5F9;">
                         <div>
                             <p style="font-size:13px;font-weight:500;color:#0F172A;margin:0 0 2px 0;" id="notif-pagos">Pagos recibidos</p>
                             <p style="font-size:11px;color:#64748B;margin:0;" id="notif-pagos-desc">Alerta cuando se registre un pago</p>
                         </div>
-                        <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;">
-                            <input type="checkbox" id="toggle-pagos" class="sr-only peer" onchange="saveToggle('notif_pagos', this.checked)">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <label class="toggle-wrap">
+                            <input type="checkbox" id="toggle-pagos" onchange="saveToggle('notif_pagos', this.checked)">
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div class="notif-row" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 0 0;border-top:1px solid #F1F5F9;">
+                    <div class="notif-row" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0;">
                         <div>
                             <p style="font-size:13px;font-weight:500;color:#0F172A;margin:0 0 2px 0;" id="notif-mora">Clientes en mora</p>
                             <p style="font-size:11px;color:#64748B;margin:0;" id="notif-mora-desc">Alerta cuando un cliente entre en mora</p>
                         </div>
-                        <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;">
-                            <input type="checkbox" id="toggle-mora" class="sr-only peer" onchange="saveToggle('notif_mora', this.checked)">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <label class="toggle-wrap">
+                            <input type="checkbox" id="toggle-mora" onchange="saveToggle('notif_mora', this.checked)">
+                            <span class="toggle-slider"></span>
                         </label>
                     </div>
                 </div>

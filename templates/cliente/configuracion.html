@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuración - Novacapital</title>
+    <title>Configuracion - Novacapital</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         *, *::before, *::after { box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; margin: 0; padding: 0; background: #F1F5F9; }
@@ -16,8 +15,21 @@
         .option-card:hover { border-color: #93c5fd; }
         .option-card.selected { border-color: #1A56DB !important; background: #EFF6FF !important; }
         /* Accent buttons */
-        .accent-btn { transition: all 0.15s; border: 3px solid transparent; }
+        .accent-btn { transition: all 0.15s; border: 3px solid transparent; cursor: pointer; }
         .accent-btn.selected { border-color: #0F172A; transform: scale(1.18); }
+        /* Toggle switch */
+        .toggle-track {
+            position: relative; width: 44px; height: 24px; border-radius: 999px;
+            background: #CBD5E1; border: none; cursor: pointer; padding: 0;
+            transition: background 0.2s; flex-shrink: 0;
+        }
+        .toggle-track.on { background: #1A56DB; }
+        .toggle-track::after {
+            content: ''; position: absolute; top: 3px; left: 3px;
+            width: 18px; height: 18px; border-radius: 50%; background: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.18); transition: transform 0.2s;
+        }
+        .toggle-track.on::after { transform: translateX(20px); }
         /* Dark mode */
         html.dark body { background: #0f172a !important; color: #e2e8f0; }
         html.dark .card-bg { background: #1e293b !important; border-color: #334155 !important; }
@@ -35,52 +47,56 @@
         html.density-compact .main-pad { padding: 20px !important; }
         html.density-comfortable .nav-link { padding-top: 12px !important; padding-bottom: 12px !important; }
         html.density-comfortable .main-pad { padding: 40px !important; }
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 10px; }
     </style>
 </head>
 <body style="display:flex;height:100vh;overflow:hidden;">
 
 <!-- SIDEBAR -->
 <aside id="sidebar" style="width:256px;background:linear-gradient(180deg,#0D1B2A 0%,#0A2463 100%);color:#fff;display:flex;flex-direction:column;flex-shrink:0;box-shadow:4px 0 24px rgba(0,0,0,0.18);z-index:20;">
-    <div style="padding:20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;">
-        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" style="height:48px;object-fit:contain;">
+    <div style="padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;">
+        <img src="{{ url_for('static', filename='novalogo.png') }}" alt="Novacapital" style="height:44px;object-fit:contain;">
     </div>
-    <nav style="flex:1;overflow-y:auto;padding:16px 12px;">
-        <a href="/cliente/dashboard" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+    <nav style="flex:1;overflow-y:auto;padding:16px 10px;">
+        <a href="/cliente/dashboard" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)';">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
             <span>Inicio</span>
         </a>
-        <a href="/solicitud" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+        <a href="/solicitud" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)';">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Nueva Solicitud</span>
         </a>
-        <a href="/cliente/dashboard#mis-prestamos" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:rgba(255,255,255,0.7);font-size:14px;font-weight:500;margin-bottom:2px;border-left:3px solid transparent;"
+        <a href="/cliente/dashboard#mis-prestamos" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:rgba(255,255,255,0.65);text-decoration:none;font-size:13.5px;font-weight:500;margin-bottom:2px;"
            onmouseover="this.style.background='rgba(255,255,255,0.08)';this.style.color='#fff';"
-           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.7)';">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            <span>Mis Préstamos</span>
+           onmouseout="this.style.background='transparent';this.style.color='rgba(255,255,255,0.65)';">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+            <span>Mis Prestamos</span>
         </a>
-        <a href="/cliente/configuracion" class="nav-link" style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;text-decoration:none;color:#fff;font-size:14px;font-weight:600;margin-bottom:2px;background:rgba(255,255,255,0.12);border-left:3px solid #1A56DB;">
-            <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
-            <span>Configuración</span>
+        <a href="/cliente/configuracion" class="nav-link" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;color:#fff;background:rgba(255,255,255,0.12);text-decoration:none;font-size:13.5px;font-weight:600;margin-bottom:2px;border-left:3px solid #1A56DB;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            <span>Configuracion</span>
         </a>
     </nav>
-    <div style="padding:16px;border-top:1px solid rgba(255,255,255,0.08);">
-        <div style="display:flex;align-items:center;gap:12px;">
-            <div style="width:36px;height:36px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                <svg width="18" height="18" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    <div style="padding:14px 12px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;">
+            <div style="width:34px;height:34px;background:rgba(255,255,255,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.15);">
+                <svg width="17" height="17" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
             </div>
             <div style="flex:1;min-width:0;">
-                <p style="font-size:13px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ session.get('user_nombre', 'Cliente') }}</p>
-                <p style="font-size:11px;color:rgba(255,255,255,0.5);margin:0;" data-i18n="Client">Cliente</p>
+                <p style="font-size:12.5px;font-weight:600;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff;">{{ session.get('user_nombre', 'Cliente') }}</p>
+                <p style="font-size:10.5px;color:rgba(255,255,255,0.45);margin:0;" data-i18n="Client">Cliente</p>
             </div>
-            <a href="/logout" style="color:rgba(255,255,255,0.5);padding:6px;border-radius:6px;text-decoration:none;display:flex;align-items:center;" title="Cerrar sesión"
+            <a href="/logout" style="color:rgba(255,255,255,0.45);padding:6px;border-radius:6px;text-decoration:none;display:flex;align-items:center;flex-shrink:0;" title="Cerrar sesion"
                onmouseover="this.style.color='#fff';this.style.background='rgba(255,255,255,0.08)';"
-               onmouseout="this.style.color='rgba(255,255,255,0.5)';this.style.background='transparent';">
-                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+               onmouseout="this.style.color='rgba(255,255,255,0.45)';this.style.background='transparent';">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
             </a>
         </div>
     </div>
@@ -88,28 +104,38 @@
 
 <!-- MAIN -->
 <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
-    <header class="top-header" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0;padding:16px 32px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
+
+    <!-- Header -->
+    <header class="top-header" style="background:#FFFFFF;border-bottom:1px solid #E2E8F0;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;box-shadow:0 1px 3px rgba(15,23,42,0.05);">
         <div>
-            <p style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 2px 0;" data-i18n="Client Portal">Portal Cliente</p>
-            <h1 style="font-size:20px;font-weight:700;color:#0F172A;margin:0;" data-i18n="Settings">Configuración</h1>
+            <p style="font-size:10.5px;color:#64748B;text-transform:uppercase;letter-spacing:0.08em;margin:0 0 1px 0;font-weight:500;" data-i18n="Client Portal">Portal Cliente</p>
+            <h1 style="font-size:18px;font-weight:700;color:#0F172A;margin:0;letter-spacing:-0.01em;" data-i18n="Settings">Configuracion</h1>
         </div>
         <button onclick="resetSettings()"
-            style="font-size:13px;color:#64748B;border:1px solid #E2E8F0;padding:8px 14px;border-radius:8px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;"
-            onmouseover="this.style.background='#F1F5F9';this.style.color='#0F172A';"
-            onmouseout="this.style.background='#fff';this.style.color='#64748B';"
-            data-i18n="Reset to defaults">Restablecer valores</button>
+            style="font-size:12.5px;color:#64748B;border:1px solid #E2E8F0;padding:9px 16px;border-radius:8px;background:#fff;cursor:pointer;font-family:'Inter',sans-serif;font-weight:500;display:flex;align-items:center;gap:7px;"
+            onmouseover="this.style.background='#F8FAFC';this.style.color='#0F172A';this.style.borderColor='#CBD5E1';"
+            onmouseout="this.style.background='#fff';this.style.color='#64748B';this.style.borderColor='#E2E8F0';"
+            data-i18n="Reset to defaults">
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Restablecer valores
+        </button>
     </header>
 
-    <div class="main-pad page-bg fade-in" style="flex:1;overflow-y:auto;padding:32px;">
-        <div style="max-width:640px;display:flex;flex-direction:column;gap:20px;">
+    <div class="main-pad page-bg fade-in" style="flex:1;overflow-y:auto;padding:28px 32px;">
+        <div style="max-width:660px;display:flex;flex-direction:column;gap:20px;">
 
             <!-- APARIENCIA -->
-            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
-                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;">
-                    <h2 style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 2px 0;" data-i18n="Appearance">Apariencia</h2>
-                    <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Customize the visual appearance of the portal">Personaliza el aspecto visual del portal</p>
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;background:#EFF6FF;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="17" height="17" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-weight:700;color:#0F172A;font-size:14.5px;margin:0 0 2px 0;" data-i18n="Appearance">Apariencia</h2>
+                        <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Customize the visual appearance of the portal">Personaliza el aspecto visual del portal</p>
+                    </div>
                 </div>
-                <div style="padding:20px 24px;display:flex;flex-direction:column;gap:24px;">
+                <div style="padding:22px 24px;display:flex;flex-direction:column;gap:26px;">
 
                     <!-- Tema -->
                     <div>
@@ -117,22 +143,22 @@
                         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
                             <div class="option-card card-bg-inner" id="card-light" onclick="setTheme('light')"
                                 style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;background:#FFFFFF;cursor:pointer;">
-                                <div style="width:100%;height:48px;background:#F1F5F9;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;border:1px solid #E2E8F0;">
-                                    <div style="width:32px;height:6px;background:#CBD5E1;border-radius:4px;"></div>
+                                <div style="width:100%;height:44px;background:#F1F5F9;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;border:1px solid #E2E8F0;">
+                                    <div style="width:28px;height:5px;background:#CBD5E1;border-radius:4px;"></div>
                                 </div>
-                                <p style="font-size:11px;font-weight:600;color:#0F172A;text-align:center;margin:0;" data-i18n="Light">Claro</p>
+                                <p style="font-size:11.5px;font-weight:600;color:#0F172A;text-align:center;margin:0;" data-i18n="Light">Claro</p>
                             </div>
                             <div class="option-card" id="card-dark" onclick="setTheme('dark')"
                                 style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;background:#1e293b;cursor:pointer;">
-                                <div style="width:100%;height:48px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;background:#0f172a;">
-                                    <div style="width:32px;height:6px;background:#334155;border-radius:4px;"></div>
+                                <div style="width:100%;height:44px;border-radius:8px;margin-bottom:10px;display:flex;align-items:center;justify-content:center;background:#0f172a;">
+                                    <div style="width:28px;height:5px;background:#334155;border-radius:4px;"></div>
                                 </div>
-                                <p style="font-size:11px;font-weight:600;color:#94a3b8;text-align:center;margin:0;" data-i18n="Dark">Oscuro</p>
+                                <p style="font-size:11.5px;font-weight:600;color:#94a3b8;text-align:center;margin:0;" data-i18n="Dark">Oscuro</p>
                             </div>
                             <div class="option-card" id="card-system" onclick="setTheme('system')"
                                 style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;background:linear-gradient(135deg,#fff 50%,#1e293b 50%);cursor:pointer;">
-                                <div style="width:100%;height:48px;border-radius:8px;margin-bottom:10px;border:1px solid #E2E8F0;overflow:hidden;background:linear-gradient(135deg,#f8fafc 50%,#0f172a 50%);"></div>
-                                <p style="font-size:11px;font-weight:600;color:#64748B;text-align:center;margin:0;" data-i18n="System">Sistema</p>
+                                <div style="width:100%;height:44px;border-radius:8px;margin-bottom:10px;border:1px solid #E2E8F0;overflow:hidden;background:linear-gradient(135deg,#f8fafc 50%,#0f172a 50%);"></div>
+                                <p style="font-size:11.5px;font-weight:600;color:#64748B;text-align:center;margin:0;" data-i18n="System">Sistema</p>
                             </div>
                         </div>
                     </div>
@@ -140,15 +166,15 @@
                     <!-- Color de acento -->
                     <div>
                         <p style="font-size:13px;font-weight:600;color:#0F172A;margin:0 0 12px 0;" data-i18n="Accent color">Color de acento</p>
-                        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-                            <button class="accent-btn" style="width:32px;height:32px;border-radius:50%;background:#1A56DB;cursor:pointer;" data-accent="blue" onclick="setAccent('blue')" title="Azul"></button>
-                            <button class="accent-btn" style="width:32px;height:32px;border-radius:50%;background:#7c3aed;cursor:pointer;" data-accent="purple" onclick="setAccent('purple')" title="Morado"></button>
-                            <button class="accent-btn" style="width:32px;height:32px;border-radius:50%;background:#059669;cursor:pointer;" data-accent="green" onclick="setAccent('green')" title="Verde"></button>
-                            <button class="accent-btn" style="width:32px;height:32px;border-radius:50%;background:#DC2626;cursor:pointer;" data-accent="red" onclick="setAccent('red')" title="Rojo"></button>
-                            <button class="accent-btn" style="width:32px;height:32px;border-radius:50%;background:#D97706;cursor:pointer;" data-accent="amber" onclick="setAccent('amber')" title="Ámbar"></button>
-                            <button class="accent-btn" style="width:32px;height:32px;border-radius:50%;background:#0891b2;cursor:pointer;" data-accent="cyan" onclick="setAccent('cyan')" title="Cian"></button>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                            <button class="accent-btn" style="width:30px;height:30px;border-radius:50%;background:#1A56DB;" data-accent="blue" onclick="setAccent('blue')" title="Azul"></button>
+                            <button class="accent-btn" style="width:30px;height:30px;border-radius:50%;background:#7c3aed;" data-accent="purple" onclick="setAccent('purple')" title="Morado"></button>
+                            <button class="accent-btn" style="width:30px;height:30px;border-radius:50%;background:#059669;" data-accent="green" onclick="setAccent('green')" title="Verde"></button>
+                            <button class="accent-btn" style="width:30px;height:30px;border-radius:50%;background:#DC2626;" data-accent="red" onclick="setAccent('red')" title="Rojo"></button>
+                            <button class="accent-btn" style="width:30px;height:30px;border-radius:50%;background:#D97706;" data-accent="amber" onclick="setAccent('amber')" title="Ambar"></button>
+                            <button class="accent-btn" style="width:30px;height:30px;border-radius:50%;background:#0891b2;" data-accent="cyan" onclick="setAccent('cyan')" title="Cian"></button>
                         </div>
-                        <p style="font-size:11px;color:#64748B;margin:8px 0 0 0;" data-i18n="Affects buttons and interactive elements in the portal">Afecta los botones y elementos interactivos del portal</p>
+                        <p style="font-size:11.5px;color:#94A3B8;margin:10px 0 0 0;" data-i18n="Affects buttons and interactive elements in the portal">Afecta los botones y elementos interactivos del portal</p>
                     </div>
 
                     <!-- Densidad -->
@@ -156,31 +182,31 @@
                         <p style="font-size:13px;font-weight:600;color:#0F172A;margin:0 0 12px 0;" data-i18n="Interface density">Densidad de la interfaz</p>
                         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
                             <div class="option-card card-bg-inner" id="card-compact" onclick="setDensity('compact')"
-                                style="border-radius:12px;padding:12px;border:2px solid #E2E8F0;text-align:center;background:#FFFFFF;cursor:pointer;">
-                                <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:8px;">
-                                    <div style="height:4px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
-                                    <div style="height:4px;background:#E2E8F0;border-radius:3px;width:75%;"></div>
-                                    <div style="height:4px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
-                                    <div style="height:4px;background:#E2E8F0;border-radius:3px;width:66%;"></div>
+                                style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;text-align:center;background:#FFFFFF;cursor:pointer;">
+                                <div style="display:flex;flex-direction:column;gap:3px;margin-bottom:10px;">
+                                    <div style="height:3.5px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
+                                    <div style="height:3.5px;background:#E2E8F0;border-radius:3px;width:75%;"></div>
+                                    <div style="height:3.5px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
+                                    <div style="height:3.5px;background:#E2E8F0;border-radius:3px;width:66%;"></div>
                                 </div>
-                                <p style="font-size:11px;font-weight:600;color:#64748B;margin:0;" data-i18n="Compact">Compacto</p>
+                                <p style="font-size:11.5px;font-weight:600;color:#64748B;margin:0;" data-i18n="Compact">Compacto</p>
                             </div>
                             <div class="option-card card-bg-inner" id="card-normal" onclick="setDensity('normal')"
-                                style="border-radius:12px;padding:12px;border:2px solid #E2E8F0;text-align:center;background:#FFFFFF;cursor:pointer;">
-                                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
-                                    <div style="height:6px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
-                                    <div style="height:6px;background:#E2E8F0;border-radius:3px;width:75%;"></div>
-                                    <div style="height:6px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
+                                style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;text-align:center;background:#FFFFFF;cursor:pointer;">
+                                <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:10px;">
+                                    <div style="height:5px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
+                                    <div style="height:5px;background:#E2E8F0;border-radius:3px;width:75%;"></div>
+                                    <div style="height:5px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
                                 </div>
-                                <p style="font-size:11px;font-weight:600;color:#64748B;margin:0;" data-i18n="Normal">Normal</p>
+                                <p style="font-size:11.5px;font-weight:600;color:#64748B;margin:0;" data-i18n="Normal">Normal</p>
                             </div>
                             <div class="option-card card-bg-inner" id="card-comfortable" onclick="setDensity('comfortable')"
-                                style="border-radius:12px;padding:12px;border:2px solid #E2E8F0;text-align:center;background:#FFFFFF;cursor:pointer;">
-                                <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:8px;">
-                                    <div style="height:8px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
-                                    <div style="height:8px;background:#E2E8F0;border-radius:3px;width:75%;"></div>
+                                style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;text-align:center;background:#FFFFFF;cursor:pointer;">
+                                <div style="display:flex;flex-direction:column;gap:9px;margin-bottom:10px;">
+                                    <div style="height:7px;background:#E2E8F0;border-radius:3px;width:100%;"></div>
+                                    <div style="height:7px;background:#E2E8F0;border-radius:3px;width:75%;"></div>
                                 </div>
-                                <p style="font-size:11px;font-weight:600;color:#64748B;margin:0;" data-i18n="Comfortable">Cómodo</p>
+                                <p style="font-size:11.5px;font-weight:600;color:#64748B;margin:0;" data-i18n="Comfortable">Comodo</p>
                             </div>
                         </div>
                     </div>
@@ -188,27 +214,32 @@
             </div>
 
             <!-- IDIOMA -->
-            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
-                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;">
-                    <h2 style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 2px 0;" data-i18n="Language">Idioma</h2>
-                    <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Portal interface language">Idioma de la interfaz del portal</p>
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;background:#F0FDF4;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="17" height="17" fill="none" stroke="#059669" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                    </div>
+                    <div>
+                        <h2 style="font-weight:700;color:#0F172A;font-size:14.5px;margin:0 0 2px 0;" data-i18n="Language">Idioma</h2>
+                        <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Portal interface language">Idioma de la interfaz del portal</p>
+                    </div>
                 </div>
-                <div style="padding:20px 24px;">
+                <div style="padding:22px 24px;">
                     <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px;">
                         <div class="option-card card-bg-inner" id="card-es" onclick="setLang('es')"
-                            style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;display:flex;align-items:center;gap:12px;background:#FFFFFF;cursor:pointer;">
-                            <span style="font-size:24px;">🇪🇸</span>
+                            style="border-radius:12px;padding:16px;border:2px solid #E2E8F0;display:flex;align-items:center;gap:14px;background:#FFFFFF;cursor:pointer;">
+                            <div style="width:36px;height:36px;border-radius:8px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">ES</div>
                             <div>
-                                <p style="font-size:13px;font-weight:600;color:#0F172A;margin:0;">Español</p>
-                                <p style="font-size:11px;color:#64748B;margin:0;">Spanish</p>
+                                <p style="font-size:13.5px;font-weight:600;color:#0F172A;margin:0 0 2px 0;">Espanol</p>
+                                <p style="font-size:11.5px;color:#64748B;margin:0;">Spanish</p>
                             </div>
                         </div>
                         <div class="option-card card-bg-inner" id="card-en" onclick="setLang('en')"
-                            style="border-radius:12px;padding:14px;border:2px solid #E2E8F0;display:flex;align-items:center;gap:12px;background:#FFFFFF;cursor:pointer;">
-                            <span style="font-size:24px;">🇺🇸</span>
+                            style="border-radius:12px;padding:16px;border:2px solid #E2E8F0;display:flex;align-items:center;gap:14px;background:#FFFFFF;cursor:pointer;">
+                            <div style="width:36px;height:36px;border-radius:8px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;">EN</div>
                             <div>
-                                <p style="font-size:13px;font-weight:600;color:#0F172A;margin:0;">English</p>
-                                <p style="font-size:11px;color:#64748B;margin:0;">Inglés</p>
+                                <p style="font-size:13.5px;font-weight:600;color:#0F172A;margin:0 0 2px 0;">English</p>
+                                <p style="font-size:11.5px;color:#64748B;margin:0;">Ingles</p>
                             </div>
                         </div>
                     </div>
@@ -216,39 +247,42 @@
             </div>
 
             <!-- NOTIFICACIONES -->
-            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 4px rgba(15,23,42,0.04);">
-                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;">
-                    <h2 style="font-weight:700;color:#0F172A;font-size:15px;margin:0 0 2px 0;" data-i18n="Notifications">Notificaciones</h2>
-                    <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Configure which alerts you want to receive">Configura qué alertas deseas recibir</p>
-                </div>
-                <div style="padding:20px 24px;display:flex;flex-direction:column;gap:0;">
-                    <div style="display:flex;align-items:center;justify-content:space-between;padding-bottom:16px;">
-                        <div>
-                            <p style="font-size:13px;font-weight:500;color:#0F172A;margin:0 0 2px 0;" data-i18n="Application updates">Actualizaciones de solicitudes</p>
-                            <p style="font-size:11px;color:#64748B;margin:0;" data-i18n="Alert when your application status changes">Alerta cuando cambie el estado de tu solicitud</p>
-                        </div>
-                        <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;">
-                            <input type="checkbox" id="toggle-solicitudes" class="sr-only peer" onchange="saveToggle('notif_solicitudes', this.checked)">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
+            <div class="card-bg" style="background:#FFFFFF;border:1px solid #E2E8F0;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <div class="section-header" style="padding:18px 24px;border-bottom:1px solid #E2E8F0;display:flex;align-items:center;gap:12px;">
+                    <div style="width:36px;height:36px;background:#FEF3C7;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <svg width="17" height="17" fill="none" stroke="#D97706" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                     </div>
-                    <div class="notif-row" style="display:flex;align-items:center;justify-content:space-between;padding:16px 0 0 0;border-top:1px solid #F1F5F9;">
-                        <div>
-                            <p style="font-size:13px;font-weight:500;color:#0F172A;margin:0 0 2px 0;" data-i18n="Payment reminders">Recordatorios de pago</p>
-                            <p style="font-size:11px;color:#64748B;margin:0;" data-i18n="Alert before your payment due date">Alerta antes de la fecha de vencimiento de tu cuota</p>
+                    <div>
+                        <h2 style="font-weight:700;color:#0F172A;font-size:14.5px;margin:0 0 2px 0;" data-i18n="Notifications">Notificaciones</h2>
+                        <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Configure which alerts you want to receive">Configura que alertas deseas recibir</p>
+                    </div>
+                </div>
+                <div style="padding:4px 0;">
+                    <!-- Toggle row 1 -->
+                    <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid #F8FAFC;">
+                        <div style="flex:1;min-width:0;padding-right:16px;">
+                            <p style="font-size:13.5px;font-weight:500;color:#0F172A;margin:0 0 3px 0;" data-i18n="Application updates">Actualizaciones de solicitudes</p>
+                            <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Alert when your application status changes">Alerta cuando cambie el estado de tu solicitud</p>
                         </div>
-                        <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;">
-                            <input type="checkbox" id="toggle-pagos" class="sr-only peer" onchange="saveToggle('notif_pagos', this.checked)">
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                        </label>
+                        <button id="toggle-solicitudes" class="toggle-track" onclick="toggleSwitch('toggle-solicitudes', 'notif_solicitudes')" aria-label="Activar notificaciones de solicitudes"></button>
+                    </div>
+                    <!-- Toggle row 2 -->
+                    <div class="notif-row" style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;">
+                        <div style="flex:1;min-width:0;padding-right:16px;">
+                            <p style="font-size:13.5px;font-weight:500;color:#0F172A;margin:0 0 3px 0;" data-i18n="Payment reminders">Recordatorios de pago</p>
+                            <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Alert before your payment due date">Alerta antes de la fecha de vencimiento de tu cuota</p>
+                        </div>
+                        <button id="toggle-pagos" class="toggle-track" onclick="toggleSwitch('toggle-pagos', 'notif_pagos')" aria-label="Activar recordatorios de pago"></button>
                     </div>
                 </div>
             </div>
 
             <!-- Info -->
-            <div class="info-box" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:12px;">
-                <svg width="18" height="18" fill="none" stroke="#94A3B8" viewBox="0 0 24 24" style="flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <p style="font-size:12px;color:#64748B;margin:0;" data-i18n="Settings are saved automatically in your browser. They do not affect other users.">Los ajustes se guardan automáticamente en tu navegador. No afectan a otros usuarios.</p>
+            <div class="info-box" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+                <div style="width:32px;height:32px;background:#EFF6FF;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    <svg width="15" height="15" fill="none" stroke="#1A56DB" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <p style="font-size:12px;color:#64748B;margin:0;line-height:1.5;" data-i18n="Settings are saved automatically in your browser. They do not affect other users.">Los ajustes se guardan automaticamente en tu navegador. No afectan a otros usuarios.</p>
             </div>
 
         </div>
@@ -295,10 +329,17 @@ function setLang(lang) {
     document.getElementById('card-en')?.classList.toggle('selected', lang === 'en');
 }
 
+function toggleSwitch(id, key) {
+    var btn = document.getElementById(id);
+    var isOn = btn.classList.contains('on');
+    btn.classList.toggle('on', !isOn);
+    setSetting(key, !isOn ? '1' : '0');
+}
+
 function saveToggle(key, val) { setSetting(key, val ? '1' : '0'); }
 
 function resetSettings() {
-    if (!confirm('¿Restablecer todos los ajustes a los valores predeterminados?')) return;
+    if (!confirm('Restablecer todos los ajustes a los valores predeterminados?')) return;
     ['theme','accent','density','lang','notif_solicitudes','notif_pagos'].forEach(function(k) {
         try { localStorage.removeItem('nc_' + k); } catch {}
     });
@@ -321,8 +362,10 @@ function resetSettings() {
     ['compact','normal','comfortable'].forEach(function(d) { document.getElementById('card-' + d)?.classList.toggle('selected', d === density); });
     document.getElementById('card-es')?.classList.toggle('selected', lang === 'es');
     document.getElementById('card-en')?.classList.toggle('selected', lang === 'en');
-    document.getElementById('toggle-solicitudes').checked = getSetting('notif_solicitudes','1') === '1';
-    document.getElementById('toggle-pagos').checked = getSetting('notif_pagos','1') === '1';
+    var notifSolicitudes = getSetting('notif_solicitudes', '1') === '1';
+    var notifPagos = getSetting('notif_pagos', '1') === '1';
+    document.getElementById('toggle-solicitudes')?.classList.toggle('on', notifSolicitudes);
+    document.getElementById('toggle-pagos')?.classList.toggle('on', notifPagos);
 })();
 </script>
 </body>

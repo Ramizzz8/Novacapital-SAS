@@ -6,6 +6,7 @@ from datetime import datetime
 from functools import wraps
 from dotenv import load_dotenv
 from datetime import datetime
+from logger import auth_logger, loan_logger, admin_logger
 
 # Cargar variables de entorno
 load_dotenv()
@@ -325,22 +326,25 @@ def login():
         print(f"DEBUG: Intento de login para: {email}")
         
         usuario, error = verificar_credenciales(email, password)
-        
+
         if error:
             print(f"DEBUG: Error en login: {error}")
+            auth_logger.log_login(email, request.remote_addr, False, razon=error)
             return render_template('login.html', error=error)
-        
+
         # Crear sesión
         session['user_id'] = usuario['id']
         session['user_nombre'] = usuario['nombre']
         session['user_email'] = usuario['email']
         session['user_rol'] = usuario['rol']
-        
+
         if remember:
             session.permanent = True
-        
+
+        auth_logger.log_login(email, request.remote_addr, True,
+                              user_id=usuario['id'], rol=usuario['rol'])
         print(f"DEBUG: Login exitoso para {email} - Rol: {usuario['rol']}")
-        
+
         # Redirigir según el rol del usuario
         return redirect_by_role()
     
@@ -415,6 +419,7 @@ def register():
             session['user_nombre'] = usuario['nombre']
             session['user_email']  = usuario['email']
             session['user_rol']    = usuario['rol']
+            auth_logger.log_register(usuario['id'], email, request.remote_addr)
             return redirect_by_role()
 
         return redirect(url_for('login'))
@@ -425,6 +430,7 @@ def register():
 def logout():
     """Cerrar sesión"""
     nombre = session.get('user_nombre', 'Usuario')
+    auth_logger.log_logout(session.get('user_id'), session.get('user_email'), request.remote_addr)
     session.clear()
     flash(f'Hasta pronto, {nombre}. Sesión cerrada correctamente.', 'success')
     return redirect(url_for('index'))
@@ -493,7 +499,13 @@ def solicitud():
             if error:
                 flash(f'Error al crear solicitud: {error}', 'error')
                 return redirect(url_for('solicitud'))
-            
+
+            loan_logger.log_nueva_solicitud(
+                prestamo_id, numero_prestamo, cliente['id'],
+                datos_solicitud.get('monto_solicitado'),
+                session.get('user_id'), request.remote_addr
+            )
+
             # Redirigir a página de éxito
             flash(f'¡Solicitud creada exitosamente! Número: {numero_prestamo}', 'success')
             return redirect(url_for('solicitud_exitosa', numero=numero_prestamo))
@@ -734,13 +746,18 @@ def asignar_asesor():
         
         mysql.connection.commit()
         cursor.close()
-        
+
+        admin_logger.log_asignar_asesor(
+            int(cliente_id), int(asesor_id),
+            session.get('user_id'), request.remote_addr
+        )
+
         flash(f'Asesor {asesor["nombre"]} asignado correctamente', 'success')
-        
+
     except Exception as e:
         mysql.connection.rollback()
         flash(f'Error al asignar asesor: {str(e)}', 'error')
-    
+
     return redirect(url_for('admin_clientes'))
 
 
@@ -858,6 +875,12 @@ def admin_cambiar_estado_prestamo():
 
         cursor = mysql.connection.cursor()
 
+        # Obtener estado anterior y número para el log
+        cursor.execute("SELECT estado, numero_prestamo FROM prestamos WHERE id = %s", (prestamo_id,))
+        prestamo_actual = cursor.fetchone()
+        estado_anterior = prestamo_actual['estado'] if prestamo_actual else 'desconocido'
+        numero_prestamo = prestamo_actual['numero_prestamo'] if prestamo_actual else ''
+
         campos_extra = ""
         params = [nuevo_estado]
 
@@ -878,6 +901,12 @@ def admin_cambiar_estado_prestamo():
         )
         mysql.connection.commit()
         cursor.close()
+
+        loan_logger.log_cambio_estado(
+            int(prestamo_id), numero_prestamo,
+            estado_anterior, nuevo_estado,
+            session.get('user_id'), request.remote_addr
+        )
 
         flash('Estado del préstamo actualizado correctamente.', 'success')
     except Exception as e:
@@ -1094,11 +1123,15 @@ def crear_asesor():
         if error:
             flash(error, 'error')
         else:
+            admin_logger.log_crear_asesor(
+                usuario_id, nombre, email,
+                session.get('user_id'), request.remote_addr
+            )
             flash(f'Asesor {nombre} creado correctamente', 'success')
-        
+
     except Exception as e:
         flash(f'Error al crear asesor: {str(e)}', 'error')
-    
+
     return redirect(url_for('admin_asesores'))
 
 # ================================
@@ -1125,14 +1158,19 @@ def toggle_asesor(asesor_id):
         
         mysql.connection.commit()
         cursor.close()
-        
+
+        admin_logger.log_toggle_asesor(
+            asesor_id, nuevo_estado,
+            session.get('user_id'), request.remote_addr
+        )
+
         estado_texto = 'activado' if nuevo_estado else 'desactivado'
         flash(f'Asesor {estado_texto} correctamente', 'success')
-        
+
     except Exception as e:
         mysql.connection.rollback()
         flash(f'Error: {str(e)}', 'error')
-    
+
     return redirect(url_for('admin_asesores'))
 
 @app.route('/admin/reportes')
@@ -1153,6 +1191,41 @@ def admin_prestamos():
 def admin_configuracion():
     """Página de configuración del panel"""
     return render_template('admin/configuracion.html')
+
+# ================================
+# VISTA DE REGISTROS JSONL
+# ================================
+
+@app.route('/admin/logs')
+@admin_required
+def admin_logs():
+    """Visor de registros de log JSONL"""
+    tipo = request.args.get('tipo', 'todos')
+
+    if tipo == 'auth':
+        entradas = auth_logger.read_last(200)
+    elif tipo == 'loans':
+        entradas = loan_logger.read_last(200)
+    elif tipo == 'admin':
+        entradas = admin_logger.read_last(200)
+    else:
+        todos = auth_logger.read_all() + loan_logger.read_all() + admin_logger.read_all()
+        todos.sort(key=lambda x: x.get('timestamp', ''), reverse=True)
+        entradas = todos[:200]
+
+    totales = {
+        'auth':  auth_logger.total(),
+        'loans': loan_logger.total(),
+        'admin': admin_logger.total(),
+    }
+    totales['todos'] = totales['auth'] + totales['loans'] + totales['admin']
+
+    return render_template('admin/logs.html',
+                           entradas=entradas,
+                           tipo=tipo,
+                           totales=totales,
+                           now=datetime.now())
+
 
 # ================================
 # MANEJADORES DE ERRORES
