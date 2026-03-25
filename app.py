@@ -842,6 +842,50 @@ def admin_solicitudes():
     
 
 
+@app.route('/admin/cambiar-estado-prestamo', methods=['POST'])
+@admin_required
+def admin_cambiar_estado_prestamo():
+    """Cambiar el estado de un préstamo"""
+    try:
+        prestamo_id = request.form.get('prestamo_id')
+        nuevo_estado = request.form.get('nuevo_estado')
+        observaciones = request.form.get('observaciones', '')
+
+        estados_validos = ['solicitado', 'en_analisis', 'aprobado', 'rechazado', 'desembolsado', 'finalizado']
+        if not prestamo_id or nuevo_estado not in estados_validos:
+            flash('Datos inválidos para cambiar el estado.', 'error')
+            return redirect(url_for('admin_solicitudes'))
+
+        cursor = mysql.connection.cursor()
+
+        campos_extra = ""
+        params = [nuevo_estado]
+
+        if nuevo_estado == 'aprobado':
+            campos_extra = ", fecha_aprobacion = NOW(), usuario_aprobador_id = %s"
+            params.append(session.get('user_id'))
+        elif nuevo_estado == 'desembolsado':
+            campos_extra = ", fecha_desembolso = NOW()"
+
+        if observaciones:
+            campos_extra += ", observaciones = %s"
+            params.append(observaciones)
+
+        params.append(prestamo_id)
+        cursor.execute(
+            f"UPDATE prestamos SET estado = %s{campos_extra} WHERE id = %s",
+            params
+        )
+        mysql.connection.commit()
+        cursor.close()
+
+        flash('Estado del préstamo actualizado correctamente.', 'success')
+    except Exception as e:
+        flash(f'Error al cambiar el estado: {str(e)}', 'error')
+
+    return redirect(url_for('admin_solicitudes'))
+
+
 # ================================================
 # DASHBOARD DEL CLIENTE
 # ================================================
