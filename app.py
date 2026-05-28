@@ -1,11 +1,14 @@
-from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash, make_response, send_file
 from flask_mysqldb import MySQL
 import bcrypt
 import os
-from datetime import datetime
+import csv
+import io
+import secrets
+from datetime import datetime, timedelta
 from functools import wraps
 from dotenv import load_dotenv
-from datetime import datetime
+from werkzeug.utils import secure_filename
 from logger import auth_logger, loan_logger, admin_logger
 
 # Cargar variables de entorno
@@ -27,6 +30,36 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 # Configuración de sesiones
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hora
 app.config['SESSION_COOKIE_HTTPONLY'] = True
+
+# Configuración de uploads
+app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB
+DOCS_UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static', 'uploads', 'docs')
+os.makedirs(DOCS_UPLOAD_FOLDER, exist_ok=True)
+
+ALLOWED_DOC_EXTENSIONS = {'pdf', 'jpg', 'jpeg', 'png'}
+
+def allowed_doc(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_DOC_EXTENSIONS
+
+def hash_password(pw: str) -> str:
+    return bcrypt.hashpw(pw.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+def check_password(pw: str, stored_hash) -> bool:
+    if isinstance(stored_hash, str):
+        stored_hash = stored_hash.encode('utf-8')
+    return bcrypt.checkpw(pw.encode('utf-8'), stored_hash)
+
+def make_csv_response(filename: str, headers: list, rows: list):
+    """Construye una respuesta HTTP con contenido CSV listo para descarga."""
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(headers)
+    for row in rows:
+        writer.writerow(row)
+    response = make_response(output.getvalue())
+    response.headers['Content-Type'] = 'text/csv; charset=utf-8'
+    response.headers['Content-Disposition'] = f'attachment; filename={filename}'
+    return response
 
 # Inicializar MySQL
 mysql = MySQL(app)
@@ -82,24 +115,21 @@ def crear_usuario(nombres, email, password, tipo_documento, numero_documento,
             cursor.close()
             return None, "El número de documento ya está registrado"
 
-        password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        password_hash_str = password_hash.decode('utf-8')
+        password_hash_str = hash_password(password)
 
-        query_usuario = """
-            INSERT INTO usuarios (nombre, email, password_hash, rol, activo)
-            VALUES (%s, %s, %s, %s, %s)
-        """
-        cursor.execute(query_usuario, (nombres, email, password_hash_str, rol, True))
+        cursor.execute(
+            "INSERT INTO usuarios (nombre, email, password_hash, rol, activo) VALUES (%s, %s, %s, %s, %s)",
+            (nombres, email, password_hash_str, rol, True)
+        )
         usuario_id = cursor.lastrowid
 
-        query_cliente = """
+        cursor.execute("""
             INSERT INTO clientes
             (usuario_id, tipo_documento, numero_documento, nombres, apellidos,
              email, celular, fecha_nacimiento, telefono, direccion, ciudad,
              departamento, tipo_cliente, entidad_empleadora, salario_mensual, estado)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, 'activo')
-        """
-        cursor.execute(query_cliente, (
+        """, (
             usuario_id, tipo_documento, numero_documento, nombres, apellidos,
             email, celular, fecha_nacimiento, telefono, direccion, ciudad,
             departamento, tipo_cliente, entidad_empleadora, salario_mensual
@@ -111,64 +141,39 @@ def crear_usuario(nombres, email, password, tipo_documento, numero_documento,
 
     except Exception as e:
         mysql.connection.rollback()
-        print(f"ERROR: {str(e)}")
         return None, f"Error al crear usuario: {str(e)}"
 
 def verificar_credenciales(email, password):
-    """Verifica las credenciales de un usuario - VERSIÓN CORREGIDA"""
+    """Devuelve (usuario_dict, None) si las credenciales son válidas, o (None, mensaje_error)."""
     try:
         cursor = mysql.connection.cursor()
-        query = """
-            SELECT id, nombre, email, password_hash, rol, activo 
-            FROM usuarios 
-            WHERE email = %s
-        """
-        cursor.execute(query, (email,))
+        cursor.execute(
+            "SELECT id, nombre, email, password_hash, rol, activo FROM usuarios WHERE email = %s",
+            (email,)
+        )
         usuario = cursor.fetchone()
         cursor.close()
-        
+
         if not usuario:
-            print(f"DEBUG: Usuario no encontrado: {email}")
             return None, "Usuario no encontrado"
-        
         if not usuario['activo']:
             return None, "Usuario inactivo"
-        
-        # Obtener el hash de la base de datos
-        password_hash_db = usuario['password_hash']
-        
-        # Si el hash está en formato string, convertir a bytes
-        if isinstance(password_hash_db, str):
-            password_hash_db = password_hash_db.encode('utf-8')
-        
-        # Verificar contraseña - CORREGIDO
-        print(f"DEBUG: Verificando password para {email}")
-        print(f"DEBUG: Hash length: {len(password_hash_db)}")
-        
-        if bcrypt.checkpw(password.encode('utf-8'), password_hash_db):
-            print(f"DEBUG: Password correcta para {email}")
+        if check_password(password, usuario['password_hash']):
             return usuario, None
-        else:
-            print(f"DEBUG: Password incorrecta para {email}")
-            return None, "Contraseña incorrecta"
-            
+        return None, "Contraseña incorrecta"
+
     except Exception as e:
-        print(f"ERROR en verificar_credenciales: {str(e)}")
         return None, f"Error al verificar credenciales: {str(e)}"
 
 def obtener_cliente_por_usuario(usuario_id):
-    """Obtiene los datos del cliente asociado a un usuario"""
+    """Devuelve el dict del cliente asociado al usuario_id, o None si no existe."""
     try:
         cursor = mysql.connection.cursor()
-        query = """
-            SELECT * FROM clientes WHERE usuario_id = %s
-        """
-        cursor.execute(query, (usuario_id,))
+        cursor.execute("SELECT * FROM clientes WHERE usuario_id = %s", (usuario_id,))
         cliente = cursor.fetchone()
         cursor.close()
         return cliente
-    except Exception as e:
-        print(f"Error al obtener cliente: {str(e)}")
+    except Exception:
         return None
 
 def crear_solicitud_prestamo(cliente_id, datos_solicitud):
@@ -234,44 +239,6 @@ def crear_solicitud_prestamo(cliente_id, datos_solicitud):
         mysql.connection.rollback()
         return None, None, f"Error al crear solicitud: {str(e)}"
 
-def obtener_estadisticas_dashboard():
-    """Obtiene las estadísticas para el dashboard"""
-    try:
-        cursor = mysql.connection.cursor()
-        
-        stats = {}
-        
-        # Total clientes activos
-        cursor.execute("SELECT COUNT(*) as total FROM clientes WHERE estado = 'activo'")
-        stats['clientes_activos'] = cursor.fetchone()['total']
-        
-        # Préstamos activos
-        cursor.execute("SELECT COUNT(*) as total FROM prestamos WHERE estado = 'desembolsado'")
-        stats['prestamos_activos'] = cursor.fetchone()['total']
-        
-        # Cartera vigente
-        cursor.execute("""
-            SELECT COALESCE(SUM(monto_aprobado), 0) as total 
-            FROM prestamos 
-            WHERE estado = 'desembolsado'
-        """)
-        stats['cartera_vigente'] = cursor.fetchone()['total']
-        
-        # Cartera en mora
-        cursor.execute("""
-            SELECT COALESCE(SUM(valor_cuota - valor_pagado), 0) as total 
-            FROM pagos 
-            WHERE estado IN ('mora', 'vencido')
-        """)
-        stats['cartera_mora'] = cursor.fetchone()['total']
-        
-        cursor.close()
-        return stats
-        
-    except Exception as e:
-        print(f"Error al obtener estadísticas: {str(e)}")
-        return {}
-
 # ================================
 # RUTAS PRINCIPALES
 # ================================
@@ -313,47 +280,37 @@ def check_session():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Página de inicio de sesión - ACTUALIZADO"""
     if 'user_id' in session:
-        # Si ya está logueado, redirigir según rol
         return redirect_by_role()
-    
+
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
         remember = request.form.get('remember')
-        
-        print(f"DEBUG: Intento de login para: {email}")
-        
+
         usuario, error = verificar_credenciales(email, password)
 
         if error:
-            print(f"DEBUG: Error en login: {error}")
             auth_logger.log_login(email, request.remote_addr, False, razon=error)
             return render_template('login.html', error=error)
 
-        # Crear sesión
-        session['user_id'] = usuario['id']
+        session['user_id']     = usuario['id']
         session['user_nombre'] = usuario['nombre']
-        session['user_email'] = usuario['email']
-        session['user_rol'] = usuario['rol']
+        session['user_email']  = usuario['email']
+        session['user_rol']    = usuario['rol']
 
         if remember:
             session.permanent = True
 
         auth_logger.log_login(email, request.remote_addr, True,
                               user_id=usuario['id'], rol=usuario['rol'])
-        print(f"DEBUG: Login exitoso para {email} - Rol: {usuario['rol']}")
-
-        # Redirigir según el rol del usuario
         return redirect_by_role()
-    
+
     return render_template('login.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Página de registro - ACTUALIZADO"""
     if 'user_id' in session:
         return redirect_by_role()
     
@@ -434,6 +391,127 @@ def logout():
     session.clear()
     flash(f'Hasta pronto, {nombre}. Sesión cerrada correctamente.', 'success')
     return redirect(url_for('index'))
+
+
+# ================================
+# RECUPERACIÓN DE CONTRASEÑA
+# ================================
+
+@app.route('/forgot-password', methods=['GET', 'POST'])
+def forgot_password():
+    """Página de recuperación de contraseña"""
+    reset_link = None
+
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        if not email:
+            return render_template('forgot_password.html', error='Ingresa tu correo electrónico')
+
+        try:
+            cursor = mysql.connection.cursor()
+
+            # Crear tabla si no existe
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS password_resets (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    usuario_id INT NOT NULL,
+                    token VARCHAR(64) NOT NULL UNIQUE,
+                    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                    expira_en TIMESTAMP NOT NULL,
+                    usado TINYINT(1) DEFAULT 0,
+                    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+                )
+            """)
+
+            cursor.execute("SELECT id, email FROM usuarios WHERE email = %s AND activo = 1", (email,))
+            usuario = cursor.fetchone()
+
+            if usuario:
+                token = secrets.token_urlsafe(32)   # 256 bits de entropía
+                expira_en = datetime.now() + timedelta(hours=1)
+
+                # Invalidar tokens anteriores del usuario
+                cursor.execute("UPDATE password_resets SET usado = 1 WHERE usuario_id = %s AND usado = 0", (usuario['id'],))
+
+                cursor.execute("""
+                    INSERT INTO password_resets (usuario_id, token, expira_en, usado)
+                    VALUES (%s, %s, %s, 0)
+                """, (usuario['id'], token, expira_en))
+                mysql.connection.commit()
+
+                base_url = request.host_url.rstrip('/')
+                reset_link = f"{base_url}/reset-password/{token}"
+
+            cursor.close()
+
+            # Siempre mostrar el formulario de éxito para no revelar si el email existe
+            return render_template('forgot_password.html', email_enviado=True, reset_link=reset_link, email=email)
+
+        except Exception as e:
+            return render_template('forgot_password.html', error=f'Error al procesar la solicitud: {str(e)}')
+
+    return render_template('forgot_password.html')
+
+
+@app.route('/reset-password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    """Página para restablecer la contraseña"""
+    try:
+        cursor = mysql.connection.cursor()
+
+        # Crear tabla si no existe
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS password_resets (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                usuario_id INT NOT NULL,
+                token VARCHAR(64) NOT NULL UNIQUE,
+                creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expira_en TIMESTAMP NOT NULL,
+                usado TINYINT(1) DEFAULT 0,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            )
+        """)
+
+        cursor.execute("""
+            SELECT pr.*, u.email
+            FROM password_resets pr
+            JOIN usuarios u ON u.id = pr.usuario_id
+            WHERE pr.token = %s AND pr.usado = 0 AND pr.expira_en > NOW()
+        """, (token,))
+        reset_record = cursor.fetchone()
+
+        if not reset_record:
+            cursor.close()
+            return render_template('reset_password.html', token_invalido=True)
+
+        if request.method == 'POST':
+            password_nueva = request.form.get('password_nueva', '')
+            confirmar = request.form.get('confirmar', '')
+
+            if len(password_nueva) < 8:
+                cursor.close()
+                return render_template('reset_password.html', token=token, error='La contraseña debe tener al menos 8 caracteres')
+
+            if password_nueva != confirmar:
+                cursor.close()
+                return render_template('reset_password.html', token=token, error='Las contraseñas no coinciden')
+
+            password_hash = hash_password(password_nueva)
+
+            cursor.execute("UPDATE usuarios SET password_hash = %s WHERE id = %s", (password_hash, reset_record['usuario_id']))
+            cursor.execute("UPDATE password_resets SET usado = 1 WHERE token = %s", (token,))
+            mysql.connection.commit()
+            cursor.close()
+
+            flash('Contraseña actualizada correctamente. Ya puedes iniciar sesión.', 'success')
+            return redirect(url_for('login'))
+
+        cursor.close()
+        return render_template('reset_password.html', token=token, email=reset_record['email'])
+
+    except Exception as e:
+        flash(f'Error al procesar la solicitud: {str(e)}', 'error')
+        return redirect(url_for('forgot_password'))
 
 
 # ================================================
@@ -595,16 +673,14 @@ def admin_dashboard():
         """)
         asesores = cursor.fetchall()
         
-        notificaciones_pendientes = 0
-        try:
-            cursor.execute("""
-                SELECT COUNT(*) as total
-                FROM notificaciones
-                WHERE leida = FALSE AND destinatario_tipo = 'admin'
-            """)
-            notificaciones_pendientes = cursor.fetchone()['total']
-        except Exception:
-            pass
+        cursor.execute("""
+            SELECT * FROM notificaciones
+            WHERE usuario_id = %s
+            ORDER BY fecha_creacion DESC
+            LIMIT 50
+        """, (session.get('user_id'),))
+        notificaciones = cursor.fetchall()
+        notificaciones_pendientes = sum(1 for n in notificaciones if not n['leida'])
 
         cursor.close()
 
@@ -612,11 +688,11 @@ def admin_dashboard():
                              stats=stats,
                              solicitudes_recientes=solicitudes_recientes,
                              asesores=asesores,
+                             notificaciones=notificaciones,
                              notificaciones_pendientes=notificaciones_pendientes,
                              now=datetime.now())
 
     except Exception as e:
-        print(f"ERROR admin_dashboard: {str(e)}")
         flash(f'Error al cargar dashboard: {str(e)}', 'error')
         return redirect(url_for('index'))
 
@@ -821,8 +897,7 @@ def admin_solicitudes():
             stats['cartera'] = float(cursor.fetchone()['t'])
             cursor.execute("SELECT COUNT(*) as t FROM prestamos")
             stats['total'] = cursor.fetchone()['t']
-        except Exception as e:
-            print(f'ERR stats: {e}')
+        except Exception:
             stats = {'pendientes':0,'desembolsados':0,'cartera':0.0,'total':0}
 
         query = """
@@ -993,7 +1068,287 @@ def cliente_dashboard():
 @app.route('/cliente/configuracion')
 @login_required
 def cliente_configuracion():
-    return render_template('cliente/configuracion.html')
+    """Página de configuración del cliente con perfil, documentos y preferencias"""
+    try:
+        cursor = mysql.connection.cursor()
+
+        # Crear tabla documentos_cliente si no existe
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS documentos_cliente (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                cliente_id INT NOT NULL,
+                tipo ENUM('cedula','comprobante_ingresos','desprendible_pago','carta_laboral','otro') NOT NULL DEFAULT 'otro',
+                nombre_original VARCHAR(255) NOT NULL,
+                nombre_archivo VARCHAR(255) NOT NULL,
+                fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+            )
+        """)
+
+        # Obtener datos del cliente
+        cursor.execute("""
+            SELECT c.*, u.nombre as usuario_nombre
+            FROM clientes c
+            JOIN usuarios u ON u.id = c.usuario_id
+            WHERE c.usuario_id = %s
+        """, (session.get('user_id'),))
+        cliente = cursor.fetchone()
+
+        documentos = []
+        if cliente:
+            cursor.execute("""
+                SELECT * FROM documentos_cliente
+                WHERE cliente_id = %s
+                ORDER BY fecha_subida DESC
+            """, (cliente['id'],))
+            documentos = cursor.fetchall()
+
+        cursor.close()
+        return render_template('cliente/configuracion.html', cliente=cliente, documentos=documentos)
+
+    except Exception as e:
+        return render_template('cliente/configuracion.html', cliente=None, documentos=[])
+
+
+@app.route('/cliente/actualizar-perfil', methods=['POST'])
+@login_required
+def cliente_actualizar_perfil():
+    """Actualiza los datos personales del cliente"""
+    if session.get('user_rol') != 'cliente':
+        flash('No autorizado', 'error')
+        return redirect(url_for('cliente_configuracion'))
+
+    try:
+        nombre = request.form.get('nombre', '').strip()
+        apellidos = request.form.get('apellidos', '').strip()
+        celular = request.form.get('celular', '').strip()
+        telefono = request.form.get('telefono', '').strip() or None
+        direccion = request.form.get('direccion', '').strip() or None
+        ciudad = request.form.get('ciudad', '').strip() or None
+        departamento = request.form.get('departamento', '').strip() or None
+
+        if not nombre:
+            flash('El nombre no puede estar vacío', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        cursor = mysql.connection.cursor()
+
+        cursor.execute("UPDATE usuarios SET nombre = %s WHERE id = %s", (nombre, session.get('user_id')))
+        cursor.execute("""
+            UPDATE clientes
+            SET apellidos = %s, celular = %s, telefono = %s, direccion = %s, ciudad = %s, departamento = %s
+            WHERE usuario_id = %s
+        """, (apellidos, celular, telefono, direccion, ciudad, departamento, session.get('user_id')))
+
+        mysql.connection.commit()
+        cursor.close()
+
+        session['user_nombre'] = nombre
+        flash('Perfil actualizado correctamente', 'success')
+
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al actualizar perfil: {str(e)}', 'error')
+
+    return redirect(url_for('cliente_configuracion'))
+
+
+@app.route('/cliente/cambiar-password', methods=['POST'])
+@login_required
+def cliente_cambiar_password():
+    """Cambia la contraseña del cliente"""
+    try:
+        password_actual = request.form.get('password_actual', '')
+        password_nueva = request.form.get('password_nueva', '')
+        confirmar = request.form.get('confirmar', '')
+
+        if not password_actual or not password_nueva or not confirmar:
+            flash('Todos los campos son obligatorios', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        if len(password_nueva) < 8:
+            flash('La nueva contraseña debe tener al menos 8 caracteres', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        if password_nueva != confirmar:
+            flash('La nueva contraseña y la confirmación no coinciden', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT password_hash FROM usuarios WHERE id = %s", (session.get('user_id'),))
+        usuario = cursor.fetchone()
+
+        if not usuario:
+            cursor.close()
+            flash('Usuario no encontrado', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        if not check_password(password_actual, usuario['password_hash']):
+            cursor.close()
+            flash('La contraseña actual es incorrecta', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        cursor.execute("UPDATE usuarios SET password_hash = %s WHERE id = %s",
+                       (hash_password(password_nueva), session.get('user_id')))
+        mysql.connection.commit()
+        cursor.close()
+
+        flash('Contraseña actualizada correctamente', 'success')
+
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al cambiar contraseña: {str(e)}', 'error')
+
+    return redirect(url_for('cliente_configuracion'))
+
+
+@app.route('/cliente/subir-documento', methods=['POST'])
+@login_required
+def cliente_subir_documento():
+    """Sube un documento del cliente"""
+    try:
+        cursor = mysql.connection.cursor()
+
+        # Crear tabla si no existe
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS documentos_cliente (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                cliente_id INT NOT NULL,
+                tipo ENUM('cedula','comprobante_ingresos','desprendible_pago','carta_laboral','otro') NOT NULL DEFAULT 'otro',
+                nombre_original VARCHAR(255) NOT NULL,
+                nombre_archivo VARCHAR(255) NOT NULL,
+                fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (cliente_id) REFERENCES clientes(id) ON DELETE CASCADE
+            )
+        """)
+
+        cursor.execute("SELECT id FROM clientes WHERE usuario_id = %s", (session.get('user_id'),))
+        cliente_row = cursor.fetchone()
+
+        if not cliente_row:
+            cursor.close()
+            flash('No se encontró información del cliente', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        cliente_id = cliente_row['id']
+
+        if 'archivo' not in request.files:
+            cursor.close()
+            flash('No se seleccionó ningún archivo', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        archivo = request.files['archivo']
+        tipo_doc = request.form.get('tipo', 'otro')
+
+        if archivo.filename == '':
+            cursor.close()
+            flash('No se seleccionó ningún archivo', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        if not allowed_doc(archivo.filename):
+            cursor.close()
+            flash('Tipo de archivo no permitido. Use PDF, JPG, JPEG o PNG', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        nombre_original = archivo.filename
+        nombre_seguro   = secure_filename(archivo.filename)
+        # Prefijo aleatorio para evitar colisiones de nombres entre clientes
+        nombre_archivo  = f"{cliente_id}_{secrets.token_hex(8)}_{nombre_seguro}"
+
+        ruta_archivo = os.path.join(DOCS_UPLOAD_FOLDER, nombre_archivo)
+        archivo.save(ruta_archivo)
+
+        cursor.execute("""
+            INSERT INTO documentos_cliente (cliente_id, tipo, nombre_original, nombre_archivo)
+            VALUES (%s, %s, %s, %s)
+        """, (cliente_id, tipo_doc, nombre_original, nombre_archivo))
+        mysql.connection.commit()
+        cursor.close()
+
+        flash('Documento subido correctamente', 'success')
+
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al subir documento: {str(e)}', 'error')
+
+    return redirect(url_for('cliente_configuracion'))
+
+
+@app.route('/doc/<int:doc_id>')
+@login_required
+def ver_documento(doc_id):
+    """Sirve un documento al usuario autorizado"""
+    try:
+        cursor = mysql.connection.cursor()
+
+        cursor.execute("""
+            SELECT dc.*, c.usuario_id
+            FROM documentos_cliente dc
+            JOIN clientes c ON c.id = dc.cliente_id
+            WHERE dc.id = %s
+        """, (doc_id,))
+        doc = cursor.fetchone()
+        cursor.close()
+
+        if not doc:
+            flash('Documento no encontrado', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        # Verificar permisos: dueño del doc o admin/asesor
+        user_id = session.get('user_id')
+        user_rol = session.get('user_rol')
+        if doc['usuario_id'] != user_id and user_rol not in ['admin', 'asesor']:
+            flash('No tienes permisos para ver este documento', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        ruta_archivo = os.path.join(DOCS_UPLOAD_FOLDER, doc['nombre_archivo'])
+        if not os.path.exists(ruta_archivo):
+            flash('El archivo no se encontró en el servidor', 'error')
+            return redirect(url_for('cliente_configuracion'))
+
+        return send_file(ruta_archivo, download_name=doc['nombre_original'], as_attachment=False)
+
+    except Exception as e:
+        flash(f'Error al cargar documento: {str(e)}', 'error')
+        return redirect(url_for('cliente_configuracion'))
+
+
+@app.route('/cliente/mis-documentos')
+@login_required
+def cliente_mis_documentos():
+    """Retorna lista de documentos del cliente (AJAX)"""
+    try:
+        cursor = mysql.connection.cursor()
+
+        cursor.execute("SELECT id FROM clientes WHERE usuario_id = %s", (session.get('user_id'),))
+        cliente_row = cursor.fetchone()
+
+        if not cliente_row:
+            cursor.close()
+            return jsonify([])
+
+        cursor.execute("""
+            SELECT id, tipo, nombre_original, fecha_subida
+            FROM documentos_cliente
+            WHERE cliente_id = %s
+            ORDER BY fecha_subida DESC
+        """, (cliente_row['id'],))
+        documentos = cursor.fetchall()
+        cursor.close()
+
+        resultado = []
+        for d in documentos:
+            resultado.append({
+                'id': d['id'],
+                'tipo': d['tipo'],
+                'nombre_original': d['nombre_original'],
+                'fecha_subida': d['fecha_subida'].strftime('%d/%m/%Y %H:%M') if d['fecha_subida'] else ''
+            })
+
+        return jsonify(resultado)
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # ================================
 # DASHBOARD DEL ASESOR
@@ -1011,7 +1366,7 @@ def asesor_dashboard():
         cursor = mysql.connection.cursor()
         asesor_id = session.get('user_id')
 
-        # Clientes asignados al asesor
+        # Clientes asignados con sus préstamos
         cursor.execute("""
             SELECT c.*,
                    COUNT(DISTINCT p.id) as total_prestamos,
@@ -1024,36 +1379,43 @@ def asesor_dashboard():
         """, (asesor_id,))
         clientes = cursor.fetchall()
 
-        # Solicitudes pendientes de sus clientes
+        # Todas las solicitudes de sus clientes
         cursor.execute("""
             SELECT p.*, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos
             FROM prestamos p
             JOIN clientes c ON p.cliente_id = c.id
             JOIN asignaciones_asesores aa ON aa.cliente_id = c.id AND aa.asesor_id = %s AND aa.activa = TRUE
-            WHERE p.estado = 'solicitado'
             ORDER BY p.fecha_solicitud DESC
-            LIMIT 10
+            LIMIT 100
         """, (asesor_id,))
-        solicitudes_pendientes = cursor.fetchall()
+        todas_solicitudes = cursor.fetchall()
 
-        # Notificaciones no leídas
+        solicitudes_pendientes = [s for s in todas_solicitudes if s['estado'] == 'solicitado']
+
+        # Notificaciones
         cursor.execute("""
-            SELECT COUNT(*) as total FROM notificaciones
-            WHERE usuario_id = %s AND leida = FALSE
+            SELECT * FROM notificaciones
+            WHERE usuario_id = %s
+            ORDER BY fecha_creacion DESC
+            LIMIT 30
         """, (asesor_id,))
-        notificaciones_pendientes = cursor.fetchone()['total']
+        notificaciones = cursor.fetchall()
+        notificaciones_pendientes = sum(1 for n in notificaciones if not n['leida'])
 
         stats = {
-            'total_clientes':        len(clientes),
+            'total_clientes':         len(clientes),
             'solicitudes_pendientes': len(solicitudes_pendientes),
-            'clientes_activos':      sum(1 for c in clientes if c['estado'] == 'activo'),
+            'clientes_activos':       sum(1 for c in clientes if c['estado'] == 'activo'),
+            'prestamos_desembolsados':sum(1 for s in todas_solicitudes if s['estado'] == 'desembolsado'),
         }
 
         cursor.close()
 
         return render_template('asesor/dashboard.html',
                                clientes=clientes,
+                               todas_solicitudes=todas_solicitudes,
                                solicitudes_pendientes=solicitudes_pendientes,
+                               notificaciones=notificaciones,
                                notificaciones_pendientes=notificaciones_pendientes,
                                stats=stats,
                                now=datetime.now())
@@ -1061,6 +1423,135 @@ def asesor_dashboard():
     except Exception as e:
         flash(f'Error al cargar dashboard: {str(e)}', 'error')
         return redirect(url_for('index'))
+
+
+@app.route('/asesor/marcar-notificaciones', methods=['POST'])
+@login_required
+def asesor_marcar_notificaciones():
+    """Marca todas las notificaciones del asesor como leídas"""
+    if session.get('user_rol') != 'asesor':
+        return jsonify({'error': 'No autorizado'}), 403
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            UPDATE notificaciones SET leida = TRUE
+            WHERE usuario_id = %s AND leida = FALSE
+        """, (session.get('user_id'),))
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/asesor/actualizar-perfil', methods=['POST'])
+@login_required
+def asesor_actualizar_perfil():
+    """Actualiza nombre y/o contraseña del asesor"""
+    if session.get('user_rol') != 'asesor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('asesor_dashboard'))
+    try:
+        nombre   = request.form.get('nombre', '').strip()
+        password = request.form.get('password', '').strip()
+        if not nombre:
+            flash('El nombre no puede estar vacío', 'error')
+            return redirect(url_for('asesor_dashboard'))
+        cursor = mysql.connection.cursor()
+        if password:
+            cursor.execute("UPDATE usuarios SET nombre=%s, password_hash=%s WHERE id=%s",
+                           (nombre, hash_password(password), session.get('user_id')))
+        else:
+            cursor.execute("UPDATE usuarios SET nombre=%s WHERE id=%s",
+                           (nombre, session.get('user_id')))
+        cursor.execute("UPDATE clientes SET nombres=%s WHERE usuario_id=%s",
+                       (nombre, session.get('user_id')))
+        mysql.connection.commit()
+        cursor.close()
+        session['user_nombre'] = nombre
+        flash('Perfil actualizado correctamente', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al actualizar perfil: {str(e)}', 'error')
+    return redirect(url_for('asesor_dashboard'))
+
+
+@app.route('/asesor/contactar-admin', methods=['POST'])
+@login_required
+def asesor_contactar_admin():
+    """Envia un mensaje a todos los administradores activos como notificacion"""
+    if session.get('user_rol') != 'asesor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('asesor_dashboard'))
+    titulo  = request.form.get('titulo', '').strip()
+    mensaje = request.form.get('mensaje', '').strip()
+    if not titulo or not mensaje:
+        flash('Titulo y mensaje son obligatorios', 'error')
+        return redirect(url_for('asesor_dashboard'))
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("SELECT id FROM usuarios WHERE rol='admin' AND activo=TRUE")
+        admins = cursor.fetchall()
+        if not admins:
+            flash('No se encontro ningun administrador activo', 'error')
+            cursor.close()
+            return redirect(url_for('asesor_dashboard'))
+        asesor_nombre = session.get('user_nombre', 'Asesor')
+        for admin in admins:
+            cursor.execute("""
+                INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo)
+                VALUES (%s, %s, %s, 'info')
+            """, (admin['id'],
+                  f"Mensaje de asesor: {titulo}",
+                  f"[{asesor_nombre}]: {mensaje}"))
+        mysql.connection.commit()
+        cursor.close()
+        flash('Mensaje enviado a administracion correctamente', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al enviar mensaje: {str(e)}', 'error')
+    return redirect(url_for('asesor_dashboard'))
+
+
+@app.route('/asesor/notificar-cliente', methods=['POST'])
+@login_required
+def asesor_notificar_cliente():
+    """Envia una notificacion a un cliente asignado al asesor"""
+    if session.get('user_rol') != 'asesor':
+        flash('No autorizado', 'error')
+        return redirect(url_for('asesor_dashboard'))
+    cliente_id = request.form.get('cliente_id', '').strip()
+    titulo     = request.form.get('titulo', '').strip()
+    mensaje    = request.form.get('mensaje', '').strip()
+    if not all([cliente_id, titulo, mensaje]):
+        flash('Todos los campos son obligatorios', 'error')
+        return redirect(url_for('asesor_dashboard'))
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            SELECT c.usuario_id, c.nombres, c.apellidos
+            FROM clientes c
+            JOIN asignaciones_asesores aa ON aa.cliente_id = c.id
+                AND aa.asesor_id = %s AND aa.activa = TRUE
+            WHERE c.id = %s
+        """, (session.get('user_id'), cliente_id))
+        cliente = cursor.fetchone()
+        if not cliente or not cliente['usuario_id']:
+            flash('Cliente no encontrado o no asignado a ti', 'error')
+            cursor.close()
+            return redirect(url_for('asesor_dashboard'))
+        cursor.execute("""
+            INSERT INTO notificaciones (usuario_id, titulo, mensaje, tipo)
+            VALUES (%s, %s, %s, 'info')
+        """, (cliente['usuario_id'], titulo, mensaje))
+        mysql.connection.commit()
+        cursor.close()
+        flash(f'Notificacion enviada a {cliente["nombres"]} {cliente["apellidos"]} correctamente', 'success')
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al enviar notificacion: {str(e)}', 'error')
+    return redirect(url_for('asesor_dashboard'))
+
 
 # ================================
 # GESTIÓN DE ASESORES
@@ -1107,17 +1598,19 @@ def crear_asesor():
     try:
         nombre = request.form.get('nombre')
         email = request.form.get('email')
-        password = request.form.get('password', 'Asesor123!')  # Password por defecto
+        password = request.form.get('password', '').strip() or 'Asesor123!'
         
         usuario_id, error = crear_usuario(
-            nombre=nombre,
+            nombres=nombre,
             email=email,
             password=password,
             tipo_documento='CC',
             numero_documento='0000000000',  # Temporal
-            apellido='',
+            apellidos='',
             celular='0000000000',  # Temporal
-            rol='asesor'
+            fecha_nacimiento='1990-01-01',  # Requerido por BD
+            rol='asesor',
+            tipo_cliente='empleado_publico'
         )
         
         if error:
@@ -1133,6 +1626,62 @@ def crear_asesor():
         flash(f'Error al crear asesor: {str(e)}', 'error')
 
     return redirect(url_for('admin_asesores'))
+
+# ================================
+# EDITAR ASESOR
+# ================================
+
+@app.route('/admin/editar-asesor', methods=['POST'])
+@admin_required
+def editar_asesor():
+    """Edita nombre, email y contraseña de un asesor"""
+    try:
+        asesor_id  = request.form.get('asesor_id')
+        nombre     = request.form.get('nombre', '').strip()
+        email      = request.form.get('email', '').strip()
+        password   = request.form.get('password', '').strip()
+
+        if not asesor_id or not nombre or not email:
+            flash('Nombre y correo son obligatorios', 'error')
+            return redirect(url_for('admin_asesores'))
+
+        cursor = mysql.connection.cursor()
+
+        # Verificar que el email no lo use otro usuario
+        cursor.execute("SELECT id FROM usuarios WHERE email = %s AND id != %s", (email, asesor_id))
+        if cursor.fetchone():
+            flash('El correo ya está en uso por otro usuario', 'error')
+            cursor.close()
+            return redirect(url_for('admin_asesores'))
+
+        if password:
+            cursor.execute(
+                "UPDATE usuarios SET nombre = %s, email = %s, password_hash = %s WHERE id = %s",
+                (nombre, email, hash_password(password), asesor_id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE usuarios SET nombre = %s, email = %s WHERE id = %s",
+                (nombre, email, asesor_id)
+            )
+
+        # Sincronizar email en la tabla clientes
+        cursor.execute(
+            "UPDATE clientes SET email = %s, nombres = %s WHERE usuario_id = %s",
+            (email, nombre, asesor_id)
+        )
+
+        mysql.connection.commit()
+        cursor.close()
+
+        flash(f'Asesor {nombre} actualizado correctamente', 'success')
+
+    except Exception as e:
+        mysql.connection.rollback()
+        flash(f'Error al editar asesor: {str(e)}', 'error')
+
+    return redirect(url_for('admin_asesores'))
+
 
 # ================================
 # ELIMINAR/DESACTIVAR ASESOR
@@ -1173,11 +1722,169 @@ def toggle_asesor(asesor_id):
 
     return redirect(url_for('admin_asesores'))
 
+@app.route('/admin/marcar-notificaciones', methods=['POST'])
+@admin_required
+def admin_marcar_notificaciones():
+    """Marca todas las notificaciones del admin como leidas"""
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            UPDATE notificaciones SET leida = TRUE
+            WHERE usuario_id = %s AND leida = FALSE
+        """, (session.get('user_id'),))
+        mysql.connection.commit()
+        cursor.close()
+        return jsonify({'ok': True})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/admin/reportes')
 @admin_required
 def admin_reportes():
-    """Página de reportes"""
-    return render_template('admin/reportes.html')
+    """Página de reportes con estadísticas y exportaciones"""
+    try:
+        cursor = mysql.connection.cursor()
+
+        stats = {}
+
+        cursor.execute("SELECT COUNT(*) as total FROM clientes")
+        stats['total_clientes'] = cursor.fetchone()['total']
+
+        cursor.execute("SELECT COUNT(*) as total FROM prestamos")
+        stats['total_prestamos'] = cursor.fetchone()['total']
+
+        cursor.execute("SELECT COALESCE(SUM(monto_aprobado), 0) as total FROM prestamos WHERE estado = 'desembolsado'")
+        stats['cartera_activa'] = float(cursor.fetchone()['total'])
+
+        cursor.execute("SELECT COUNT(*) as total FROM usuarios WHERE rol = 'asesor' AND activo = 1")
+        stats['total_asesores'] = cursor.fetchone()['total']
+
+        # Distribución de estados
+        cursor.execute("""
+            SELECT estado, COUNT(*) as conteo
+            FROM prestamos
+            GROUP BY estado
+        """)
+        filas_estados = cursor.fetchall()
+        cursor.close()
+
+        estados_posibles = ['solicitado', 'en_analisis', 'aprobado', 'rechazado', 'desembolsado', 'finalizado']
+        dist_dict = {f['estado']: f['conteo'] for f in filas_estados}
+        total_prest = stats['total_prestamos'] or 1
+
+        distribucion_estados = []
+        for estado in estados_posibles:
+            conteo = dist_dict.get(estado, 0)
+            distribucion_estados.append({
+                'estado': estado,
+                'conteo': conteo,
+                'porcentaje': round(conteo / total_prest * 100, 1)
+            })
+
+        return render_template('admin/reportes.html', stats=stats, distribucion_estados=distribucion_estados)
+
+    except Exception as e:
+        flash(f'Error al cargar reportes: {str(e)}', 'error')
+        return render_template('admin/reportes.html', stats={}, distribucion_estados=[])
+
+
+@app.route('/admin/exportar/clientes')
+@admin_required
+def exportar_clientes():
+    """Exporta todos los clientes en formato CSV."""
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            SELECT c.nombres, c.apellidos, c.email, c.tipo_documento, c.numero_documento,
+                   c.celular, c.ciudad, c.tipo_cliente, c.estado, c.fecha_registro
+            FROM clientes c ORDER BY c.fecha_registro DESC
+        """)
+        rows = [
+            [c['nombres'], c['apellidos'], c['email'],
+             c['tipo_documento'], c['numero_documento'],
+             c['celular'], c['ciudad'] or '', c['tipo_cliente'] or '',
+             c['estado'],
+             c['fecha_registro'].strftime('%d/%m/%Y') if c['fecha_registro'] else '']
+            for c in cursor.fetchall()
+        ]
+        cursor.close()
+        return make_csv_response(
+            'clientes_novacapital.csv',
+            ['Nombres','Apellidos','Email','Tipo Documento','Numero Documento',
+             'Celular','Ciudad','Tipo Cliente','Estado','Fecha Registro'],
+            rows
+        )
+    except Exception as e:
+        flash(f'Error al exportar clientes: {str(e)}', 'error')
+        return redirect(url_for('admin_reportes'))
+
+
+@app.route('/admin/exportar/prestamos')
+@admin_required
+def exportar_prestamos():
+    """Exporta todos los préstamos en formato CSV."""
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            SELECT p.numero_prestamo, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos,
+                   p.monto_solicitado, p.monto_aprobado, p.tasa_interes, p.plazo_meses,
+                   p.estado, p.fecha_solicitud
+            FROM prestamos p JOIN clientes c ON c.id = p.cliente_id
+            ORDER BY p.fecha_solicitud DESC
+        """)
+        rows = [
+            [p['numero_prestamo'], p['cliente_nombres'], p['cliente_apellidos'],
+             p['monto_solicitado'], p['monto_aprobado'] or '',
+             p['tasa_interes'] or '', p['plazo_meses'], p['estado'],
+             p['fecha_solicitud'].strftime('%d/%m/%Y') if p['fecha_solicitud'] else '']
+            for p in cursor.fetchall()
+        ]
+        cursor.close()
+        return make_csv_response(
+            'prestamos_novacapital.csv',
+            ['Numero Prestamo','Nombres Cliente','Apellidos Cliente',
+             'Monto Solicitado','Monto Aprobado','Tasa Interes',
+             'Plazo Meses','Estado','Fecha Solicitud'],
+            rows
+        )
+    except Exception as e:
+        flash(f'Error al exportar préstamos: {str(e)}', 'error')
+        return redirect(url_for('admin_reportes'))
+
+
+@app.route('/admin/exportar/cartera')
+@admin_required
+def exportar_cartera():
+    """Exporta la cartera activa (préstamos desembolsados) en formato CSV."""
+    try:
+        cursor = mysql.connection.cursor()
+        cursor.execute("""
+            SELECT p.numero_prestamo, c.nombres as cliente_nombres, c.apellidos as cliente_apellidos,
+                   p.monto_aprobado, p.tasa_interes, p.plazo_meses, p.cuota_mensual,
+                   p.fecha_desembolso
+            FROM prestamos p JOIN clientes c ON c.id = p.cliente_id
+            WHERE p.estado = 'desembolsado'
+            ORDER BY p.fecha_desembolso DESC
+        """)
+        rows = [
+            [p['numero_prestamo'], p['cliente_nombres'], p['cliente_apellidos'],
+             p['monto_aprobado'] or '', p['tasa_interes'] or '',
+             p['plazo_meses'], p['cuota_mensual'] or '',
+             p['fecha_desembolso'].strftime('%d/%m/%Y') if p['fecha_desembolso'] else '']
+            for p in cursor.fetchall()
+        ]
+        cursor.close()
+        return make_csv_response(
+            'cartera_activa_novacapital.csv',
+            ['Numero Prestamo','Nombres Cliente','Apellidos Cliente',
+             'Monto Aprobado','Tasa Interes','Plazo Meses',
+             'Cuota Mensual','Fecha Desembolso'],
+            rows
+        )
+    except Exception as e:
+        flash(f'Error al exportar cartera: {str(e)}', 'error')
+        return redirect(url_for('admin_reportes'))
 
 @app.route('/admin/prestamos')
 @admin_required
