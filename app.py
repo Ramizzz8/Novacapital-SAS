@@ -26,6 +26,7 @@ app.config['MYSQL_USER'] = os.getenv('MYSQL_USER', 'novacapital')
 app.config['MYSQL_PASSWORD'] = os.getenv('MYSQL_PASSWORD', 'Novacapital123$')
 app.config['MYSQL_DB'] = os.getenv('MYSQL_DB', 'novacapital_db')
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
+app.config['MYSQL_CHARSET'] = 'utf8mb4'
 
 # Configuración de sesiones
 app.config['PERMANENT_SESSION_LIFETIME'] = 3600  # 1 hora
@@ -63,6 +64,27 @@ def make_csv_response(filename: str, headers: list, rows: list):
 
 # Inicializar MySQL
 mysql = MySQL(app)
+
+# Modo demo (despliegue público del portafolio): aviso fijo con las cuentas de prueba
+DEMO_MODE = os.getenv('DEMO_MODE') == '1'
+AVISO_DEMO = (
+    '<style>body{padding-bottom:44px}</style>'
+    '<div style="position:fixed;left:0;right:0;bottom:0;z-index:9999;background:#0b1f3a;color:#e2e8f0;'
+    'font:13px/1.4 system-ui,sans-serif;padding:8px 14px;text-align:center;box-shadow:0 -2px 12px rgba(0,0,0,.25)">'
+    '<strong style="color:#f5b942">Demo de portafolio</strong> · Datos ficticios que se reinician cada noche · '
+    'Prueba con <code>cliente@novacapital.demo</code>, <code>asesor@novacapital.demo</code> o '
+    '<code>admin@novacapital.demo</code> y la contraseña <code>Demo1234!</code>'
+    '</div>'
+)
+
+
+@app.after_request
+def insertar_aviso_demo(response):
+    if DEMO_MODE and response.mimetype == 'text/html' and not response.direct_passthrough:
+        html = response.get_data(as_text=True)
+        if '</body>' in html:
+            response.set_data(html.replace('</body>', AVISO_DEMO + '</body>', 1))
+    return response
 
 # ================================
 # DECORADORES

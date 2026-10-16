@@ -1,54 +1,31 @@
-
-# ================================
-# .gitignore
-# ================================
-"""
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
-.Python
-env/
+.venv/
 venv/
-ENV/
-.venv
+env/
 
-# Flask
-instance/
-.webassets-cache
-
-# Environment variables
+# Variables de entorno
 .env
 .env.local
 
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Uploads
+# Datos generados en tiempo de ejecución (pueden contener datos personales)
+logs/*.jsonl
+static/uploads/
 uploads/
 *.log
 
-# IDE
+# Volcados de bases de datos reales: no se suben nunca
+*_dump.sql
+backup*.sql
+
+# IDE / SO
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
-
-# OS
 .DS_Store
 Thumbs.db
 
-# Testing
+# Tests
 .pytest_cache/
 .coverage
 htmlcov/
-
-# Distribution
-dist/
-build/
-*.egg-info/
-"""
